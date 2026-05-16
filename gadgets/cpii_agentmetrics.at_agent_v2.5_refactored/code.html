@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title data-i18n="agent.page_title">CPII AgentMetrics .at-agent</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "var(--theme-primary)",
+                        "primary-hover": "var(--theme-primary-hover)",
+                        "theme-bg": "var(--theme-bg)",
+                        "theme-surface": "var(--theme-surface)",
+                        "theme-border": "var(--theme-border)",
+                        "theme-text": "var(--theme-text)",
+                        "theme-text-muted": "var(--theme-text-muted)",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "serif": ["serif"]
+                    },
+                    spacing: {
+                        "header": "var(--header-height)",
+                        "footer": "var(--footer-height)",
+                        "sidebar": "var(--sidebar-width)",
+                        "dock": "var(--dock-width)",
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        :root {
+            --theme-bg: #161513;
+            --theme-surface: #1e1b14;
+            --theme-border: #35332c;
+            --theme-primary: #C1A85D;
+            --theme-primary-hover: #d4b86a;
+            --theme-text: #FDFBF6;
+            --theme-text-muted: #b2afa3;
+            --sidebar-width: 250px;
+            --dock-width: 320px;
+            --header-height: 64px;
+            --footer-height: 48px;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            scrollbar-width: thin;
+            scrollbar-color: var(--theme-border) transparent;
+        }
+        .waterfall-line::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--theme-primary) 0%, transparent 100%);
+            transform: translateX(-50%);
+        }
+        .custom-bar {
+            transition: height 0.3s ease;
+        }
+        .h-header { height: var(--header-height); }
+        .h-footer { height: var(--footer-height); }
+        .w-sidebar { width: var(--sidebar-width); }
+        .w-dock { width: var(--dock-width); }
+    </style>
+</head>
+<body class="bg-theme-bg text-theme-text antialiased overflow-hidden h-screen flex flex-col">
+<!-- Header (h-header) -->
+<header class="h-header border-b border-theme-border flex items-center justify-between px-6 bg-theme-bg z-50">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-3xl">account_balance_wallet</span>
+<h1 class="font-bold text-xl tracking-tight uppercase" data-i18n="agent.platform_title">CPII Platform</h1>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-semibold opacity-70 hover:opacity-100 hover:text-primary transition-all" data-i18n="agent.nav_dashboard" href="#">Dashboard</a>
+<a class="text-sm font-semibold text-primary border-b-2 border-primary pb-1" data-i18n="agent.nav_analytics" href="#">Analytics</a>
+<a class="text-sm font-semibold opacity-70 hover:opacity-100 hover:text-primary transition-all" data-i18n="agent.nav_network" href="#">Network</a>
+<a class="text-sm font-semibold opacity-70 hover:opacity-100 hover:text-primary transition-all" data-i18n="agent.nav_assets" href="#">Assets</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-theme-text-muted text-sm">search</span>
+<input class="bg-theme-surface border-none rounded-lg pl-9 pr-4 py-2 text-sm w-64 focus:ring-1 focus:ring-primary text-theme-text" data-i18n-placeholder="agent.search_placeholder" placeholder="Search resources..." type="text"/>
+</div>
+<button class="p-2 hover:bg-theme-surface rounded-lg relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="h-8 w-[1px] bg-theme-border mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold" data-i18n="agent.admin_name">Admin User</p>
+<p class="text-[10px] opacity-50 uppercase tracking-widest" data-i18n="agent.admin_subtitle">Lux Lusitana</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary/20 border border-primary/40 p-0.5 overflow-hidden">
+<img alt="Avatar" class="w-full h-full rounded-full object-cover" data-alt="agent.user_avatar_alt" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBo57Yx6WgQH8LG4U90NKhlH8sXrZ4OB4b1cNamEcp6itmFm-JdxxM8IbFEdOvtApcI99r0M_0cvxjQWTy30eCTV1jHGibMapc-YRdKvSaJozb0xVSisGUz5LVgg9NVaGcve6IsUnd8JhU0vEdPGELkEEIoXXvjdHQ0lw4Lb6FCMsMNp32z_hHi5lU12XxnMVxsEvQsYrRRv2zEvLn8A_oNJtsnSG1XMkGOoqS4D0zTEZpEkhqLrWeLPJMxqL6fPBVFkPIFfFP_wX9D"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Layout Trinity -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Órbita 1 (Sidebar) -->
+<aside class="w-sidebar flex-shrink-0 border-r border-theme-border flex flex-col bg-theme-bg hidden lg:flex">
+<div class="p-6 flex-1 space-y-6">
+<div>
+<p class="text-[10px] font-bold uppercase tracking-widest text-primary mb-4 opacity-70" data-i18n="agent.nav_main_header">Main Navigation</p>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-60 hover:opacity-100 hover:bg-primary/5 transition-all" href="#">
+<span class="material-symbols-outlined text-lg">dashboard</span>
+<span class="text-sm font-medium" data-i18n="agent.nav_overview">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined text-lg">monitoring</span>
+<span class="text-sm font-bold" data-i18n="agent.nav_metrics">Agent Metrics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-60 hover:opacity-100 hover:bg-primary/5 transition-all" href="#">
+<span class="material-symbols-outlined text-lg">account_tree</span>
+<span class="text-sm font-medium" data-i18n="agent.nav_waterfall">Commission Waterfall</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-60 hover:opacity-100 hover:bg-primary/5 transition-all" href="#">
+<span class="material-symbols-outlined text-lg">group</span>
+<span class="text-sm font-medium" data-i18n="agent.nav_referral">Referral Network</span>
+</a>
+</div>
+</div>
+<div>
+<p class="text-[10px] font-bold uppercase tracking-widest text-primary mb-4 opacity-70" data-i18n="agent.nav_internal_header">Internal Systems</p>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-60 hover:opacity-100 hover:bg-primary/5 transition-all" href="#">
+<span class="material-symbols-outlined text-lg">receipt_long</span>
+<span class="text-sm font-medium" data-i18n="agent.nav_invoices">Invoices</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-60 hover:opacity-100 hover:bg-primary/5 transition-all" href="#">
+<span class="material-symbols-outlined text-lg">settings</span>
+<span class="text-sm font-medium" data-i18n="agent.nav_settings">Settings</span>
+</a>
+</div>
+</div>
+</div>
+<div class="p-6 border-t border-theme-border">
+<button class="w-full bg-primary text-theme-bg font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-primary-hover transition-all">
+<span class="material-symbols-outlined">add</span>
+<span class="text-sm" data-i18n="agent.btn_new_entry">New Entry</span>
+</button>
+</div>
+</aside>
+<!-- Órbita 2 (Main Scroll Area) -->
+<main class="flex-1 overflow-y-auto bg-theme-bg">
+<div class="p-8 max-w-6xl mx-auto space-y-8">
+<!-- Block 1: Agent Profile Header -->
+<section class="bg-theme-surface rounded-xl border border-theme-border p-6 flex flex-col md:flex-row items-center gap-8 shadow-sm">
+<div class="relative">
+<div class="w-32 h-32 rounded-2xl bg-gradient-to-tr from-primary/20 to-primary/40 p-1">
+<img alt="Agent Profile" class="w-full h-full rounded-xl object-cover" data-alt="agent.profile_img_alt" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2iRUvTavZoYTGeR6k8VZv3BhQDDQuS2LcfNdYVfMDWvDf9FVfoE_-_8jlJT9J0jpKuh8dUH9TuoS3saipkFBh_NYu1_rempTvNwnYeOxtDnkg98WpnFIVZ8Aj7RVUfVwWu2fgI4Vz2GTk45QGPcfeZ1M9Tba5bybTIhf5oqoklcUXhxVaiDOhdWT9QY-OBXV_fYzQXla79NDi90S72pK9zMZb-qUMK5-IBapdKRM_9kA6L9OA_eES8wJC58AbtfmxA-YJTcGA6wVL"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-primary text-theme-bg text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-xl" data-i18n="agent.badge_lux">Lux Agent</div>
+</div>
+<div class="flex-1 text-center md:text-left space-y-2">
+<div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
+<h2 class="text-3xl font-bold tracking-tight" data-i18n="agent.profile_name">Henrique Ferreira</h2>
+<span class="px-3 py-0.5 bg-primary/20 text-primary text-[10px] font-black rounded border border-primary/40 uppercase tracking-widest" data-i18n="agent.tier_founder">FUNDADOR</span>
+</div>
+<div class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm opacity-60">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base">public</span>
+<span data-i18n="agent.profile_jurisdiction">Jurisdiction: PT</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base text-green-500">verified</span>
+<span class="text-green-500 font-bold uppercase" data-i18n="agent.profile_status">ACTIVO</span>
+</div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="px-5 py-2.5 rounded-lg border border-primary/30 text-primary font-bold text-sm hover:bg-primary/5 transition-all" data-i18n="agent.btn_edit_profile">Edit Profile</button>
+<button class="p-2.5 rounded-lg border border-primary/30 text-primary hover:bg-primary/5 transition-all">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</section>
+<!-- Block 2: KPI Cards -->
+<div class="gd-agent-scores" data-hibernatable="true" data-state="">
+<section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+<div class="bg-theme-surface border border-theme-border p-6 rounded-xl shadow-sm">
+<p class="text-xs font-bold text-primary uppercase tracking-widest opacity-70 mb-2" data-i18n="agent.kpi_total_captures">Captações Totais</p>
+<p class="text-4xl font-serif font-bold" data-i18n="agent.val_total_captures">€1.240.000</p>
+<div class="mt-4 flex items-center gap-2 text-[10px] text-green-500 font-bold">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span data-i18n="agent.kpi_total_captures_trend">+12.5% this month</span>
+</div>
+</div>
+<div class="bg-theme-surface border border-theme-border p-6 rounded-xl shadow-sm">
+<p class="text-xs font-bold text-primary uppercase tracking-widest opacity-70 mb-2" data-i18n="agent.kpi_off_market">Volume Off-Market</p>
+<p class="text-4xl font-serif font-bold" data-i18n="agent.val_off_market">€450.000</p>
+<div class="mt-4 flex items-center gap-2 text-[10px] text-primary font-bold">
+<span class="material-symbols-outlined text-sm">lock</span>
+<span data-i18n="agent.kpi_off_market_note">3 exclusive listings</span>
+</div>
+</div>
+<div class="bg-theme-surface border border-theme-border p-6 rounded-xl shadow-sm">
+<p class="text-xs font-bold text-primary uppercase tracking-widest opacity-70 mb-2" data-i18n="agent.kpi_commissions">Comissão Acumulada</p>
+<p class="text-4xl font-serif font-bold" data-i18n="agent.val_commissions">€28.520</p>
+<div class="mt-4 flex items-center gap-2 text-[10px] text-theme-text-muted font-bold">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span data-i18n="agent.kpi_commissions_pending">Pending: €1,200</span>
+</div>
+</div>
+<div class="bg-theme-surface border border-theme-border p-6 rounded-xl shadow-sm">
+<p class="text-xs font-bold text-primary uppercase tracking-widest opacity-70 mb-2" data-i18n="agent.kpi_active_network">Rede Ativa</p>
+<p class="text-4xl font-serif font-bold" data-i18n="agent.val_active_network">12 Members</p>
+<div class="mt-4 flex items-center gap-2 text-[10px] text-theme-text-muted font-bold">
+<span class="material-symbols-outlined text-sm">hub</span>
+<span data-i18n="agent.kpi_active_network_detail">Tier 1: 5 | Tier 2: 7</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Block 3: CommissionWaterfall Visualization -->
+<div class="gd-agent-waterfall" data-hibernatable="true" data-state="">
+<section class="bg-theme-surface border border-theme-border rounded-xl p-8 relative overflow-hidden">
+<div class="flex flex-col md:flex-row justify-between items-start mb-12">
+<div>
+<h3 class="text-xl font-bold flex items-center gap-2" data-i18n="agent.waterfall_title">
+<span class="material-symbols-outlined text-primary">flowsheet</span>
+                                Commission Waterfall
+                            </h3>
+<p class="text-sm opacity-60" data-i18n="agent.waterfall_subtitle">Hierarchical revenue split distribution model</p>
+</div>
+<div class="bg-primary/10 border border-primary/30 px-4 py-2 rounded-lg text-primary text-xs font-black uppercase" data-i18n="agent.waterfall_scheme">Standard Skin 09 Flow</div>
+</div>
+<div class="relative max-w-4xl mx-auto py-10 space-y-10 flex flex-col items-center">
+<div class="waterfall-line absolute inset-0 -z-0"></div>
+<!-- Waterfall Items -->
+<div class="relative z-10 flex flex-col items-center gap-4 w-full">
+<div class="flex items-center gap-10 w-full">
+<div class="flex-1 text-right">
+<span class="text-xs font-bold opacity-50 uppercase tracking-widest block mb-1" data-i18n="agent.waterfall_phase_entry">Entry Phase</span>
+<h4 class="text-lg font-bold" data-i18n="agent.waterfall_label_entry">Entry Breakdown</h4>
+</div>
+<div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-theme-bg font-black text-xl ring-8 ring-primary/10 ring-offset-4 ring-offset-theme-bg" data-i18n="agent.waterfall_val_entry">2.5%</div>
+<div class="flex-1">
+<p class="text-sm opacity-60" data-i18n="agent.waterfall_desc_entry">Initial client registration and profiling commission.</p>
+</div>
+</div>
+<div class="flex items-center gap-10 w-full mt-4">
+<div class="flex-1 text-right">
+<span class="text-xs font-bold opacity-50 uppercase tracking-widest block mb-1" data-i18n="agent.waterfall_phase_closing">Closing Phase</span>
+<h4 class="text-lg font-bold" data-i18n="agent.waterfall_label_closing">Sale Breakdown</h4>
+</div>
+<div class="w-16 h-16 rounded-full bg-primary/80 flex items-center justify-center text-theme-bg font-black text-xl ring-4 ring-primary/20" data-i18n="agent.waterfall_val_closing">5%</div>
+<div class="flex-1">
+<p class="text-sm opacity-60" data-i18n="agent.waterfall_desc_closing">Success fee applied upon final transaction completion.</p>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-4 w-full mt-8 max-w-3xl">
+<div class="bg-theme-bg border border-theme-border p-4 rounded-xl flex flex-col items-center text-center">
+<span class="text-primary font-black text-lg mb-1" data-i18n="agent.waterfall_l1_val">1%</span>
+<span class="text-xs font-bold opacity-70" data-i18n="agent.waterfall_l1_label">Level L1</span>
+</div>
+<div class="bg-theme-bg border border-theme-border p-4 rounded-xl flex flex-col items-center text-center">
+<span class="text-primary font-black text-lg mb-1" data-i18n="agent.waterfall_l2_val">0.5%</span>
+<span class="text-xs font-bold opacity-70" data-i18n="agent.waterfall_l2_label">Level L2</span>
+</div>
+<div class="bg-theme-bg border border-theme-border p-4 rounded-xl flex flex-col items-center text-center">
+<span class="text-primary font-black text-lg mb-1" data-i18n="agent.waterfall_l3_val">0.25%</span>
+<span class="text-xs font-bold opacity-70" data-i18n="agent.waterfall_l3_label">Level L3</span>
+</div>
+</div>
+<div class="w-full mt-10 space-y-4">
+<div class="flex items-center justify-center gap-6 p-4 border border-dashed border-primary/40 rounded-xl bg-primary/5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-theme-bg border border-theme-border flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">corporate_fare</span>
+</div>
+<div class="text-left">
+<p class="text-xs font-black uppercase tracking-tighter" data-i18n="agent.waterfall_tax_label">Platform Tax (1%)</p>
+<p class="text-[10px] opacity-50 italic" data-i18n="agent.waterfall_tax_desc">Split: Leirum / GLOBIZMARKT</p>
+</div>
+</div>
+<div class="w-[1px] h-10 bg-theme-border"></div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-theme-bg border border-theme-border flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">eco</span>
+</div>
+<div class="text-left">
+<p class="text-xs font-black uppercase tracking-tighter" data-i18n="agent.waterfall_fund_label">Sustainability Fund (50%)</p>
+<p class="text-[10px] opacity-50 italic" data-i18n="agent.waterfall_fund_desc">Mandatory Reserve</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Block 4: Referral Network Table -->
+<section class="bg-theme-surface border border-theme-border rounded-xl overflow-hidden shadow-sm">
+<div class="p-6 border-b border-theme-border flex justify-between items-center">
+<h3 class="text-lg font-bold flex items-center gap-2" data-i18n="agent.network_table_title">
+<span class="material-symbols-outlined text-primary">diversity_3</span>
+                        Referral Network Performance
+                    </h3>
+<div class="flex items-center gap-2">
+<button class="p-2 text-primary hover:bg-primary/10 rounded-lg transition-all">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+</button>
+<button class="p-2 text-primary hover:bg-primary/10 rounded-lg transition-all">
+<span class="material-symbols-outlined text-sm">download</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-theme-bg border-b border-theme-border">
+<tr>
+<th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-50" data-i18n="agent.table_head_node">Node Name</th>
+<th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-50" data-i18n="agent.table_head_jurisdiction">Jurisdiction</th>
+<th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-50" data-i18n="agent.table_head_level">Level</th>
+<th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-50" data-i18n="agent.table_head_volume">Volume</th>
+<th class="px-6 py-4 text-[10px] font-black uppercase tracking-widest opacity-50" data-i18n="agent.table_head_commission">Commission</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-theme-border/50">
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-theme-bg flex items-center justify-center font-bold text-xs border border-theme-border">MA</div>
+<div>
+<p class="text-sm font-bold" data-i18n="agent.node_name_1">Miguel Almeida</p>
+<p class="text-[10px] opacity-50" data-i18n="agent.node_time_1">Joined 2 months ago</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm" data-i18n="agent.node_juris_1">Portugal (PT)</td>
+<td class="px-6 py-4"><span class="px-2 py-0.5 bg-theme-bg rounded text-[10px] font-bold border border-theme-border" data-i18n="agent.node_level_1">L1 (1%)</span></td>
+<td class="px-6 py-4 text-sm font-medium" data-i18n="agent.node_vol_1">€210,000</td>
+<td class="px-6 py-4 text-sm font-black text-primary" data-i18n="agent.node_comm_1">€2,100.00</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-theme-bg flex items-center justify-center font-bold text-xs text-primary border border-theme-border">SO</div>
+<div>
+<p class="text-sm font-bold" data-i18n="agent.node_name_2">Sara Oliveira</p>
+<p class="text-[10px] opacity-50" data-i18n="agent.node_time_2">Joined 5 months ago</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm" data-i18n="agent.node_juris_2">Spain (ES)</td>
+<td class="px-6 py-4"><span class="px-2 py-0.5 bg-theme-bg rounded text-[10px] font-bold border border-theme-border" data-i18n="agent.node_level_2">L2 (0.5%)</span></td>
+<td class="px-6 py-4 text-sm font-medium" data-i18n="agent.node_vol_2">€440,500</td>
+<td class="px-6 py-4 text-sm font-black text-primary" data-i18n="agent.node_comm_2">€2,202.50</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-theme-bg flex items-center justify-center font-bold text-xs border border-theme-border">RB</div>
+<div>
+<p class="text-sm font-bold" data-i18n="agent.node_name_3">Ricardo Bento</p>
+<p class="text-[10px] opacity-50" data-i18n="agent.node_time_3">Joined 1 month ago</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm" data-i18n="agent.node_juris_3">Portugal (PT)</td>
+<td class="px-6 py-4"><span class="px-2 py-0.5 bg-theme-bg rounded text-[10px] font-bold border border-theme-border" data-i18n="agent.node_level_3">L1 (1%)</span></td>
+<td class="px-6 py-4 text-sm font-medium" data-i18n="agent.node_vol_3">€95,000</td>
+<td class="px-6 py-4 text-sm font-black text-primary" data-i18n="agent.node_comm_3">€950.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Block 5: Performance Timeline (CSS Chart) -->
+<div class="gd-agent-timeline" data-hibernatable="true" data-state="">
+<section class="bg-theme-surface border border-theme-border rounded-xl p-8 shadow-sm">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="text-lg font-bold flex items-center gap-2" data-i18n="agent.timeline_title">
+<span class="material-symbols-outlined text-primary">analytics</span>
+                                Performance Timeline
+                            </h3>
+<p class="text-sm opacity-60" data-i18n="agent.timeline_subtitle">Comparative analysis of Captures vs Commissions (6 Months)</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded bg-primary"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest opacity-60" data-i18n="agent.timeline_legend_cap">Captures</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded bg-theme-text-muted"></div>
+<span class="text-[10px] font-bold uppercase tracking-widest opacity-60" data-i18n="agent.timeline_legend_comm">Commissions</span>
+</div>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-4 px-4 pb-6 border-b border-theme-border relative">
+<div class="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-[10px] opacity-30 font-bold -translate-x-full pr-4">
+<span data-i18n="agent.chart_y_500">€500k</span>
+<span data-i18n="agent.chart_y_250">€250k</span>
+<span data-i18n="agent.chart_y_0">€0</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3 h-full">
+<div class="flex-1 w-full flex items-end justify-center gap-1.5 h-full">
+<div class="w-6 bg-primary/40 rounded-t h-[40%] custom-bar"></div>
+<div class="w-6 bg-theme-text-muted/40 rounded-t h-[20%] custom-bar"></div>
+</div>
+<span class="text-[10px] font-bold opacity-60 uppercase" data-i18n="agent.month_jan">Jan</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3 h-full">
+<div class="flex-1 w-full flex items-end justify-center gap-1.5 h-full">
+<div class="w-6 bg-primary/40 rounded-t h-[60%] custom-bar"></div>
+<div class="w-6 bg-theme-text-muted/40 rounded-t h-[35%] custom-bar"></div>
+</div>
+<span class="text-[10px] font-bold opacity-60 uppercase" data-i18n="agent.month_feb">Feb</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3 h-full">
+<div class="flex-1 w-full flex items-end justify-center gap-1.5 h-full relative">
+<div class="absolute -top-6 text-[10px] font-bold text-primary" data-i18n="agent.chart_peak">Peak</div>
+<div class="w-6 bg-primary rounded-t h-[95%] custom-bar shadow-lg shadow-primary/20"></div>
+<div class="w-6 bg-theme-text-muted rounded-t h-[55%] custom-bar"></div>
+</div>
+<span class="text-[10px] font-bold opacity-100 text-primary uppercase" data-i18n="agent.month_mar">Mar</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3 h-full">
+<div class="flex-1 w-full flex items-end justify-center gap-1.5 h-full">
+<div class="w-6 bg-primary/40 rounded-t h-[50%] custom-bar"></div>
+<div class="w-6 bg-theme-text-muted/40 rounded-t h-[25%] custom-bar"></div>
+</div>
+<span class="text-[10px] font-bold opacity-60 uppercase" data-i18n="agent.month_apr">Apr</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3 h-full">
+<div class="flex-1 w-full flex items-end justify-center gap-1.5 h-full">
+<div class="w-6 bg-primary/40 rounded-t h-[75%] custom-bar"></div>
+<div class="w-6 bg-theme-text-muted/40 rounded-t h-[40%] custom-bar"></div>
+</div>
+<span class="text-[10px] font-bold opacity-60 uppercase" data-i18n="agent.month_may">May</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3 h-full">
+<div class="flex-1 w-full flex items-end justify-center gap-1.5 h-full">
+<div class="w-6 bg-primary/40 rounded-t h-[65%] custom-bar"></div>
+<div class="w-6 bg-theme-text-muted/40 rounded-t h-[30%] custom-bar"></div>
+</div>
+<span class="text-[10px] font-bold opacity-60 uppercase" data-i18n="agent.month_jun">Jun</span>
+</div>
+</div>
+</section>
+</div>
+<div class="h-10"></div>
+</div>
+</main>
+<!-- Órbita 3 (Dock / Context Assistant) -->
+<aside class="w-dock flex-shrink-0 bg-theme-bg border-l border-theme-border flex flex-col hidden xl:flex">
+<div class="p-6 border-b border-theme-border">
+<div class="flex items-center gap-3 text-primary mb-1">
+<span class="material-symbols-outlined">smart_toy</span>
+<h4 class="font-bold text-sm tracking-widest uppercase" data-i18n="agent.aimon_title">AIMON Assistant</h4>
+</div>
+<p class="text-[10px] opacity-50 font-medium" data-i18n="agent.aimon_subtitle">Contextual Intelligence Engine</p>
+</div>
+<div class="flex-1 p-6 space-y-6">
+<div class="bg-primary/5 border border-primary/20 p-4 rounded-xl space-y-3">
+<p class="text-xs leading-relaxed opacity-80" data-i18n="agent.aimon_suggestion_1">
+                    Based on your March peak, Henrique, you have <strong data-i18n="agent.aimon_val_proj">€45k</strong> in projected commissions for Q2. Consider expanding your Tier 2 network in Spain to optimize the waterfall.
+                </p>
+<button class="w-full py-2 bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-bold rounded uppercase transition-all" data-i18n="agent.aimon_btn_action">Review Spain Expansion Plan</button>
+</div>
+<div>
+<p class="text-[10px] font-black uppercase tracking-widest opacity-40 mb-3" data-i18n="agent.recent_notifications_header">Recent Notifications</p>
+<div class="space-y-4">
+<div class="flex gap-3">
+<div class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0"></div>
+<div class="space-y-1">
+<p class="text-xs font-bold" data-i18n="agent.notif_1_title">New L1 Node Activated</p>
+<p class="text-[10px] opacity-50" data-i18n="agent.notif_1_desc">Ricardo Bento joined your network via personal referral.</p>
+<p class="text-[9px] text-primary font-bold" data-i18n="agent.notif_1_time">2 hours ago</p>
+</div>
+</div>
+<div class="flex gap-3 opacity-60">
+<div class="w-1.5 h-1.5 rounded-full bg-theme-text-muted mt-1.5 shrink-0"></div>
+<div class="space-y-1">
+<p class="text-xs font-bold" data-i18n="agent.notif_2_title">Waterfall Adjustment</p>
+<p class="text-[10px] opacity-50" data-i18n="agent.notif_2_desc">Sustainability Fund updated to standard 50% ratio for the period.</p>
+<p class="text-[9px] font-bold" data-i18n="agent.notif_2_time">Yesterday</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-theme-border">
+<div class="p-4 bg-theme-surface rounded-xl border border-theme-border">
+<p class="text-[10px] font-black uppercase text-primary mb-2" data-i18n="agent.health_label">Network Health</p>
+<div class="w-full bg-theme-bg h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[82%]"></div>
+</div>
+<div class="flex justify-between mt-2 text-[9px] font-bold opacity-50 uppercase">
+<span data-i18n="agent.health_efficiency">Efficiency</span>
+<span data-i18n="agent.health_val">82%</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-theme-border">
+<div class="flex items-center bg-theme-surface rounded-lg p-2 gap-2">
+<input class="bg-transparent border-none text-xs w-full focus:ring-0 text-theme-text" data-i18n-placeholder="agent.aimon_input_placeholder" placeholder="Ask AIMON..." type="text"/>
+<button class="bg-primary text-theme-bg p-1.5 rounded-md">
+<span class="material-symbols-outlined text-sm">send</span>
+</button>
+</div>
+</div>
+</aside>
+</div>
+<!-- Footer (h-footer) -->
+<footer class="h-footer border-t border-theme-border bg-theme-bg flex items-center justify-between px-6 z-50">
+<div class="flex items-center gap-6 text-[9px] font-black uppercase tracking-widest opacity-40">
+<span data-i18n="agent.footer_status">System: Operational</span>
+<span data-i18n="agent.footer_version">Core: Skeleton v2.5.0</span>
+<span data-i18n="agent.footer_theme">Skin: Lux Lusitana 09</span>
+</div>
+<div class="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest opacity-40">
+<span data-i18n="agent.footer_timestamp">Timestamp: 2024.10.27.1432</span>
+<span data-i18n="agent.footer_id">AgentID: AT-09412-HF</span>
+</div>
+</footer>
+</body></html>

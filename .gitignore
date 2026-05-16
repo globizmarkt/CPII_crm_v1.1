@@ -1,0 +1,10 @@
+# ============================================================
+# CPII_crm_v1.1 — .gitignore
+# ============================================================
+# Credenciales y configuración local — NUNCA al repositorio
+core/env.local.js
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp

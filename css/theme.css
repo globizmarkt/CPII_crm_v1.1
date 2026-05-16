@@ -1,0 +1,62 @@
+/* ════════════════════════════════════════════════════════════════
+ * 🎨 MÉDULA v2.6.1 — CPII Design Token System
+ * ════════════════════════════════════════════════════════════════
+ * PROYECTO:   CPII — Clube Privado de Investidores Imobiliários
+ * DOCTRINA:   R0 | R3 (Zero-Hex)
+ * STANDARDS:  Glass-Certified | Paper-Mode Compatible
+ * ════════════════════════════════════════════════════════════════
+ */
+
+:root {
+    /* 1. Colores Base (Sólidos) */
+    --theme-bg: #161513;
+    --theme-bg-light: #f8f7f6;
+    --theme-surface: #1e1b14;
+    --theme-primary: #C1A85D;
+    --theme-accent: var(--theme-primary);
+    --theme-ink: #161513;
+
+    /* 2. Tokens de Habitabilidad (Paper Mode) */
+    --theme-paper: #FDFBF6;
+    --theme-paper-ink: #161513;
+    --theme-text-muted: #73726E;
+    --theme-surface-paper: #FDFBF6;
+    --theme-border-subtle: rgba(193, 168, 93, 0.1);
+    --theme-border-strong: #454339;
+    --theme-canvas-deep: #0D0D0D;
+
+    /* 3. Tripletes RGB (R3 Compliance) */
+    --theme-bg-rgb: 22, 21, 19;
+    --theme-surface-rgb: 30, 27, 20;
+    --theme-primary-rgb: 193, 168, 93;
+    --theme-alert-rgb: 217, 119, 6;
+
+    /* 4. Glassmorphism v2.6.1 (Luxury Glass) */
+    --theme-alert: #D97706;
+    --theme-surface-glass: rgba(var(--theme-surface-rgb), 0.4);
+    --theme-border-glass: rgba(var(--theme-primary-rgb), 0.15);
+    --theme-blur-glass: 16px;
+
+    /* 5. Mapeos de Infraestructura */
+    --theme-border: var(--theme-border-subtle);
+    --theme-bg-secondary: var(--theme-surface);
+    --theme-surface-hover: rgba(var(--theme-primary-rgb), 0.08);
+}
+
+/* ── Utilidades Globales ── */
+body {
+    font-family: 'Manrope', sans-serif;
+    background-color: var(--theme-bg);
+}
+
+.luxury-glass {
+    background: var(--theme-surface-glass);
+    backdrop-filter: blur(var(--theme-blur-glass));
+    -webkit-backdrop-filter: blur(var(--theme-blur-glass));
+    border: 1px solid var(--theme-border-glass);
+}
+
+.gatekeeper-overlay {
+    backdrop-filter: blur(8px);
+    background: rgba(var(--theme-bg-rgb), 0.4);
+}

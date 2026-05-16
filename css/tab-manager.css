@@ -1,0 +1,394 @@
+/**
+ * ============================================================
+ * ARCHIVO  : tab-manager.css
+ * VERSIÓN  : 1.1.0
+ * FECHA    : 2026-03-14
+ * PROPÓSITO: Estilos de Órbita 2: Tab Bar, Workspace, Omnibox
+ *            y gd-manual. Doctrina R3: cero hex, solo tokens.
+ * ============================================================
+ *
+ * ÍNDICE
+ * [SEC-01] Canvas Órbita 2
+ * [SEC-02] Tab Bar + Tab individual
+ * [SEC-03] Workspace
+ * [SEC-04] gd-manual
+ * [SEC-05] Omnibox
+ * [SEC-06] Empty State — .cpii-empty-state
+ * ============================================================
+ */
+
+/* ── [SEC-01] Canvas Órbita 2 ──────────────────────────────────────── */
+
+#canvas-orbita-2 {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--theme-bg);
+    overflow: hidden;
+}
+
+/* ── [SEC-02] Tab Bar + Tab individual ──────────────────────────────────────── */
+
+.cpii-tab-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--theme-spacing-xs);
+    padding: var(--theme-spacing-xs) var(--theme-spacing-sm) 0;
+    background: var(--theme-bg-secondary);
+    border-bottom: 1px solid var(--theme-border);
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* Firefox */
+    flex-shrink: 0;
+}
+
+.cpii-tab-bar::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+/* ── Tab individual ────────────────────────────────────────── */
+.cpii-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--theme-spacing-xs);
+    padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
+    background: var(--theme-bg-elevated);
+    border: 1px solid var(--theme-border);
+    border-bottom: none;
+    border-radius: var(--theme-radius-sm) var(--theme-radius-sm) 0 0;
+    color: var(--theme-text-secondary);
+    font-size: var(--theme-font-sm);
+    cursor: pointer;
+    transition: var(--theme-transition);
+    white-space: nowrap;
+    max-width: 200px;
+}
+
+.cpii-tab:hover {
+    background: var(--theme-accent-subtle);
+    color: var(--theme-text-primary);
+}
+
+.cpii-tab.is-active {
+    background: var(--theme-bg);
+    border-color: var(--theme-border);
+    border-bottom-color: var(--theme-bg);
+    /* Fusiona con workspace */
+    color: var(--theme-accent);
+    font-weight: 600;
+    margin-bottom: -1px;
+    /* Cubre el borde inferior del tab-bar */
+}
+
+.cpii-tab__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 140px;
+}
+
+.cpii-tab__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: none;
+    border-radius: var(--theme-radius-sm);
+    background: transparent;
+    color: var(--theme-text-muted);
+    font-size: var(--theme-font-sm);
+    cursor: pointer;
+    transition: var(--theme-transition);
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.cpii-tab__close:hover {
+    background: var(--theme-danger-bg);
+    color: var(--theme-danger-text);
+}
+
+/* ── [SEC-03] Workspace ──────────────────────────────────────── */
+.cpii-workspace {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--theme-spacing-md);
+    background: var(--theme-bg);
+}
+
+/* ── [SEC-04] gd-manual ──────────────────────────────────────── */
+.gd-manual {
+    display: block;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.gd-manual__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-lg);
+}
+
+/* Cabecera */
+.gd-manual__header {
+    padding-bottom: var(--theme-spacing-md);
+    border-bottom: 1px solid var(--theme-border);
+}
+
+.gd-manual__title {
+    font-size: var(--theme-font-xl);
+    font-weight: 700;
+    color: var(--theme-text-primary);
+    margin: 0 0 var(--theme-spacing-xs) 0;
+}
+
+.gd-manual__subtitle {
+    font-size: var(--theme-font-md);
+    color: var(--theme-text-secondary);
+    margin: 0;
+}
+
+/* Alerta doctrinal — cuadro oscuro */
+.gd-manual__alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--theme-spacing-sm);
+    padding: var(--theme-spacing-md);
+    background: var(--theme-danger-bg);
+    border: 1px solid var(--theme-danger-border);
+    border-radius: var(--theme-radius-md);
+    color: var(--theme-danger-text);
+}
+
+.gd-manual__alert-icon {
+    font-size: var(--theme-font-lg);
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.gd-manual__alert p {
+    margin: 0;
+    font-size: var(--theme-font-sm);
+    line-height: 1.6;
+}
+
+/* Índice */
+.gd-manual__index {
+    padding: var(--theme-spacing-md);
+    background: var(--theme-bg-secondary);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--theme-radius-md);
+}
+
+.gd-manual__index-title {
+    font-size: var(--theme-font-md);
+    font-weight: 600;
+    color: var(--theme-text-primary);
+    margin: 0 0 var(--theme-spacing-sm) 0;
+}
+
+.gd-manual__index-list {
+    margin: 0;
+    padding-left: var(--theme-spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-xs);
+}
+
+.gd-manual__index-list a {
+    color: var(--theme-accent);
+    text-decoration: none;
+    font-size: var(--theme-font-sm);
+    transition: var(--theme-transition);
+}
+
+.gd-manual__index-list a:hover {
+    text-decoration: underline;
+    color: var(--theme-text-primary);
+}
+
+/* Secciones */
+.gd-manual__section {
+    padding-top: var(--theme-spacing-md);
+    border-top: 1px solid var(--theme-border);
+}
+
+.gd-manual__section-title {
+    font-size: var(--theme-font-lg);
+    font-weight: 600;
+    color: var(--theme-text-primary);
+    margin: 0 0 var(--theme-spacing-sm) 0;
+}
+
+.gd-manual__section-body {
+    font-size: var(--theme-font-md);
+    color: var(--theme-text-secondary);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* ── [SEC-05] Omnibox ──────────────────────────────────────── */
+.cpii-omnibox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.cpii-omnibox__input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    height: 36px;
+    background: rgba(var(--theme-surface-rgb), 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(var(--theme-primary-rgb), 0.2);
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+}
+
+.cpii-omnibox__input-wrapper:focus-within {
+    border-color: var(--theme-primary);
+}
+
+.cpii-omnibox__icon {
+    color: rgba(var(--theme-primary-rgb), 0.5);
+    font-size: 18px;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.cpii-omnibox__input {
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    color: var(--theme-bg-light);
+    width: 220px;
+}
+
+.cpii-omnibox__input::placeholder {
+    color: rgba(var(--theme-primary-rgb), 0.4);
+}
+
+.cpii-omnibox__dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 260px;
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: 8px;
+    z-index: 999;
+    display: none;
+    padding: 4px 0;
+    list-style: none;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(var(--theme-bg-rgb), 0.6);
+}
+
+.cpii-omnibox__item {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--theme-accent);
+    border-bottom: 1px solid var(--theme-border);
+    transition: background 0.15s ease;
+}
+
+.cpii-omnibox__item:last-child {
+    border-bottom: none;
+}
+
+.cpii-omnibox__item:hover {
+    background: var(--theme-accent-subtle);
+}
+
+.cpii-omnibox__empty {
+    padding: 10px 16px;
+    font-size: 12px;
+    color: rgba(var(--theme-primary-rgb), 0.4);
+}
+
+/* ── [SEC-06] Empty State ──────────────────────────────────── */
+.cpii-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    height: 100%;
+    padding: 48px;
+    text-align: center;
+}
+
+.cpii-empty-state__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(var(--theme-primary-rgb), 0.1);
+    border: 1px solid rgba(var(--theme-primary-rgb), 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cpii-empty-state__icon .material-symbols-outlined {
+    font-size: 32px;
+}
+
+.cpii-empty-state__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cpii-empty-state__title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.cpii-empty-state__desc {
+    font-size: 13px;
+    margin: 0;
+    max-width: 280px;
+    line-height: 1.6;
+}
+
+.cpii-empty-state__btn {
+    margin-top: 8px;
+    padding: 10px 28px;
+    background: rgba(var(--theme-primary-rgb), 0.15);
+    border: 1px solid rgba(var(--theme-primary-rgb), 0.3);
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.cpii-empty-state__btn:hover {
+    background: rgba(var(--theme-primary-rgb), 0.25);
+}
+
+/* ── [SEC-07] Gadget Frame — Camino A (fetch HTML) ──────────── */
+/* Contenedor genérico para gadgets cargados vía fetch.          */
+/* Sutura F2 — Ticket Fracturas Críticas (2026-05-16)           */
+.cpii-gadget-frame {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.cpii-gadget-error {
+    padding: 2rem;
+    color: var(--theme-text-muted);
+    font-size: var(--theme-font-sm);
+    font-family: monospace;
+    line-height: 1.6;
+}

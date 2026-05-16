@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Staff Gate · CPII</title>
+
+    <!-- Tailwind CDN — layout utilities only; colors via CSS vars -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary":      "var(--theme-primary)",
+                        "surface":      "var(--theme-surface)",
+                        "gate-bg":      "var(--theme-bg)",
+                        "muted":        "var(--theme-text-muted)",
+                        "alert":        "var(--theme-alert)"
+                    },
+                    fontFamily: {
+                        "sans": ["Manrope", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Manrope typeface -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&display=swap">
+
+    <!-- Design token system (--theme-* variables, .luxury-glass) -->
+    <link rel="stylesheet" href="css/theme.css">
+
+    <style>
+        /* ── Born Locked ─────────────────────────────────────────────
+           #golden-gate-root starts with the data-gate-lock attribute.
+           at-admin-gate._activateControls() removes it → content fades in.
+        ─────────────────────────────────────────────────────────────── */
+        #golden-gate-root[data-gate-lock] [data-gate-content] {
+            opacity: 0;
+            pointer-events: none;
+        }
+        [data-gate-content] {
+            transition: opacity 0.25s ease;
+        }
+
+        /* ── Auth form states ──────────────────────────────────────── */
+        .gate-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        /* ── Spinner ───────────────────────────────────────────────── */
+        .gate-spinner {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--theme-border-glass);
+            border-top-color: var(--theme-primary);
+            animation: gate-spin 0.7s linear infinite;
+        }
+        @keyframes gate-spin { to { transform: rotate(360deg); } }
+
+        /* ── Custody Hold overlay (passport-engine managed) ─────────
+           passport-engine.auditGateZones() toggles .hidden on this div.
+        ─────────────────────────────────────────────────────────────── */
+        .gate-custody {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            background: rgba(var(--theme-bg-rgb), 0.85);
+        }
+        .gate-custody.hidden { display: none; }
+
+        /* ── OAuth / action buttons ────────────────────────────────── */
+        .gate-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.625rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--theme-border-glass);
+            background: var(--theme-surface-glass);
+            backdrop-filter: blur(var(--theme-blur-glass));
+            color: var(--theme-primary);
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+        .gate-btn:hover:not(:disabled) {
+            background: var(--theme-surface-hover);
+            border-color: var(--theme-primary);
+        }
+        .gate-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        /* ── Email input ───────────────────────────────────────────── */
+        .gate-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--theme-border-glass);
+            background: rgba(var(--theme-surface-rgb), 0.6);
+            color: var(--theme-primary);
+            font-family: inherit;
+            font-size: 0.875rem;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.15s ease;
+        }
+        .gate-input::placeholder { color: var(--theme-text-muted); }
+        .gate-input:focus        { border-color: var(--theme-primary); }
+        .gate-input:disabled     { opacity: 0.45; cursor: not-allowed; }
+
+        /* ── Manual confirm panel ──────────────────────────────────── */
+        #gate-manual-confirm {
+            display: none;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--theme-border-glass);
+            background: rgba(var(--theme-primary-rgb), 0.06);
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="bg-gate-bg min-h-screen flex items-center justify-center p-6 font-sans">
+
+    <!-- ═══════════════════════════════════════════════════════════
+         GATE PAGE
+    ════════════════════════════════════════════════════════════════ -->
+    <main class="w-full max-w-md">
+
+        <div class="luxury-glass rounded-2xl overflow-hidden" style="position: relative;">
+
+            <!-- ── Inner ───────────────────────────────────────── -->
+            <div class="p-10">
+
+                <!-- Brand header -->
+                <header class="flex flex-col items-center gap-1 mb-8 text-center">
+                    <div class="mb-2 flex items-center justify-center w-10 h-10 rounded-full"
+                         style="border: 1.5px solid var(--theme-primary);"
+                         aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24"
+                             style="stroke: var(--theme-primary); fill: none;"
+                             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2"/>
+                            <path d="M7 11V7a5 5 0 0110 0v4"/>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-semibold tracking-wide"
+                          style="color: var(--theme-primary);"
+                          data-i18n="brand_name"></span>
+                    <span class="text-xs tracking-widest uppercase"
+                          style="color: var(--theme-text-muted);"
+                          data-i18n="brand_subtitle"></span>
+                </header>
+
+                <!-- ╔══════════════════════════════════════════╗
+                     ║  GATE PORTAL — ATOM-04 (COG-70 conforme) ║
+                     ╚══════════════════════════════════════════╝
+                     data-gate-zone    → contenedor evaluable
+                     data-gate-content → capa de contenido real
+                     data-gate-lock    → capa Custody Hold (hijo)
+                     data-gate-state   → estado: pending/granted/denied
+                     data-tenant-id    → inyectado por at-bootstrapper.js
+                -->
+                <div id="golden-gate-root"
+                     data-gate-zone="staff-login"
+                     data-requires="role:owner|role:gestor"
+                     data-gate-state="pending"
+                     data-tenant-id="cpii_v1.1"
+                     data-gate-lock
+                     style="position: relative;">
+
+                    <!-- ── Content layer ──────────────────────── -->
+                    <div data-gate-content>
+
+                        <!-- State: loading -->
+                        <div id="gate-state-loading" class="gate-state" aria-live="polite">
+                            <div class="gate-spinner" role="status" aria-hidden="true"></div>
+                            <span style="font-size: 0.8125rem; color: var(--theme-text-muted);"
+                                  data-i18n="gate.loading"></span>
+                        </div>
+
+                        <!-- State: error -->
+                        <div id="gate-state-error" class="gate-state" aria-live="assertive">
+                            <svg width="28" height="28" viewBox="0 0 24 24"
+                                 style="stroke: var(--theme-alert); fill: none;"
+                                 stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <circle cx="12" cy="16" r="0.5" fill="var(--theme-alert)" stroke="none"/>
+                            </svg>
+                            <p id="gate-error-message"
+                               style="font-size: 0.8125rem; color: var(--theme-alert); margin: 0;"></p>
+                        </div>
+
+                        <!-- State: success -->
+                        <div id="gate-state-success" class="gate-state" aria-live="polite">
+                            <svg width="28" height="28" viewBox="0 0 24 24"
+                                 style="stroke: var(--theme-primary); fill: none;"
+                                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                                 aria-hidden="true">
+                                <path d="M20 6L9 17l-5-5"/>
+                            </svg>
+                            <span style="font-size: 0.8125rem; color: var(--theme-primary);"
+                                  data-i18n="gate.success"></span>
+                        </div>
+
+                        <!-- Auth form (default: shown when not in loading/error/success) -->
+                        <div class="gate-auth-form">
+
+                            <div class="text-center mb-7">
+                                <h1 class="text-xl font-semibold mb-1"
+                                    style="color: var(--theme-primary);"
+                                    data-i18n="gate.title"></h1>
+                                <p class="text-xs leading-relaxed"
+                                   style="color: var(--theme-text-muted);"
+                                   data-i18n="gate.subtitle"></p>
+                            </div>
+
+                            <!-- OAuth providers (Doctrina Coste Cero: Google + Apple) -->
+                            <div class="flex flex-col gap-3 mb-6">
+
+                                <button id="gate-btn-google" class="gate-btn" type="button" disabled>
+                                    <svg width="18" height="18" viewBox="0 0 24 24"
+                                         aria-hidden="true" style="flex-shrink: 0;">
+                                        <path style="fill: var(--theme-text-muted);"
+                                              d="M21.35 11.1H12v2.9h5.35c-.24 1.3-1.01 2.4-2.1 3.12v2.6h3.4C20.85 17.85 22 15.14 22 12c0-.55-.05-1.1-.65-2.9z"/>
+                                        <path style="fill: var(--theme-text-muted);"
+                                              d="M12 22c2.7 0 4.96-.9 6.62-2.42l-3.4-2.6c-.9.6-2.04.95-3.22.95-2.48 0-4.58-1.68-5.33-3.93H3.17v2.68A9.99 9.99 0 0012 22z"/>
+                                        <path style="fill: var(--theme-text-muted);"
+                                              d="M6.67 14c-.2-.6-.31-1.23-.31-1.88s.11-1.28.31-1.88V7.56H3.17A10 10 0 002 12c0 1.61.38 3.14 1.17 4.44l3.5-2.44z"/>
+                                        <path style="fill: var(--theme-text-muted);"
+                                              d="M12 6.18c1.4 0 2.66.48 3.65 1.42l2.74-2.74C16.95 3.27 14.69 2.3 12 2.3A10 10 0 003.17 7.56l3.5 2.56C7.42 7.86 9.52 6.18 12 6.18z"/>
+                                    </svg>
+                                    <span data-i18n="gate.btn_google"></span>
+                                </button>
+
+                                <button id="gate-btn-apple" class="gate-btn" type="button" disabled>
+                                    <svg width="18" height="18" viewBox="0 0 24 24"
+                                         aria-hidden="true"
+                                         style="flex-shrink: 0; fill: var(--theme-text-muted);"
+                                         stroke="none">
+                                        <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.39.07 2.35.74 3.15.8.96-.2 1.88-.87 3.21-.79 2.08.17 3.3 1.12 3.9 2.8-3.27 1.35-2.57 5.14.68 6.12-.74 1.62-1.5 3.24-2.94 3.95zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                                    </svg>
+                                    <span data-i18n="gate.btn_apple"></span>
+                                </button>
+
+                            </div>
+
+                            <!-- Divider -->
+                            <div class="flex items-center gap-3 mb-6" aria-hidden="true">
+                                <div class="flex-1 h-px" style="background: var(--theme-border-glass);"></div>
+                                <span class="text-xs tracking-widest uppercase"
+                                      style="color: var(--theme-text-muted);"
+                                      data-i18n="gate.divider"></span>
+                                <div class="flex-1 h-px" style="background: var(--theme-border-glass);"></div>
+                            </div>
+
+                            <!-- Manual email flow -->
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs tracking-wide"
+                                       style="color: var(--theme-text-muted);"
+                                       for="gate-email-input"
+                                       data-i18n="gate.email_label"></label>
+                                <input id="gate-email-input"
+                                       class="gate-input"
+                                       type="email"
+                                       autocomplete="email"
+                                       disabled
+                                       data-i18n-placeholder="gate.email_placeholder">
+                                <button id="gate-btn-manual-submit"
+                                        class="gate-btn mt-1"
+                                        type="button"
+                                        disabled>
+                                    <span data-i18n="gate.btn_email_send"></span>
+                                </button>
+                            </div>
+
+                            <!-- Confirm panel (revealed after email link sent) -->
+                            <div id="gate-manual-confirm" class="mt-4" role="status">
+                                <p class="font-medium text-sm mb-1"
+                                   style="color: var(--theme-primary);"
+                                   data-i18n="gate.confirm_title"></p>
+                                <p class="text-xs"
+                                   style="color: var(--theme-text-muted);"
+                                   data-i18n="gate.confirm_text"></p>
+                            </div>
+
+                        </div><!-- /.gate-auth-form -->
+
+                    </div><!-- /data-gate-content -->
+
+                    <!-- ── Custody Hold overlay ────────────────────
+                         passport-engine.auditGateZones() removes .hidden
+                         when a gate zone is blocked (role mismatch, etc.)
+                    ─────────────────────────────────────────────────── -->
+                    <div class="gate-custody hidden" data-gate-lock aria-live="assertive">
+                        <svg width="28" height="28" viewBox="0 0 24 24"
+                             style="stroke: var(--theme-text-muted); fill: none;"
+                             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                             aria-hidden="true">
+                            <rect x="3" y="11" width="18" height="11" rx="2"/>
+                            <path d="M7 11V7a5 5 0 0110 0v4"/>
+                        </svg>
+                        <span class="text-sm font-medium"
+                              style="color: var(--theme-text-muted);"
+                              data-i18n="gate.custody_title"></span>
+                    </div>
+
+                </div><!-- /#golden-gate-root -->
+
+            </div><!-- /.gate-inner -->
+
+            <!-- ── Footer ─────────────────────────────────────── -->
+            <footer class="flex items-center justify-center gap-2 py-4 px-10"
+                    style="border-top: 1px solid var(--theme-border-glass);">
+                <div class="w-1.5 h-1.5 rounded-full"
+                     style="background: var(--theme-primary); opacity: 0.4;"
+                     aria-hidden="true"></div>
+                <span class="text-xs tracking-widest uppercase"
+                      style="color: var(--theme-text-muted);"
+                      data-i18n="gate.tenant"></span>
+            </footer>
+
+        </div><!-- /.luxury-glass -->
+
+    </main>
+
+    <!-- ── at-admin-gate web component ───────────────────────────
+         Light DOM controller (R2). Placed outside the visible gate
+         card — it discovers #golden-gate-root and all IDs by
+         document.getElementById(), then wires OAuth listeners.
+    ─────────────────────────────────────────────────────────────── -->
+    <at-admin-gate></at-admin-gate>
+
+    <!-- ── Scripts — canonical load order ───────────────────────
+         1. Firebase compat SDK  (window.firebase)
+         2. firebase-config.js   (initializeApp)
+         3. at-bootstrapper.js   (window.__CPII__, reads data-tenant-id)
+         4. i18n.js              (window.__CPII__.i18n, applies data-i18n)
+         5. passport-engine.js   (auditGateZones on passport:session-updated)
+         6. at-admin-gate.js     (OAuth wiring, _buildSession + getIdTokenResult)
+    ─────────────────────────────────────────────────────────────── -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+    <script src="core/firebase-config.js"></script>
+    <script src="core/at-bootstrapper.js"></script>
+    <script src="core/i18n.js"></script>
+    <script src="core/passport-engine.js"></script>
+    <script src="features/at-admin-gate.js"></script>
+
+</body>
+</html>

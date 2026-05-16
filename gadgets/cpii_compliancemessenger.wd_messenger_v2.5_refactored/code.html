@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CPII ComplianceMessenger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "var(--theme-primary)",
+                        "primary-hover": "var(--theme-primary-hover)",
+                        "background-light": "var(--theme-bg)",
+                        "background-dark": "var(--theme-bg)",
+                        "surface": "var(--theme-surface)",
+                        "border-theme": "var(--theme-border)",
+                        "text-theme": "var(--theme-text)",
+                        "text-muted": "var(--theme-text-muted)",
+                    },
+                    spacing: {
+                        "sidebar": "var(--sidebar-width)",
+                        "dock": "var(--dock-width)",
+                        "header": "var(--header-height)",
+                        "footer": "var(--footer-height)",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        :root {
+            --theme-bg: #161513;
+            --theme-surface: #1e1b14;
+            --theme-border: #35332c;
+            --theme-primary: #C1A85D;
+            --theme-primary-hover: #d4b86a;
+            --theme-text: #FDFBF6;
+            --theme-text-muted: #b2afa3;
+            --sidebar-width: 250px;
+            --dock-width: 320px;
+            --header-height: 64px;
+            --footer-height: 48px;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            scrollbar-width: thin;
+            scrollbar-color: var(--theme-border) var(--theme-bg);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: var(--theme-bg);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--theme-border);
+            border-radius: 10px;
+        }
+        .w-sidebar { width: var(--sidebar-width); }
+        .w-dock { width: var(--dock-width); }
+        .h-header { height: var(--header-height); }
+        .h-footer { height: var(--footer-height); }
+    </style>
+</head>
+<body class="bg-background-dark text-text-theme antialiased overflow-hidden">
+<div class="flex h-screen flex-col">
+<!-- Header (h-header) -->
+<header class="flex h-header items-center justify-between border-b border-border-theme bg-surface px-6 shrink-0">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl">verified_user</span>
+<h2 class="text-xl font-bold tracking-tight" data-i18n="msg.app_name">CPII ComplianceMessenger</h2>
+</div>
+<div class="h-6 w-px bg-border-theme"></div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-primary hover:text-primary-hover transition-colors" data-i18n="msg.nav_dashboard" href="#">Dashboard</a>
+<a class="text-sm font-medium text-text-muted hover:text-text-theme transition-colors" data-i18n="msg.nav_portfolio" href="#">Portfolio</a>
+<a class="text-sm font-medium text-text-muted hover:text-text-theme transition-colors" data-i18n="msg.nav_compliance" href="#">Compliance</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">search</span>
+<input class="w-full h-9 rounded-lg bg-background-dark border-border-theme pl-10 text-sm focus:border-primary focus:ring-1 focus:ring-primary text-text-theme" data-i18n-placeholder="msg.search_placeholder" placeholder="Search audit trail..." type="text"/>
+</div>
+<button class="relative p-2 text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 flex h-2 w-2 rounded-full bg-primary ring-2 ring-surface"></span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary/20 border border-primary/40 overflow-hidden">
+<img alt="Avatar" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw_3vEgR0bCNpb4rYrpinoKgKCwa59w_kOyvgwvnv1K27Zh8zKg1bHiar8CrewiRwdfiNkhnANqFKLvDsOA8GYFIbopy-eZy9KG0CCgCLJGcjdI7V8UBM8Sb_XkmDdj6wpqP5NuMFlTOs2lJJP_0vmuV72TxF9myC14gh2nk0lba9AMQpptXqmIGqzBDpgeHLsaSfMvIn2QeNIJbfCq0G0R1GV9VT_nvJCwf7VKCtwVm82GhwnC-Ky4BTLpapuyN0KTtw8bIJr9NFw"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Orbit 1 (w-sidebar) -->
+<aside class="w-sidebar border-r border-border-theme bg-surface flex flex-col p-4 shrink-0">
+<div class="mb-6 px-2">
+<p class="text-[10px] uppercase tracking-widest text-primary/60 font-bold" data-i18n="msg.sys_version">Skeleton Core v2.5.0</p>
+</div>
+<nav class="flex flex-col gap-1 grow">
+<button class="flex items-center gap-3 rounded-lg bg-primary/10 px-3 py-2.5 text-primary text-sm font-semibold group">
+<span class="material-symbols-outlined">inbox</span>
+<span data-i18n="msg.inbox">Bandeja de Entrada</span>
+<span class="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] text-background-dark" data-i18n="msg.inbox_count">3</span>
+</button>
+<button class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-text-muted hover:bg-white/5 hover:text-text-theme text-sm transition-all group">
+<span class="material-symbols-outlined">description</span>
+<span data-i18n="msg.templates">Templates</span>
+</button>
+<button class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-text-muted hover:bg-white/5 hover:text-text-theme text-sm transition-all group">
+<span class="material-symbols-outlined">history_edu</span>
+<span data-i18n="msg.audit">Audit Trail</span>
+</button>
+<button class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-text-muted hover:bg-white/5 hover:text-text-theme text-sm transition-all group">
+<span class="material-symbols-outlined">rule</span>
+<span data-i18n="msg.retention">Retention Rules</span>
+</button>
+<button class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-text-muted hover:bg-white/5 hover:text-text-theme text-sm transition-all group">
+<span class="material-symbols-outlined">archive</span>
+<span data-i18n="msg.archived">Archived</span>
+</button>
+</nav>
+<div class="mt-auto pt-4 border-t border-border-theme">
+<button class="w-full flex items-center justify-center gap-2 rounded-lg bg-primary py-2.5 text-sm font-bold text-background-dark hover:bg-primary-hover transition-all shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined">add</span>
+<span data-i18n="msg.new_message">New Message</span>
+</button>
+</div>
+</aside>
+<!-- Orbit 2 (Messenger Interface) -->
+<main class="flex-1 flex flex-col bg-background-dark overflow-y-auto custom-scrollbar">
+<div class="wd-messenger-inbox" data-hibernatable="true" data-state="">
+<div class="h-2/5 border-b border-border-theme flex flex-col min-h-[300px]">
+<div class="flex items-center justify-between px-6 py-4 bg-surface/50 border-b border-border-theme">
+<h3 class="text-sm font-bold flex items-center gap-2" data-i18n="msg.inbox_title">
+<span class="material-symbols-outlined text-primary text-lg">mail</span>
+                            Inbox Review
+                        </h3>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-[10px] font-bold uppercase rounded border border-border-theme text-primary hover:bg-primary/5" data-i18n="msg.filter_all">Filter All</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<!-- Message 1 -->
+<div class="flex gap-4 border-b border-border-theme p-4 hover:bg-primary/5 transition-colors cursor-pointer group relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">account_balance</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<h4 class="text-sm font-semibold truncate text-text-theme" data-i18n-placeholder="msg.subject_1">Notificacao_Distribuicao_Rendimentos</h4>
+<span class="text-[10px] font-mono text-text-muted" data-i18n-placeholder="msg.timestamp_1">2023-10-27 10:45:30 UTC</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-1.5 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold" data-i18n="msg.lang_pt">PT</span>
+<span class="px-1.5 py-0.5 rounded bg-surface text-text-muted text-[10px] font-bold" data-i18n="msg.cat_financial">FINANCIAL</span>
+<p class="text-xs text-text-muted truncate" data-i18n-placeholder="msg.snippet_1">Draft report for Quinta da Marinha yield distribution...</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="h-2 w-2 rounded-full bg-primary"></span>
+<span class="material-symbols-outlined text-text-muted/40 text-sm">lock</span>
+</div>
+</div>
+<!-- Message 2 -->
+<div class="flex gap-4 border-b border-border-theme p-4 hover:bg-primary/5 transition-colors cursor-pointer group">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface text-text-muted">
+<span class="material-symbols-outlined">gavel</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<h4 class="text-sm font-semibold truncate text-text-muted" data-i18n-placeholder="msg.subject_2">Comunicacion_Cumplimiento_Fiscal</h4>
+<span class="text-[10px] font-mono text-text-muted" data-i18n-placeholder="msg.timestamp_2">2023-10-27 09:12:05 UTC</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-1.5 py-0.5 rounded bg-orange-900/40 text-orange-400 text-[10px] font-bold" data-i18n="msg.lang_es">ES</span>
+<span class="px-1.5 py-0.5 rounded bg-surface text-text-muted text-[10px] font-bold" data-i18n="msg.cat_tax">TAX</span>
+<p class="text-xs text-text-muted/60 truncate" data-i18n-placeholder="msg.snippet_2">Quarterly fiscal reporting verification required for Madrid Hub.</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="material-symbols-outlined text-text-muted/40 text-sm">check_circle</span>
+</div>
+</div>
+<!-- Message 3 -->
+<div class="flex gap-4 border-b border-border-theme p-4 hover:bg-primary/5 transition-colors cursor-pointer group">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface text-text-muted">
+<span class="material-symbols-outlined">security</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between mb-1">
+<h4 class="text-sm font-semibold truncate text-text-muted" data-i18n-placeholder="msg.subject_3">Aviso_Privacidade_LGPD</h4>
+<span class="text-[10px] font-mono text-text-muted" data-i18n-placeholder="msg.timestamp_3">2023-10-26 18:30:11 UTC</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="px-1.5 py-0.5 rounded bg-green-900/40 text-green-400 text-[10px] font-bold" data-i18n="msg.lang_br">BR</span>
+<span class="px-1.5 py-0.5 rounded bg-surface text-text-muted text-[10px] font-bold" data-i18n="msg.cat_privacy">PRIVACY</span>
+<p class="text-xs text-text-muted/60 truncate" data-i18n-placeholder="msg.snippet_3">Updating data processing terms for Brazilian investors.</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<span class="material-symbols-outlined text-text-muted/40 text-sm">check_circle</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="wd-messenger-editor" data-hibernatable="true" data-state="">
+<div class="flex-1 flex flex-col bg-surface p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold text-primary flex items-center gap-2" data-i18n="msg.editor_title">
+<span class="material-symbols-outlined">edit_square</span>
+                            Compliance Message Editor
+                        </h3>
+<div class="flex bg-background-dark p-1 rounded-lg border border-border-theme">
+<button class="px-4 py-1.5 text-xs font-bold rounded-md bg-primary text-background-dark shadow-sm" data-i18n="msg.tab_pt">PT</button>
+<button class="px-4 py-1.5 text-xs font-bold rounded-md text-text-muted hover:text-text-theme transition-colors" data-i18n="msg.tab_es">ES</button>
+<button class="px-4 py-1.5 text-xs font-bold rounded-md text-text-muted hover:text-text-theme transition-colors" data-i18n="msg.tab_br">BR</button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="text-xs font-bold text-primary/70 uppercase tracking-widest" data-i18n="msg.field_template_label">Template Selection</label>
+<select class="w-full bg-background-dark border-border-theme rounded-lg text-text-theme text-sm py-2.5 focus:border-primary focus:ring-1 focus:ring-primary">
+<option data-i18n="msg.tpl_1">Notificacao_Distribuicao_Rendimentos (PT)</option>
+<option data-i18n="msg.tpl_2">Comunicado_Assembleia_Geral (PT)</option>
+<option data-i18n="msg.tpl_3">Relatorio_Anual_Investimento (PT)</option>
+</select>
+</div>
+<div class="space-y-4">
+<p class="text-xs font-bold text-primary/70 uppercase tracking-widest" data-i18n="msg.field_mandatory_group">Mandatory Fields (Portugal Jurisdiction)</p>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-[11px] font-medium text-text-muted" data-i18n="msg.field_amount">Montante_Bruto (€)</label>
+<input class="w-full bg-background-dark border-border-theme rounded-lg text-text-theme text-sm py-2 px-3 focus:border-primary" data-i18n-placeholder="msg.val_amount" type="text" value="1.250,00"/>
+</div>
+<div class="space-y-2">
+<label class="text-[11px] font-medium text-text-muted" data-i18n="msg.field_tax">IRS_Retido (28%)</label>
+<input class="w-full bg-background-dark border-border-theme rounded-lg text-text-theme text-sm py-2 px-3 focus:border-primary" data-i18n-placeholder="msg.val_tax" type="text" value="350,00"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-[11px] font-medium text-text-muted" data-i18n="msg.field_iban">Destinatário_IBAN</label>
+<input class="w-full bg-background-dark border-border-theme rounded-lg text-text-theme text-sm py-2 px-3 focus:border-primary font-mono" data-i18n-placeholder="msg.val_iban" type="text" value="PT50 0001 0000 1234 5678 9012 3"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-primary/70 uppercase tracking-widest" data-i18n="msg.field_payload">Message Payload</label>
+<textarea class="w-full bg-background-dark border-border-theme rounded-lg text-text-muted text-xs p-3 focus:border-primary resize-none" data-i18n-placeholder="msg.val_payload" rows="4">Estimado investidor, comunicamos que a distribuição de rendimentos referente ao Q3 2023 da Quinta da Marinha Real Estate Fund foi processada. Os detalhes encontram-se no anexo seguro conforme regulamento da CMVM.</textarea>
+</div>
+</div>
+<div class="space-y-6 flex flex-col">
+<div class="wd-messenger-metadata" data-hibernatable="true" data-state="">
+<div class="rounded-xl border border-border-theme bg-background-dark/30 p-5 space-y-4">
+<h4 class="text-xs font-bold text-text-theme flex items-center gap-2" data-i18n="msg.metadata_title">
+<span class="material-symbols-outlined text-sm">shield</span>
+                                        Compliance Metadata
+                                    </h4>
+<div class="grid grid-cols-2 gap-3">
+<div class="p-3 rounded-lg bg-surface border border-border-theme">
+<p class="text-[10px] text-text-muted uppercase" data-i18n="msg.meta_retention">Retention</p>
+<p class="text-sm font-bold text-primary" data-i18n-placeholder="msg.meta_retention_val">3650 Days</p>
+</div>
+<div class="p-3 rounded-lg bg-surface border border-border-theme">
+<p class="text-[10px] text-text-muted uppercase" data-i18n="msg.meta_encryption">Encryption</p>
+<p class="text-sm font-bold text-primary" data-i18n-placeholder="msg.meta_encryption_val">AES-256-GCM</p>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="px-2 py-1 rounded bg-surface border border-border-theme text-text-muted text-[9px] font-black tracking-tighter uppercase" data-i18n="msg.tag_gdpr">GDPR COMPLIANT</span>
+<span class="px-2 py-1 rounded bg-surface border border-border-theme text-text-muted text-[9px] font-black tracking-tighter uppercase" data-i18n="msg.tag_miffid">MIFFID II</span>
+<span class="px-2 py-1 rounded bg-surface border border-border-theme text-text-muted text-[9px] font-black tracking-tighter uppercase" data-i18n="msg.tag_cmvm">CMVM REG</span>
+</div>
+</div>
+<div class="mt-6 rounded-xl border border-border-theme bg-background-dark/30 p-5 space-y-3">
+<h4 class="text-xs font-bold text-text-theme flex items-center gap-2" data-i18n="msg.audit_title">
+<span class="material-symbols-outlined text-sm">fingerprint</span>
+                                        Audit Trail (Live)
+                                    </h4>
+<div class="space-y-2 font-mono text-[10px]">
+<div class="flex justify-between">
+<span class="text-text-muted" data-i18n="msg.audit_sig">SIGNATURE (ED25519)</span>
+<span class="text-primary truncate ml-4" data-i18n-placeholder="msg.audit_sig_val">z5jR...A8m2w</span>
+</div>
+<div class="flex justify-between">
+<span class="text-text-muted" data-i18n="msg.audit_hash">BLOCK_HASH</span>
+<span class="text-text-muted truncate ml-4" data-i18n-placeholder="msg.audit_hash_val">0x7f2e...991c</span>
+</div>
+<div class="flex justify-between border-t border-border-theme pt-2">
+<span class="text-text-muted" data-i18n="msg.audit_ts">TIMESTAMP</span>
+<span class="text-text-muted" data-i18n-placeholder="msg.audit_ts_val">2023-10-27T14:22:01.004Z</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto flex gap-3 pt-6">
+<button class="flex-1 py-3 border border-primary/30 rounded-lg text-sm font-bold text-primary hover:bg-primary/5 transition-colors" data-i18n="msg.cta_preview">Preview Report</button>
+<button class="flex-1 py-3 bg-primary rounded-lg text-sm font-bold text-background-dark hover:bg-primary-hover transition-all flex items-center justify-center gap-2" data-i18n="msg.cta_send">
+<span class="material-symbols-outlined text-lg">send</span>
+                                    Emitir &amp; Gravar
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Orbit 3 (w-dock) AI Assistant -->
+<aside class="w-dock border-l border-border-theme bg-surface p-5 flex flex-col shrink-0">
+<div class="wd-messenger-ai-pilot" data-hibernatable="true" data-state="">
+<div class="flex items-center gap-3 mb-6">
+<div class="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-text-theme" data-i18n="msg.ai_title">AI Compliance Pilot</h4>
+<p class="text-[10px] text-primary" data-i18n="msg.ai_status">Contextual Assistance Active</p>
+</div>
+</div>
+<div class="space-y-4 flex-1">
+<div class="p-4 rounded-xl bg-background-dark/50 border-l-2 border-primary text-xs leading-relaxed text-text-muted">
+<p class="font-bold text-text-theme mb-1" data-i18n="msg.ai_obs_label">Observation:</p>
+<p data-i18n-placeholder="msg.ai_obs_text">"The selected Portuguese IBAN is valid. Distribution amount is within expected thresholds for Q3. Retention period set to 10 years per Portuguese Commercial Code Art. 40."</p>
+</div>
+<div class="p-4 rounded-xl bg-primary/5 border border-border-theme space-y-3">
+<p class="text-[10px] font-bold text-primary uppercase" data-i18n="msg.ai_checks_label">Quick Checks</p>
+<div class="flex items-center gap-2 text-xs text-text-muted">
+<span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+<span data-i18n="msg.check_tpl">Regulatory Template Matched</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-text-muted">
+<span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+<span data-i18n="msg.check_enc">Secure Encryption Primed</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-text-muted">
+<span class="material-symbols-outlined text-orange-500 text-sm">warning</span>
+<span data-i18n="msg.check_gdpr">GDPR Field Sensitivity High</span>
+</div>
+</div>
+</div>
+<div class="mt-auto bg-background-dark rounded-lg p-2 border border-border-theme flex items-center gap-2">
+<input class="bg-transparent border-none text-xs text-text-theme w-full focus:ring-0" data-i18n-placeholder="msg.ai_input_placeholder" placeholder="Ask AI about regulation..." type="text"/>
+<button class="text-primary hover:text-primary-hover">
+<span class="material-symbols-outlined">bolt</span>
+</button>
+</div>
+</div>
+</aside>
+</div>
+<!-- Footer (h-footer) -->
+<footer class="h-footer bg-background-dark border-t border-border-theme flex items-center justify-between px-6 shrink-0">
+<div class="flex items-center gap-4 text-[10px] font-medium text-text-muted uppercase tracking-widest">
+<span class="flex items-center gap-1.5">
+<span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+<span data-i18n="msg.sys_status">System Active</span>
+</span>
+<span class="h-3 w-px bg-border-theme"></span>
+<span data-i18n-placeholder="msg.node_info">Node: Lux-L-08</span>
+<span class="h-3 w-px bg-border-theme"></span>
+<span data-i18n-placeholder="msg.enc_info">Enc: AES-256</span>
+</div>
+<div class="text-[10px] text-text-muted/60 font-mono" data-i18n="msg.copyright">
+            © 2023 CPII - Compliant Real Estate Investment Engine
+        </div>
+</footer>
+</div>
+</body></html>

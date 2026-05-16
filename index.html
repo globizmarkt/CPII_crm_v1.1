@@ -1,0 +1,457 @@
+<!--
+============================================================
+ARCHIVO  : index.html
+VERSIÓN  : v1.4.0 → v1.5.0
+FECHA    : 2026-03-14
+PROPÓSITO: Conectar brand_name y brand_subtitle al motor i18n.
+           Inyectar componente tooltip brand_tooltip_text en Órbita 1.
+           Inyectar 6 tokens semánticos en :root para conectar
+           tab-manager.css con el sistema de diseño R3.
+           Sustituir los 5 enlaces nav actuales por los 6 pilares
+           fiduciarios con data-phase, data-requires y
+           menu-pillar-wrapper para Fases 1, 2 y 3.
+           Conservar clases Tailwind base del sistema.
+           Enlazar passport-engine.js antes del cierre de </body>.
+============================================================
+
+ÍNDICE
+[SEC-01] Head — Meta, fuentes y scripts core
+[SEC-02] Tailwind Config — Design tokens vía var(--theme-*)
+[SEC-03] Estilos globales — :root tokens + clases utilitarias
+[SEC-04] Gatekeeper Overlay — KYC security layer
+[SEC-05] Trinity Layout — Contenedor principal flex
+[SEC-06] Órbita 1 — Sidebar (250px): nav, brand, user footer
+        [SEC-06] — MODIFICADA  (Brand: h1 hardcoded → data-i18n="brand_name")
+        [SEC-06] — MODIFICADA  (Subtítulo: p hardcoded → data-i18n="brand_subtitle")
+        [SEC-06] — AMPLIADA    (nuevo tooltip data-i18n="brand_tooltip_text")
+        [SEC-06] — SUSTITUIDA  (bloque <nav> completo: 5 enlaces → 6 pilares)
+[SEC-07] Órbita 2 — Canvas dinámico (#canvas-orbita-2)
+[SEC-08] Órbita 3 — Dock (320px): perfil, gatekeeper, AIMON
+[SEC-09] Notification Toast — Sistema de alertas flotante
+[SEC-10] Bootstrap Script — Wiring del TabManager con sidebar
+        [SEC-10] MODIFICADA — Bootstrap Scripts
+============================================================
+-->
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<!-- [SEC-01] Head — Meta, fuentes y scripts core -->
+
+<head>
+    <link rel="stylesheet" href="css/tab-manager.css">
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>CPII-CRM Skin 01 Layout Trinity</title>
+    <script src="features/at-attribution.js"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <script src="core/at-bootstrapper.js"></script>
+    <script src="core/i18n.js"></script>
+    <script src="core/at-resource-registry.js" defer></script>
+    <script src="core/at-search-engine.js" defer></script>
+    <script src="core/at-tab-manager.js" defer></script>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <!-- [SEC-02] Tailwind Config — Design tokens vía var(--theme-*) -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "var(--theme-primary)",
+                        "background-light": "var(--theme-bg-light)",
+                        "background-dark": "var(--theme-bg)",
+                        "surface": "var(--theme-surface)",
+                        "accent-gold": "var(--theme-accent)",
+                        "ink": "var(--theme-ink)",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+
+    <!-- [SEC-03] Estilos globales — Médula v2.6.1 (Tokens + Glass + Alerts) -->
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+
+<body class="bg-background-dark text-slate-100 overflow-hidden font-display">
+
+    <!-- [SEC-04] Gatekeeper Overlay — KYC security layer -->
+    <!-- Security Overlay (Visible when KYC is pending) -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center gatekeeper-overlay pointer-events-none">
+        <div
+            class="pointer-events-auto luxury-glass p-8 rounded-xl border border-primary/30 flex flex-col items-center gap-6 max-w-md text-center shadow-2xl">
+            <div class="size-16 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-4xl">verified_user</span>
+            </div>
+            <div>
+                <h3 class="font-serif text-2xl text-primary mb-2" data-i18n="kyc_required">Acesso Restrito</h3>
+                <p class="text-slate-400 text-sm" data-i18n="kyc_description">A sua verificação KYC está pendente.
+                    Algumas funcionalidades estão limitadas até à aprovação.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- [SEC-05] Trinity Layout — Contenedor principal flex -->
+    <!-- Main Trinity Layout -->
+    <div class="flex h-screen w-full overflow-hidden" data-tenant-id="cpii_v1.1">
+
+        <!-- [SEC-06] Órbita 1 — Sidebar (250px): nav, brand, user footer -->
+        <!-- Orbit 1: Left Sidebar (250px) -->
+        <aside class="w-[250px] flex-shrink-0 bg-surface border-r border-primary/10 flex flex-col h-full z-30">
+            <div class="p-6 flex flex-col gap-8">
+                <!-- Brand -->
+                <div class="flex items-center gap-3">
+                    <div
+                        class="size-10 bg-primary/20 rounded-lg flex items-center justify-center border border-primary/40">
+                        <span class="material-symbols-outlined text-primary text-2xl">diamond</span>
+                    </div>
+                    <div class="flex flex-col relative group/brand">
+                        <h1 class="font-serif text-xl font-bold tracking-tight text-primary leading-none"
+                            data-i18n="brand_name">Gestor de Relaciones</h1>
+                        <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold"
+                            data-i18n="brand_subtitle">Club Privado</p>
+                        <!-- Tooltip Inteligencia Patrimonial -->
+                        <div class="absolute left-0 top-full mt-2 w-64 z-50
+                                    bg-surface border border-primary/20 rounded-lg p-3
+                                    text-[11px] text-slate-400 leading-relaxed shadow-xl
+                                    opacity-0 pointer-events-none
+                                    group-hover/brand:opacity-100 group-hover/brand:pointer-events-auto
+                                    transition-opacity duration-200" data-i18n="brand_tooltip_text">
+                        </div>
+                    </div>
+                </div>
+                <!-- Navigation -->
+                <nav class="flex flex-col gap-1">
+                    <!-- Fase 1 — Acceso inmediato -->
+                    <a class="menu-pillar flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary border border-primary/20 group"
+                        href="/dashboard" data-phase="2" data-requires="kyc:approved" data-gadget="gd-dashboard">
+                        <span class="material-symbols-outlined transition-colors">monitoring</span>
+                        <span class="text-sm font-semibold" data-i18n="nav_dashboard">Posición Global</span>
+                    </a>
+                    <a class="menu-pillar flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-primary/5 hover:text-primary transition-all group"
+                        href="/network" data-phase="2" data-requires="kyc:approved" data-gadget="gd-network">
+                        <span class="material-symbols-outlined transition-colors">hub</span>
+                        <span class="text-sm font-medium" data-i18n="nav_network">Mi Red</span>
+                    </a>
+                    <a class="menu-pillar flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-primary/5 hover:text-primary transition-all group"
+                        href="/academy" data-phase="2" data-requires="kyc:approved" data-gadget="gd-academy">
+                        <span class="material-symbols-outlined transition-colors">school</span>
+                        <span class="text-sm font-medium" data-i18n="nav_academy">Academy</span>
+                    </a>
+                    <!-- Fase 2 — Custody Hold: KYC + Academy 100% -->
+                    <div class="menu-pillar-wrapper relative group" data-phase="2"
+                        data-requires="kyc:approved,academy:100" data-i18n-tooltip="tooltip_phase2">
+                        <a class="menu-pillar flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-primary/5 hover:text-primary transition-all"
+                            href="/portfolio" data-gadget="gd-vault">
+                            <span class="material-symbols-outlined transition-colors">account_balance_wallet</span>
+                            <span class="text-sm font-medium" data-i18n="nav_vault">Mi Cartera</span>
+                        </a>
+                    </div>
+                    <div class="menu-pillar-wrapper relative group" data-phase="2"
+                        data-requires="kyc:approved,academy:100" data-i18n-tooltip="tooltip_phase2">
+                        <a class="menu-pillar flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-primary/5 hover:text-primary transition-all"
+                            href="/history" data-gadget="gd-history">
+                            <span class="material-symbols-outlined transition-colors">history_edu</span>
+                            <span class="text-sm font-medium" data-i18n="nav_audit">Historial y Documentos</span>
+                        </a>
+                    </div>
+                    <!-- Fase 3 — Custody Hold: AUM o rol Staff/Manager -->
+                    <div class="menu-pillar-wrapper relative group" data-phase="3"
+                        data-requires="kyc:approved,academy:100,aum:500000|role:staff,manager"
+                        data-i18n-tooltip="tooltip_phase3">
+                        <a class="menu-pillar flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-primary/5 hover:text-primary transition-all"
+                            href="/crm" data-gadget="gd-crm">
+                            <span class="material-symbols-outlined transition-colors">diversity_3</span>
+                            <span class="text-sm font-medium" data-i18n="nav_crm">Gestión de Relaciones</span>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+            <div class="mt-auto p-6 border-t border-primary/10 flex flex-col gap-1">
+                <a class="menu-pillar flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-primary/5 hover:text-primary transition-all group"
+                    href="/manuals" data-phase="1" data-requires="none" data-gadget="gd-manual">
+                    <span class="material-symbols-outlined transition-colors">menu_book</span>
+                    <span class="text-sm font-medium" data-i18n="nav_manuals">Manuales</span>
+                </a>
+                <a class="menu-pillar flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-primary/5 hover:text-primary transition-all group"
+                    href="/settings" data-phase="1" data-requires="none">
+                    <span class="material-symbols-outlined transition-colors">settings</span>
+                    <span class="text-sm font-medium" data-i18n="nav_settings">Definições</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- [SEC-07] Órbita 2 — Canvas dinámico (#canvas-orbita-2) -->
+        <!-- Orbit 2: Center Canvas (Dynamic Workspace) -->
+        <main class="flex-1 bg-background-light relative flex flex-col overflow-y-auto text-slate-800">
+            <div id="canvas-orbita-2" class="flex-1 flex flex-col relative p-12 bg-[var(--theme-canvas-deep)]">
+            </div>
+        </main>
+
+        <!-- [SEC-08] Órbita 3 — Dock (320px): perfil, gatekeeper, AIMON -->
+        <!-- Orbit 3: Right Dock (320px) -->
+        <aside class="w-[320px] flex-shrink-0 bg-surface border-l border-primary/10 flex flex-col h-full z-30">
+            <!-- Top Controls -->
+            <div class="p-6 border-b border-primary/10 flex flex-col gap-6">
+                <!-- User Profile & Tenant -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <img alt="User" class="size-10 rounded-full border border-primary/30"
+                            data-alt="User profile avatar"
+                            data-avatar-src="session"
+                            src="" />
+                        <div class="flex flex-col">
+                            <span class="text-xs text-slate-500 font-bold uppercase tracking-tighter"
+                                data-i18n="tenant_label">Tenant Name</span>
+                            <span class="text-sm font-semibold text-slate-200" data-i18n="nav.user.role"></span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="window.__CPII__.i18n.setLanguage('pt')"
+                            class="lang-btn text-xs text-slate-400 hover:text-primary transition-colors font-bold px-1">PT</button>
+                        <span class="text-slate-700">|</span>
+                        <button onclick="window.__CPII__.i18n.setLanguage('es')"
+                            class="lang-btn text-xs text-slate-400 hover:text-primary transition-colors font-bold px-1">ES</button>
+                        <span class="text-slate-700">|</span>
+                        <button onclick="window.__CPII__.i18n.setLanguage('en')"
+                            class="lang-btn text-xs text-slate-400 hover:text-primary transition-colors font-bold px-1">EN</button>
+                        <span class="text-slate-700">|</span>
+                        <button onclick="window.__CPII__.i18n.setLanguage('fr')"
+                            class="lang-btn text-xs text-slate-400 hover:text-primary transition-colors font-bold px-1">FR</button>
+                    </div>
+                </div>
+                <!-- Gatekeeper Status -->
+                <div class="bg-background-dark/50 p-4 rounded-xl border border-primary/10">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest"
+                            data-i18n="gatekeeper_title">Gatekeeper Status</span>
+                        <span
+                            class="size-2 rounded-full bg-orange-500 animate-pulse shadow-[0_0_8px_rgba(249,115,22,0.6)]"></span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="size-10 bg-orange-500/10 rounded-lg flex items-center justify-center">
+                            <span class="material-symbols-outlined text-orange-500">shield_with_heart</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-slate-200" data-i18n="kyc_status">KYC Pending</span>
+                            <span class="text-[10px] text-slate-500" data-i18n="kyc_action">Requer atenção
+                                imediata</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- AIMON Panel -->
+            <div class="flex-1 p-6 flex flex-col">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-primary">smart_toy</span>
+                    <h4 class="text-sm font-bold uppercase tracking-widest text-primary" data-i18n="aimon_title">AIMON
+                        Panel</h4>
+                </div>
+                <div
+                    class="bg-primary/5 border border-primary/20 p-5 rounded-xl flex flex-col gap-4 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 text-primary/10 group-hover:text-primary/20 transition-colors">
+                        <span class="material-symbols-outlined text-8xl">bolt</span>
+                    </div>
+                    <div class="relative z-10">
+                        <p class="text-slate-100 text-sm font-serif leading-relaxed" data-i18n="aimon_msg">
+                            Bem-vindo ao seu workspace dinâmico. Como posso assistir o seu investimento hoje?
+                        </p>
+                    </div>
+                    <button
+                        class="relative z-10 w-full bg-primary/20 hover:bg-primary/30 text-primary py-2 px-4 rounded-lg text-xs font-bold transition-all border border-primary/30">
+                        <span data-i18n="open_assistant">Open Assistant</span>
+                    </button>
+                </div>
+                <!-- Activity Feed Placeholder -->
+                <div class="mt-8 flex flex-col gap-4">
+                    <span class="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]"
+                        data-i18n="recent_activity">Atividade Recente</span>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex gap-3 items-start">
+                            <div class="size-2 mt-1.5 rounded-full bg-primary/40"></div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-slate-300" data-i18n="activity.feed.login_new_device"></span>
+                                <span class="text-[10px] text-slate-500" data-i18n="activity.feed.time_2min"></span>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-start">
+                            <div class="size-2 mt-1.5 rounded-full bg-primary/40"></div>
+                            <div class="flex flex-col">
+                                <span class="text-xs text-slate-300" data-i18n="activity.feed.kyc_received"></span>
+                                <span class="text-[10px] text-slate-500" data-i18n="activity.feed.time_yesterday"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Bottom Brand -->
+            <div class="p-6 mt-auto flex items-center justify-center border-t border-primary/5">
+                <span class="text-[10px] text-slate-700 tracking-[0.3em] font-bold uppercase">Trinity Architecture
+                    v1.0</span>
+            </div>
+        </aside>
+    </div>
+
+    <!-- [SEC-09] Notification Toast — Sistema de alertas flotante -->
+    <!-- Notification Toast -->
+    <div
+        class="fixed bottom-6 right-6 z-[60] luxury-glass border border-primary/30 px-6 py-4 rounded-xl flex items-center gap-4 shadow-2xl translate-y-20 opacity-0 pointer-events-none transition-all duration-500 transform">
+        <span class="material-symbols-outlined text-primary">notifications_active</span>
+        <div class="flex flex-col">
+            <span class="text-xs font-bold text-slate-100">Atualização de Sistema</span>
+            <span class="text-[10px] text-slate-400">Novas propriedades MLS adicionadas.</span>
+        </div>
+    </div>
+
+    <!-- [SEC-10] Bootstrap Script — Trinity Router v3.0.0 (Resilience) -->
+    <script>
+        // ============================================================
+        // CARTOGRAFÍA QUIRÚRGICA v3.2
+        // ============================================================
+        // ARCHIVO   : index.html [SEC-10] Bootstrap Trinity Router
+        // VERSIÓN   : 3.0.0-RESILIENCE
+        // FECHA     : 2026-04-10
+        // AUTOR     : Junior Dev-Logic Kimi
+        // DOCTRINA  : R2 (Light DOM) | R4 (i18n Strict) | R5 (Economía O(1))
+        // PROPÓSITO : Blindaje contra race conditions. El Gatekeeper opera
+        //             independientemente del router. Retry polivalente O(1).
+        // SPRINT    : VIBE-CPII-20 — Conexión Traccional
+        // ============================================================
+
+        'use strict';
+
+        // [SEC-10.0] EXTIRPADO — cpii:kyc-dismissed eliminado (handler huérfano).
+        // Botón dismiss-gatekeeper removido en Ticket Adaptación TrinityLayout.
+
+        // ============================================================
+        // [SEC-10.1] TRINITY ROUTER — Inicialización con Resilience
+        // ============================================================
+        function initTrinity() {
+            // Fail-soft: Si el TabManager no está listo, auto-retry en 100ms (R5: sin polling agresivo)
+            if (!window.__CPII__?.tabManager) {
+                console.warn('[TrinityRouter] ⏳ TabManager no disponible, reintentando en 100ms...');
+                setTimeout(initTrinity, 100);
+                return;
+            }
+
+            const tm = window.__CPII__.tabManager;
+
+            // Whitelist O(1) de gadgets permitidos (fail-closed security)
+            const ALLOWED_GADGETS = new Set([
+                'gd-dashboard',
+                'gd-manual',
+                'gd-simulador',
+                'gd-calculadora',
+                'gd-vault',
+                'gd-crm',
+                'gd-academy',
+                'gd-history',
+                'gd-network',
+                'gd-settings'
+            ]);
+
+            // Delegación de navegación en Órbita 1 (Sidebar)
+            const sidebar = document.querySelector('aside.w-\\[250px\\]');
+            if (!sidebar) {
+                console.error('[TrinityRouter] ❌ Sidebar no encontrado en DOM');
+                return;
+            }
+
+            sidebar.addEventListener('click', (e) => {
+                const trigger = e.target.closest('[data-gadget]');
+                if (!trigger) return;
+
+                e.preventDefault();
+                const gadgetId = trigger.getAttribute('data-gadget');
+
+                // R5: Validación O(1) contra Set constante
+                if (!ALLOWED_GADGETS.has(gadgetId)) {
+                    console.warn(`[TrinityRouter] Gadget no autorizado: ${gadgetId}`);
+                    return;
+                }
+
+                try {
+                    tm.openFromRegistry(gadgetId);
+
+                    // Feedback visual: actualizar estado activo en menú
+                    document.querySelectorAll('.menu-pillar').forEach(el => {
+                        el.classList.remove('bg-primary/10', 'text-primary', 'border-primary/20');
+                        el.classList.add('text-slate-400');
+                    });
+
+                    const activePillar = trigger.closest('.menu-pillar-wrapper')?.querySelector('.menu-pillar')
+                        || trigger.closest('.menu-pillar')
+                        || trigger;
+
+                    activePillar.classList.add('bg-primary/10', 'text-primary', 'border-primary/20');
+                    activePillar.classList.remove('text-slate-400');
+
+                    document.dispatchEvent(new CustomEvent('trinity:navigate', {
+                        detail: { gadget: gadgetId, source: 'sidebar', timestamp: Date.now() },
+                        bubbles: true
+                    }));
+
+                } catch (err) {
+                    console.error(`[TrinityRouter] Error cargando ${gadgetId}:`, err);
+                }
+            });
+
+            console.log('[TrinityRouter] ✅ Inicializado (Event Delegation O(1))');
+
+            // [SEC-10.2] Auto-Boot: Conexión Traccional por defecto (R5 O(1))
+            (function autoBootTraccional() {
+                const DEFAULT_GADGET = 'gd-manual';
+
+                if (!ALLOWED_GADGETS.has(DEFAULT_GADGET)) {
+                    console.warn(`[TrinityRouter] Auto-boot bloqueado: ${DEFAULT_GADGET} no en whitelist`);
+                    return;
+                }
+
+                try {
+                    tm.openFromRegistry(DEFAULT_GADGET);
+
+                    const defaultTrigger = sidebar.querySelector(`[data-gadget="${DEFAULT_GADGET}"]`);
+                    if (defaultTrigger) {
+                        const activePillar = defaultTrigger.closest('.menu-pillar-wrapper')?.querySelector('.menu-pillar')
+                            || defaultTrigger.closest('.menu-pillar')
+                            || defaultTrigger;
+
+                        activePillar.classList.add('bg-primary/10', 'text-primary', 'border-primary/20');
+                        activePillar.classList.remove('text-slate-400');
+                    }
+
+                    document.dispatchEvent(new CustomEvent('trinity:boot-complete', {
+                        detail: { gadget: DEFAULT_GADGET, mode: 'auto-traccional', timestamp: Date.now() },
+                        bubbles: true
+                    }));
+
+                } catch (err) {
+                    console.error('[TrinityRouter] Auto-boot fallido:', err);
+                }
+            })();
+        }
+
+        // Disparar inicialización con espera DOM
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTrinity);
+        } else {
+            initTrinity();
+        }
+    </script>
+    <script src="core/passport-engine.js" defer></script>
+
+</body>
+
+</html>

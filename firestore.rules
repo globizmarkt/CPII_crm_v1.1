@@ -1,0 +1,84 @@
+rules_version = '2';
+
+// ============================================================================
+// FIRESTORE SECURITY RULES — CPII_crm_v1.1
+// ============================================================================
+// tenant_id canónico : cpii_v1.1
+// Doctrina           : ATOM-07 (10_destilacion_arqueologia_01_arquitectura.md)
+// Fuente             : FIRESTORE_SECURITY_RULES_TEMPLATE.md (04_ARCHIVE)
+// Principio          : Aislamiento Lógico Perimetral — JWT como muro criptográfico
+// Timestamp          : 2026-05-14
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── FUNCIONES DE BLINDAJE ──────────────────────────────────────────────
+
+    // Verifica que el documento pertenece al mismo tenant que el JWT del usuario.
+    // Anti-spoofing: impide leer datos de otro tenant aunque el usuario esté autenticado.
+    function belongsToTenant() {
+      return request.auth != null &&
+             request.auth.token.tenant_id == resource.data.tenant_id;
+    }
+
+    // Verifica que el documento que se va a crear lleva el tenant_id correcto.
+    // Obligatorio en todo addDoc/setDoc — "Marca de Nacimiento" doctrinal.
+    function isCreateValid() {
+      return request.auth != null &&
+             request.resource.data.tenant_id == request.auth.token.tenant_id;
+    }
+
+    // Rol Staff (owner, gestor, admin) — acceso CRM completo dentro del tenant.
+    function isStaff() {
+      return request.auth != null &&
+             request.auth.token.role in ['owner', 'gestor', 'admin'];
+    }
+
+    // Rol Owner exclusivo — operaciones destructivas o de configuración.
+    function isOwner() {
+      return request.auth != null &&
+             request.auth.token.role == 'owner';
+    }
+
+
+    // ── COLECCIÓN: leads ──────────────────────────────────────────────────
+    // Staff puede leer, actualizar y eliminar leads de su tenant.
+    // Creación protegida: el tenant_id debe coincidir con el JWT.
+    match /leads/{leadId} {
+      allow read, update, delete: if belongsToTenant() && isStaff();
+      allow create:               if isCreateValid() && isStaff();
+    }
+
+    // ── COLECCIÓN: users ──────────────────────────────────────────────────
+    // Cada usuario puede leer/actualizar su propio perfil (dentro de su tenant).
+    // Creación protegida por isCreateValid.
+    // Owner puede leer cualquier perfil del tenant.
+    match /users/{uid} {
+      allow read, update: if (request.auth.uid == uid && belongsToTenant()) ||
+                             (belongsToTenant() && isOwner());
+      allow create:       if isCreateValid();
+    }
+
+    // ── COLECCIÓN: staff ──────────────────────────────────────────────────
+    // Solo Staff del tenant puede leer sus propios registros.
+    // Solo Owner puede crear o modificar registros de staff.
+    match /staff/{staffId} {
+      allow read:         if belongsToTenant() && isStaff();
+      allow write:        if belongsToTenant() && isOwner();
+    }
+
+    // ── COLECCIÓN: public_content ─────────────────────────────────────────
+    // Lectura pública — contenido global sin restricción de tenant.
+    match /public_content/{contentId} {
+      allow read: if true;
+    }
+
+    // ── DEFAULT-DENY ──────────────────────────────────────────────────────
+    // Cierre total: cualquier ruta no declarada explícitamente → denegada.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+  }
+}

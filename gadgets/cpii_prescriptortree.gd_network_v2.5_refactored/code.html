@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title data-i18n="network.page_title">CPII PrescriptorTree .gd-network</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --theme-bg: #161513;
+            --theme-surface: #1e1b14;
+            --theme-border: #35332c;
+            --theme-primary: #C1A85D;
+            --theme-primary-hover: #d4b86a;
+            --theme-text: #FDFBF6;
+            --theme-text-muted: #b2afa3;
+            --sidebar-width: 250px;
+            --dock-width: 320px;
+            --header-height: 64px;
+            --footer-height: 48px;
+        }
+
+        body { 
+            font-family: 'Manrope', sans-serif; 
+            background-color: var(--theme-bg);
+            color: var(--theme-text);
+            overflow: hidden;
+        }
+
+        .network-node { position: relative; }
+        .network-node::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -1rem;
+            width: 1rem;
+            height: 2px;
+            background: var(--theme-border);
+        }
+        .tree-line-v {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--theme-border);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { 
+            background: var(--theme-border); 
+            border-radius: 10px; 
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "var(--theme-primary)",
+                        "primary-hover": "var(--theme-primary-hover)",
+                        "background": "var(--theme-bg)",
+                        "surface": "var(--theme-surface)",
+                        "border-muted": "var(--theme-border)",
+                        "text-main": "var(--theme-text)",
+                        "text-muted": "var(--theme-text-muted)",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        'header': 'var(--header-height)',
+                        'footer': 'var(--footer-height)',
+                        'sidebar': 'var(--sidebar-width)',
+                        'dock': 'var(--dock-width)',
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="h-screen w-full flex flex-col font-display">
+<header class="h-[var(--header-height)] flex-shrink-0 flex items-center justify-between border-b border-border-muted bg-surface px-6 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-background text-2xl">account_tree</span>
+</div>
+<div>
+<h2 class="text-text-main text-lg font-bold leading-none" data-i18n="network.platform_title">CPII PrescriptorTree</h2>
+<span class="text-[10px] text-primary uppercase tracking-widest font-bold" data-i18n="network.platform_sub">.gd-network</span>
+</div>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-text-muted hover:text-primary text-sm font-medium transition-colors" data-i18n="network.nav_dashboard" href="#">Dashboard</a>
+<a class="text-primary text-sm font-medium transition-colors border-b-2 border-primary pb-5 mt-5" data-i18n="network.nav_network" href="#">Minha Rede</a>
+<a class="text-text-muted hover:text-primary text-sm font-medium transition-colors" data-i18n="network.nav_revenue" href="#">Rendimentos</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center bg-background/50 border border-border-muted rounded-lg px-3 py-1.5">
+<span class="material-symbols-outlined text-text-muted text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm text-text-main placeholder:text-text-muted w-48" data-i18n-placeholder="network.search_node_placeholder" placeholder="Procurar nó..." type="text"/>
+</div>
+<button class="text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="network.user_avatar_alt" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCD_2AmCflL_u1EuigDWkTRt8wdzj2V6ZLSZe5D1TLPPuIBQ3hZf-i0iw7CgWG2l914R3NgBaDjSqAyTNbOyLuKS2z2JUZ0rcaRTCqKMB-VRGH9Gp3ihSldyLh-m8bCyqW8XDk75RXRh-p-2bJ35BlHfe8-a4-qMwqbtYz1oEw3DlEsZ6n-SJypY8VGvgg-KoTuOSDBTSPOvQvs2Ro2OobVv-MIYyENPslK-Shw4Mi7Cqh0wsn23i9OCULeBzR13lySFesFFmhFVf1Y"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Orbit 1: LSB -->
+<aside class="w-[var(--sidebar-width)] flex-shrink-0 border-r border-border-muted bg-surface flex flex-col justify-between py-6 overflow-hidden">
+<div class="px-4 space-y-8">
+<div>
+<p class="text-[10px] text-text-muted uppercase tracking-widest font-bold mb-4 px-2" data-i18n="network.sidebar_menu">Menu Principal</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-xl">grid_view</span>
+<span class="text-sm font-medium" data-i18n="network.side_overview">Visão Geral</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary text-background transition-all" href="#">
+<span class="material-symbols-outlined text-xl">hub</span>
+<span class="text-sm font-bold" data-i18n="network.side_network">Minha Rede</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-xl">payments</span>
+<span class="text-sm font-medium" data-i18n="network.side_earnings">Ganhos L1/L2/L3</span>
+</a>
+</nav>
+</div>
+<div>
+<p class="text-[10px] text-text-muted uppercase tracking-widest font-bold mb-4 px-2" data-i18n="network.sidebar_tools">Ferramentas Lux</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-xl">history_edu</span>
+<span class="text-sm font-medium" data-i18n="network.side_reports">Relatórios</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:bg-primary/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-xl">settings_accessibility</span>
+<span class="text-sm font-medium" data-i18n="network.side_settings">Configurações</span>
+</a>
+</nav>
+</div>
+</div>
+<div class="px-6 border-t border-border-muted pt-6">
+<div class="p-4 rounded-xl bg-primary/10 border border-primary/20">
+<p class="text-xs text-primary font-bold mb-1" data-i18n="network.system_status_label">Status do Sistema</p>
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+<span class="text-[10px] text-text-main" data-i18n="network.system_version">v2.5.0 Lux Lusitana</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Orbit 2: Main Content (Scrollable) -->
+<main class="flex-1 overflow-y-auto custom-scrollbar bg-background">
+<div class="p-8 space-y-8 max-w-7xl mx-auto">
+<div class="gd-network-metrics grid grid-cols-1 md:grid-cols-5 gap-4" data-hibernatable="true" data-state="">
+<div class="bg-surface p-5 rounded-xl border border-border-muted hover:border-primary/50 transition-all group">
+<p class="text-text-muted text-xs font-medium uppercase tracking-wider mb-2" data-i18n="network.kpi_nodes">Total Nós Rede</p>
+<h3 class="font-serif text-3xl font-bold text-text-main group-hover:text-primary transition-colors" data-i18n="network.kpi_nodes_val">1.284</h3>
+</div>
+<div class="bg-surface p-5 rounded-xl border border-border-muted hover:border-primary/50 transition-all group">
+<p class="text-text-muted text-xs font-medium uppercase tracking-wider mb-2" data-i18n="network.kpi_l1">Receita L1</p>
+<h3 class="font-serif text-3xl font-bold text-text-main group-hover:text-primary transition-colors" data-i18n="network.kpi_l1_val">€45.200</h3>
+</div>
+<div class="bg-surface p-5 rounded-xl border border-border-muted hover:border-primary/50 transition-all group">
+<p class="text-text-muted text-xs font-medium uppercase tracking-wider mb-2" data-i18n="network.kpi_l2">Receita L2</p>
+<h3 class="font-serif text-3xl font-bold text-text-main group-hover:text-primary transition-colors" data-i18n="network.kpi_l2_val">€12.800</h3>
+</div>
+<div class="bg-surface p-5 rounded-xl border border-border-muted hover:border-primary/50 transition-all group">
+<p class="text-text-muted text-xs font-medium uppercase tracking-wider mb-2" data-i18n="network.kpi_l3">Receita L3</p>
+<h3 class="font-serif text-3xl font-bold text-text-main group-hover:text-primary transition-colors" data-i18n="network.kpi_l3_val">€3.450</h3>
+</div>
+<div class="bg-surface p-5 rounded-xl border border-primary/40 bg-primary/5 transition-all group">
+<p class="text-primary/70 text-xs font-bold uppercase tracking-wider mb-2" data-i18n="network.kpi_total">Total Revenue Share</p>
+<h3 class="font-serif text-3xl font-bold text-primary group-hover:scale-105 transition-transform" data-i18n="network.kpi_total_val">€61.450</h3>
+</div>
+</div>
+<div class="gd-network-canvas bg-surface rounded-xl border border-border-muted p-6" data-hibernatable="true" data-state="">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-xl font-bold text-text-main flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">schema</span>
+<span data-i18n="network.tree_title">Visualização Genealógica</span>
+</h2>
+<div class="flex gap-2">
+<span class="flex items-center gap-1.5 text-xs text-text-muted bg-background px-3 py-1 rounded-full border border-border-muted">
+<div class="w-2 h-2 rounded-full bg-primary"></div> <span data-i18n="network.legend_l1">L1 Gold</span>
+</span>
+<span class="flex items-center gap-1.5 text-xs text-text-muted bg-background px-3 py-1 rounded-full border border-border-muted">
+<div class="w-2 h-2 rounded-full bg-text-muted"></div> <span data-i18n="network.legend_l2">L2 Silver</span>
+</span>
+<span class="flex items-center gap-1.5 text-xs text-text-muted bg-background px-3 py-1 rounded-full border border-border-muted">
+<div class="w-2 h-2 rounded-full bg-orange-700"></div> <span data-i18n="network.legend_l3">L3 Bronze</span>
+</span>
+</div>
+</div>
+<div class="relative overflow-x-auto pb-8 min-h-[400px]">
+<div class="flex flex-col items-center gap-12 min-w-[800px]">
+<div class="bg-primary/10 border-2 border-primary p-4 rounded-xl text-center shadow-xl shadow-primary/5 w-64 z-10">
+<div class="text-[10px] font-bold text-primary uppercase mb-1" data-i18n="network.node_role_master">Prescritor Master</div>
+<div class="text-text-main font-bold" data-i18n="network.node_name_self">Você (Root Node)</div>
+<div class="text-xs text-text-muted" data-i18n="network.node_loc_self">Lisboa, Portugal</div>
+</div>
+<div class="relative flex justify-center gap-16 w-full">
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 w-[60%] h-[2px] bg-border-muted"></div>
+<div class="flex flex-col items-center gap-8 group">
+<div class="absolute -top-12 left-1/2 h-12 w-[2px] bg-border-muted"></div>
+<div class="bg-surface border border-primary p-3 rounded-lg w-56 shadow-lg shadow-primary/5 relative">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[8px] bg-primary text-background px-1.5 rounded font-black">L1</span>
+<span class="material-symbols-outlined text-primary text-sm">verified_user</span>
+</div>
+<div class="text-sm font-bold truncate" data-i18n="network.node_name_pedro">Pedro Fernandes S.</div>
+<div class="text-[10px] text-text-muted" data-i18n="network.node_stats_pedro">Porto | Vol: €150k</div>
+<div class="text-xs font-serif font-bold text-primary mt-1" data-i18n="network.node_rev_pedro">€2,450.00</div>
+</div>
+<div class="flex gap-4">
+<div class="bg-surface border border-text-muted/30 p-2 rounded-lg w-40 hover:border-text-muted transition-colors">
+<div class="flex justify-between items-start">
+<span class="text-[8px] bg-text-muted text-background px-1.5 rounded font-black">L2</span>
+</div>
+<div class="text-xs font-bold truncate" data-i18n="network.node_name_imobilux">ImobiLux Lda.</div>
+<div class="text-[9px] text-text-muted" data-i18n="network.node_stats_imobilux">Braga | €45k</div>
+<div class="text-[11px] font-serif font-bold text-text-main" data-i18n="network.node_rev_imobilux">€450.00</div>
+</div>
+<div class="bg-surface border border-text-muted/30 p-2 rounded-lg w-40 opacity-60">
+<div class="flex justify-between items-start">
+<span class="text-[8px] bg-text-muted text-background px-1.5 rounded font-black">L2</span>
+</div>
+<div class="text-xs font-bold truncate" data-i18n="network.node_name_ana">Ana Martins</div>
+<div class="text-[9px] text-text-muted" data-i18n="network.node_stats_ana">Faro | €12k</div>
+<div class="text-[11px] font-serif font-bold text-text-main" data-i18n="network.node_rev_ana">€120.00</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-center gap-8 group">
+<div class="bg-surface border border-primary p-3 rounded-lg w-56 shadow-lg shadow-primary/5 relative">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[8px] bg-primary text-background px-1.5 rounded font-black">L1</span>
+</div>
+<div class="text-sm font-bold truncate" data-i18n="network.node_name_santos">Santos &amp; Co. Wealth</div>
+<div class="text-[10px] text-text-muted" data-i18n="network.node_stats_santos">Cascais | Vol: €890k</div>
+<div class="text-xs font-serif font-bold text-primary mt-1" data-i18n="network.node_rev_santos">€8,900.00</div>
+</div>
+<div class="bg-surface border border-orange-800/40 p-2 rounded-lg w-40 ring-1 ring-orange-800/10">
+<div class="flex justify-between items-start">
+<span class="text-[8px] bg-orange-700 text-white px-1.5 rounded font-black">L3</span>
+</div>
+<div class="text-xs font-bold truncate" data-i18n="network.node_name_wick">John Wick Ltd</div>
+<div class="text-[9px] text-text-muted" data-i18n="network.node_stats_wick">Madeira | €3k</div>
+<div class="text-[11px] font-serif font-bold text-orange-200" data-i18n="network.node_rev_wick">€30.00</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 bg-surface rounded-xl border border-border-muted p-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+<h3 class="font-bold text-lg" data-i18n="network.table_referrals">Referenciações Detalhadas</h3>
+<div class="flex bg-background p-1 rounded-lg border border-border-muted">
+<button class="px-4 py-1.5 rounded-md bg-primary text-background text-xs font-bold">L1</button>
+<button class="px-4 py-1.5 rounded-md text-text-muted text-xs font-medium hover:text-text-main">L2</button>
+<button class="px-4 py-1.5 rounded-md text-text-muted text-xs font-medium hover:text-text-main">L3</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] text-text-muted uppercase tracking-widest border-b border-border-muted">
+<th class="pb-3 pl-2" data-i18n="network.table_id">ID</th>
+<th class="pb-3" data-i18n="network.table_entity">Entidade / Nome</th>
+<th class="pb-3" data-i18n="network.table_jurisdiction">Jurisdição</th>
+<th class="pb-3" data-i18n="network.table_kyc">Status KYC</th>
+<th class="pb-3" data-i18n="network.table_date">Data Adesão</th>
+<th class="pb-3 text-right pr-2" data-i18n="network.table_revenue">Receita</th>
+</tr>
+</thead>
+<tbody class="text-sm divide-y divide-border-muted/50">
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="py-4 pl-2 font-mono text-xs text-text-muted" data-i18n="network.row1_id">#0481</td>
+<td class="py-4 font-bold" data-i18n="network.row1_name">Fernando Pessoa</td>
+<td class="py-4 text-text-muted" data-i18n="network.row1_loc">Lisboa, PT</td>
+<td class="py-4">
+<span class="bg-green-500/10 text-green-500 text-[10px] px-2 py-1 rounded font-bold" data-i18n="network.status_active">ACTIVO</span>
+</td>
+<td class="py-4 text-text-muted" data-i18n="network.row1_date">12 Mai 2023</td>
+<td class="py-4 text-right pr-2 font-serif font-bold text-primary" data-i18n="network.row1_rev">€1.200</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="py-4 pl-2 font-mono text-xs text-text-muted" data-i18n="network.row2_id">#0489</td>
+<td class="py-4 font-bold" data-i18n="network.row2_name">Saramago Assets</td>
+<td class="py-4 text-text-muted" data-i18n="network.row2_loc">Madrid, ES</td>
+<td class="py-4">
+<span class="bg-primary/10 text-primary text-[10px] px-2 py-1 rounded font-bold" data-i18n="network.status_pending">PENDENTE</span>
+</td>
+<td class="py-4 text-text-muted" data-i18n="network.row2_date">01 Jun 2023</td>
+<td class="py-4 text-right pr-2 font-serif font-bold text-text-muted" data-i18n="network.row2_rev">€0</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors">
+<td class="py-4 pl-2 font-mono text-xs text-text-muted" data-i18n="network.row3_id">#0501</td>
+<td class="py-4 font-bold" data-i18n="network.row3_name">Luís de Camões</td>
+<td class="py-4 text-text-muted" data-i18n="network.row3_loc">Coimbra, PT</td>
+<td class="py-4">
+<span class="bg-red-500/10 text-red-500 text-[10px] px-2 py-1 rounded font-bold" data-i18n="network.status_inactive">INACTIVO</span>
+</td>
+<td class="py-4 text-text-muted" data-i18n="network.row3_date">15 Jun 2023</td>
+<td class="py-4 text-right pr-2 font-serif font-bold text-text-muted" data-i18n="network.row3_rev">€0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="bg-surface rounded-xl border border-border-muted p-6 flex flex-col h-full">
+<h3 class="font-bold text-lg mb-6" data-i18n="network.chart_revenue_title">Evolução Revenue Share</h3>
+<div class="flex-1 flex items-end justify-between gap-3 h-48">
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full flex flex-col-reverse gap-0.5">
+<div class="bg-orange-700 h-2 w-full rounded-sm opacity-60"></div>
+<div class="bg-text-muted h-4 w-full rounded-sm opacity-60"></div>
+<div class="bg-primary h-12 w-full rounded-sm"></div>
+</div>
+<span class="text-[10px] text-text-muted uppercase font-bold" data-i18n="network.month_jan">Jan</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full flex flex-col-reverse gap-0.5">
+<div class="bg-orange-700 h-3 w-full rounded-sm opacity-60"></div>
+<div class="bg-text-muted h-6 w-full rounded-sm opacity-60"></div>
+<div class="bg-primary h-16 w-full rounded-sm"></div>
+</div>
+<span class="text-[10px] text-text-muted uppercase font-bold" data-i18n="network.month_feb">Fev</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full flex flex-col-reverse gap-0.5">
+<div class="bg-orange-700 h-4 w-full rounded-sm opacity-60"></div>
+<div class="bg-text-muted h-8 w-full rounded-sm opacity-60"></div>
+<div class="bg-primary h-24 w-full rounded-sm"></div>
+</div>
+<span class="text-[10px] text-text-muted uppercase font-bold" data-i18n="network.month_mar">Mar</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full flex flex-col-reverse gap-0.5">
+<div class="bg-orange-700 h-5 w-full rounded-sm opacity-60"></div>
+<div class="bg-text-muted h-10 w-full rounded-sm opacity-60"></div>
+<div class="bg-primary h-32 w-full rounded-sm"></div>
+</div>
+<span class="text-[10px] text-text-muted uppercase font-bold text-primary" data-i18n="network.month_apr">Abr</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full flex flex-col-reverse gap-0.5">
+<div class="bg-orange-700 h-6 w-full rounded-sm opacity-60"></div>
+<div class="bg-text-muted h-12 w-full rounded-sm opacity-60"></div>
+<div class="bg-primary h-36 w-full rounded-sm animate-pulse"></div>
+</div>
+<span class="text-[10px] text-text-muted uppercase font-bold" data-i18n="network.month_may">Mai</span>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-border-muted space-y-4">
+<div class="bg-background p-6 rounded-xl border-2 border-dashed border-primary/30 text-center relative overflow-hidden group">
+<div class="absolute -top-4 -right-4 w-16 h-16 bg-primary/20 rotate-45 flex items-center justify-center pt-6 pr-6">
+<span class="text-[10px] font-black text-primary" data-i18n="network.badge_new">NEW</span>
+</div>
+<p class="text-xs text-text-main mb-4" data-i18n="network.cta_text">Expanda sua rede e ganhe incentivo extra de 1% em volumes L1.</p>
+<button class="w-full py-3 bg-primary text-background font-bold rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">link</span>
+<span data-i18n="network.cta_button">Gerar Link de Referência</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Orbit 3: RSB/Dock -->
+<aside class="w-[var(--dock-width)] flex-shrink-0 border-l border-border-muted bg-surface flex flex-col overflow-hidden">
+<div class="gd-network-feed p-6 flex flex-col gap-6 h-full" data-hibernatable="true" data-state="">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">bolt</span>
+<h4 class="font-bold text-sm uppercase tracking-widest text-text-main" data-i18n="network.assistant_title">AIMON Assistant</h4>
+</div>
+<span class="bg-primary/20 text-primary text-[10px] px-2 py-0.5 rounded font-bold" data-i18n="network.assistant_status">AI ACTIVE</span>
+</div>
+<div class="space-y-4 overflow-hidden">
+<div class="bg-background p-4 rounded-xl border border-primary/20 relative">
+<div class="absolute top-0 right-0 w-8 h-8 flex items-center justify-center opacity-20">
+<span class="material-symbols-outlined text-primary">lightbulb</span>
+</div>
+<p class="text-xs text-primary font-bold mb-2" data-i18n="network.tip_label">Network Growth Tip</p>
+<p class="text-xs text-text-muted leading-relaxed" data-i18n="network.tip_content">Detectamos um volume crescente em <strong>Braga (L2)</strong>. Considere apoiar o parceiro <em>Pedro Fernandes</em> para converter o nó L3 pendente e desbloquear o bónus de volume.</p>
+</div>
+<div class="bg-background p-4 rounded-xl border border-border-muted">
+<p class="text-xs text-text-muted font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-blue-400">insights</span>
+<span data-i18n="network.analysis_label">Análise Contextual</span>
+</p>
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<span class="text-[10px] text-text-muted" data-i18n="network.metric_conv_rate">Taxa de Conversão L2</span>
+<span class="text-xs font-bold text-text-main" data-i18n="network.metric_conv_val">68%</span>
+</div>
+<div class="w-full bg-border-muted h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[68%]"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-[10px] text-text-muted" data-i18n="network.metric_stability">Estabilidade da Rede</span>
+<span class="text-xs font-bold text-text-main" data-i18n="network.metric_stability_val">Alta</span>
+</div>
+</div>
+</div>
+<div class="bg-background p-4 rounded-xl border border-border-muted">
+<p class="text-xs text-text-muted font-bold mb-3" data-i18n="network.next_steps_label">Próximos Passos</p>
+<ul class="space-y-2">
+<li class="flex items-start gap-2 group cursor-pointer">
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+<span class="text-[11px] text-text-muted group-hover:text-text-main transition-colors" data-i18n="network.step_kyc">Revisar KYC da Saramago Assets</span>
+</li>
+<li class="flex items-start gap-2 group cursor-pointer">
+<span class="material-symbols-outlined text-text-muted text-lg group-hover:text-primary">radio_button_unchecked</span>
+<span class="text-[11px] text-text-muted group-hover:text-text-main transition-colors" data-i18n="network.step_newsletter">Enviar Newsletter Lux v2.5</span>
+</li>
+<li class="flex items-start gap-2 group cursor-pointer">
+<span class="material-symbols-outlined text-text-muted text-lg group-hover:text-primary">radio_button_unchecked</span>
+<span class="text-[11px] text-text-muted group-hover:text-text-main transition-colors" data-i18n="network.step_call">Agendar chamada c/ L1 Cascais</span>
+</li>
+</ul>
+</div>
+</div>
+<button class="mt-auto w-full py-2.5 border border-primary text-primary hover:bg-primary hover:text-background text-xs font-bold rounded-lg transition-all" data-i18n="network.btn_suggestions">
+                    Ver Sugestões Completas
+                </button>
+</div>
+</aside>
+</div>
+<footer class="h-[var(--footer-height)] flex-shrink-0 bg-surface border-t border-border-muted flex items-center justify-between px-6 z-50">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-text-muted" data-i18n="network.footer_latency_label">API Latency:</span>
+<span class="text-[10px] text-green-500 font-bold" data-i18n="network.footer_latency_val">24ms</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-text-muted" data-i18n="network.footer_security_label">Security Node:</span>
+<span class="text-[10px] text-text-main font-bold" data-i18n="network.footer_security_val">LX-772-B</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[10px] text-text-muted uppercase tracking-tighter" data-i18n="network.footer_copyright">© 2024 LUX LUSITANA PLATFORM</span>
+<span class="text-[10px] text-primary/50" data-i18n="network.footer_version">SKELETON CORE v2.5.0</span>
+</div>
+</footer>
+</body></html>

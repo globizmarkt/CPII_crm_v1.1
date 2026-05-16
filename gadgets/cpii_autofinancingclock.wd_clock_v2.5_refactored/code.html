@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "var(--theme-primary)",
+                        "primary-hover": "var(--theme-primary-hover)",
+                        "background": "var(--theme-bg)",
+                        "surface": "var(--theme-surface)",
+                        "border-color": "var(--theme-border)",
+                        "text-main": "var(--theme-text)",
+                        "text-muted": "var(--theme-text-muted)",
+                    },
+                    fontFamily: {
+                        "display": ["Newsreader", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "header": "var(--header-height)",
+                        "footer": "var(--footer-height)",
+                        "sidebar": "var(--sidebar-width)",
+                        "dock": "var(--dock-width)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        :root {
+            --theme-bg: #161513;
+            --theme-surface: #1e1b14;
+            --theme-border: #35332c;
+            --theme-primary: #C1A85D;
+            --theme-primary-hover: #d4b86a;
+            --theme-text: #FDFBF6;
+            --theme-text-muted: #b2afa3;
+            --sidebar-width: 250px;
+            --dock-width: 320px;
+            --header-height: 64px;
+            --footer-height: 48px;
+        }
+        body {
+            font-family: 'Newsreader', serif;
+            background-color: var(--theme-bg);
+            color: var(--theme-text);
+        }
+        .orbit-sidebar { width: var(--sidebar-width); flex-shrink: 0; }
+        .orbit-dock { width: var(--dock-width); flex-shrink: 0; }
+        .glass-panel {
+            background: var(--theme-surface);
+            opacity: 0.9;
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--theme-border);
+        }
+        .progress-gradient {
+            background: linear-gradient(90deg, var(--theme-primary) 0%, var(--theme-primary-hover) 100%);
+        }
+        .circular-progress {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="h-header border-b border-border-color flex items-center justify-between px-6 bg-surface/50 backdrop-blur-md z-50">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl">hourglass_empty</span>
+<h1 class="text-xl font-bold tracking-tight uppercase" data-i18n="clock.app_title">CPII Platform</h1>
+</div>
+<nav class="hidden md:flex items-center gap-6 text-sm font-medium opacity-80">
+<a class="hover:text-primary transition-colors" data-i18n="clock.nav_dashboard" href="#">Dashboard</a>
+<a class="text-primary" data-i18n="clock.nav_clock" href="#">Clock</a>
+<a class="hover:text-primary transition-colors" data-i18n="clock.nav_simulator" href="#">Simulator</a>
+<a class="hover:text-primary transition-colors" data-i18n="clock.nav_assets" href="#">Assets</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-sm">search</span>
+<input class="bg-surface border-border-color rounded-full pl-10 pr-4 py-1.5 text-sm focus:ring-primary focus:border-primary w-64 text-main" data-i18n-placeholder="clock.search" placeholder="Pesquisar ativos..." type="text"/>
+</div>
+<button class="p-2 hover:bg-white/5 rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 border-l border-border-color ml-2 pl-4">
+<div class="text-right hidden lg:block">
+<p class="text-xs font-bold" data-i18n="clock.user_name">Lux Lusitana</p>
+<p class="text-[10px] opacity-60" data-i18n="clock.user_status">Skin 14 Active</p>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">person</span>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Orbit 1 (Sidebar) -->
+<aside class="orbit-sidebar border-r border-border-color bg-surface/30 hidden md:flex flex-col p-4">
+<div class="space-y-2">
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 text-text-muted transition-all">
+<span class="material-symbols-outlined">home</span>
+<span class="text-sm font-medium" data-i18n="clock.menu_home">Início</span>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary border border-primary/20 transition-all">
+<span class="material-symbols-outlined">schedule</span>
+<span class="text-sm font-medium" data-i18n="clock.menu_autofinancing">Autofinanciamento</span>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 text-text-muted transition-all">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-medium" data-i18n="clock.menu_investments">Investimentos</span>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 text-text-muted transition-all">
+<span class="material-symbols-outlined">calculate</span>
+<span class="text-sm font-medium" data-i18n="clock.menu_simulator">Simulador</span>
+</button>
+<div class="pt-8 pb-2 px-4 uppercase text-[10px] font-bold opacity-40 tracking-widest" data-i18n="clock.menu_tools">Ferramentas Core</div>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 text-text-muted transition-all">
+<span class="material-symbols-outlined">history</span>
+<span class="text-sm font-medium" data-i18n="clock.menu_history">Histórico</span>
+</button>
+<button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 text-text-muted transition-all">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium" data-i18n="clock.menu_settings">Configurações</span>
+</button>
+</div>
+<div class="mt-auto p-4 bg-primary/5 border border-primary/10 rounded-xl">
+<div class="flex items-center gap-2 mb-2 text-primary">
+<span class="material-symbols-outlined text-sm">auto_awesome</span>
+<span class="text-xs font-bold uppercase tracking-tighter" data-i18n="clock.gold_status">Gold Status</span>
+</div>
+<p class="text-[11px] opacity-70 leading-relaxed mb-3" data-i18n="clock.gold_description">Estás no caminho certo para a liberdade financeira.</p>
+<div class="h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[65%]"></div>
+</div>
+</div>
+</aside>
+<!-- Orbit 2 (Main) -->
+<main class="flex-1 overflow-y-auto bg-background p-8 relative">
+<div class="max-w-4xl mx-auto space-y-10">
+<!-- Block 1: Main Countdown -->
+<div class="wd-clock-global" data-hibernatable="false" data-state="">
+<section class="text-center space-y-8 py-6">
+<div class="space-y-2">
+<h2 class="text-5xl md:text-6xl font-display italic text-primary" data-i18n="clock.headline">
+                                Faltam <span class="text-text-main not-italic font-bold" data-i18n="clock.months_val">14</span> meses e <span class="text-text-main not-italic font-bold" data-i18n="clock.days_val">22</span> dias
+                            </h2>
+<p class="text-lg opacity-60" data-i18n="clock.countdown_subtitle">para te autofinanciares completamente</p>
+</div>
+<div class="flex justify-center items-center gap-8 md:gap-16">
+<div class="flex flex-col items-center gap-4">
+<div class="circular-progress ring-4 ring-primary/20 ring-offset-4 ring-offset-background border-4 border-primary">
+<span class="text-3xl font-bold" data-i18n="clock.months_val">14</span>
+</div>
+<span class="text-xs font-bold uppercase tracking-widest opacity-50" data-i18n="clock.unit_months">Meses</span>
+</div>
+<div class="flex flex-col items-center gap-4">
+<div class="circular-progress ring-4 ring-border-color ring-offset-4 ring-offset-background border-4 border-border-color">
+<span class="text-3xl font-bold" data-i18n="clock.weeks_val">03</span>
+</div>
+<span class="text-xs font-bold uppercase tracking-widest opacity-50" data-i18n="clock.unit_weeks">Semanas</span>
+</div>
+<div class="flex flex-col items-center gap-4">
+<div class="circular-progress ring-4 ring-border-color ring-offset-4 ring-offset-background border-4 border-border-color">
+<span class="text-3xl font-bold" data-i18n="clock.days_val">22</span>
+</div>
+<span class="text-xs font-bold uppercase tracking-widest opacity-50" data-i18n="clock.unit_days">Dias</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Block 2: Autofinancing Progress -->
+<section class="glass-panel p-6 rounded-2xl">
+<div class="flex justify-between items-end mb-4">
+<div>
+<h3 class="text-sm font-bold uppercase tracking-widest text-primary mb-1" data-i18n="clock.progress_label">Progresso do Autofinanciamento</h3>
+<p class="text-2xl font-display italic" data-i18n="clock.milestone_status">Rendimento vs. Aporte Mensal</p>
+</div>
+<div class="text-right">
+<span class="text-3xl font-bold text-primary" data-i18n="clock.completion_val">68%</span>
+<p class="text-[10px] uppercase opacity-40" data-i18n="clock.completed_label">concluído</p>
+</div>
+</div>
+<div class="relative h-12 bg-white/5 rounded-xl border border-white/10 overflow-hidden flex">
+<div class="h-full bg-border-color flex items-center px-4 relative group" style="width: 45%;">
+<span class="text-[10px] font-bold uppercase" data-i18n="clock.investment_label">Investimento</span>
+<div class="absolute -right-1 top-0 bottom-0 w-[2px] bg-white/20 z-10"></div>
+</div>
+<div class="h-full progress-gradient flex items-center px-4" style="width: 23%;">
+<span class="text-[10px] font-bold uppercase text-background" data-i18n="clock.returns_label">Retornos</span>
+</div>
+<div class="absolute left-[75%] top-0 bottom-0 w-[3px] bg-primary shadow-[0_0_15px_rgba(193,168,92,0.8)] z-20 flex flex-col items-center">
+<div class="absolute -top-6 bg-primary text-background text-[9px] font-black px-2 py-0.5 rounded uppercase whitespace-nowrap" data-i18n="clock.milestone_meta">Meta: Autofinance</div>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-2 text-xs opacity-60">
+<span class="material-symbols-outlined text-sm">info</span>
+<p data-i18n="clock.progress_hint">Falta apenas 32% para que os teus retornos mensais cubram o teu aporte fixo.</p>
+</div>
+</section>
+<!-- Block 3: Vehicle Breakdown -->
+<section class="grid md:grid-cols-2 gap-6">
+<!-- Catapulta Card -->
+<div class="wd-clock-catapulta" data-hibernatable="true" data-state="">
+<div class="glass-panel h-full p-6 rounded-2xl border-l-4 border-l-primary/50">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="text-lg font-bold" data-i18n="clock.catapulta">Catapulta</h4>
+<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded font-bold uppercase" data-i18n="clock.high_yield">High Yield</span>
+</div>
+<div class="text-right">
+<p class="text-2xl font-bold text-primary"><span data-i18n="clock.catapulta_apy">20%</span> <span class="text-xs opacity-50">APY</span></p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-sm">
+<span class="opacity-60" data-i18n="clock.lbl_monthly">Aporte Mensal</span>
+<span class="font-medium" data-i18n="clock.catapulta_contribution">€ 450,00</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="opacity-60" data-i18n="clock.lbl_cycles">Ciclos Restantes</span>
+<span class="font-medium" data-i18n="clock.catapulta_cycles">8 ciclos</span>
+</div>
+<div class="pt-4 border-t border-white/5">
+<div class="flex justify-between items-center mb-1 text-[10px] uppercase font-bold opacity-40">
+<span data-i18n="clock.cycle_efficiency">Eficiência do Ciclo</span>
+<span data-i18n="clock.catapulta_efficiency">92%</span>
+</div>
+<div class="h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary/40 w-[92%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Refúgio Card -->
+<div class="wd-clock-refugio" data-hibernatable="true" data-state="">
+<div class="glass-panel h-full p-6 rounded-2xl border-l-4 border-l-text-muted">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="text-lg font-bold" data-i18n="clock.refugio">Refúgio</h4>
+<span class="text-[10px] bg-surface text-text-muted px-2 py-0.5 rounded font-bold uppercase" data-i18n="clock.conservative">Conservative</span>
+</div>
+<div class="text-right">
+<p class="text-2xl font-bold"><span data-i18n="clock.refugio_apy">8%</span> <span class="text-xs opacity-50">APY</span></p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-sm">
+<span class="opacity-60" data-i18n="clock.lbl_monthly">Aporte Mensal</span>
+<span class="font-medium" data-i18n="clock.refugio_contribution">€ 1.200,00</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="opacity-60" data-i18n="clock.lbl_cycles">Ciclos Restantes</span>
+<span class="font-medium" data-i18n="clock.refugio_cycles">18 ciclos</span>
+</div>
+<div class="pt-4 border-t border-white/5">
+<div class="flex justify-between items-center mb-1 text-[10px] uppercase font-bold opacity-40">
+<span data-i18n="clock.cycle_efficiency">Eficiência do Ciclo</span>
+<span data-i18n="clock.refugio_efficiency">45%</span>
+</div>
+<div class="h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-text-muted w-[45%]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Block 5: Action CTAs -->
+<section class="flex flex-wrap items-center gap-4 py-6">
+<button class="flex-1 bg-primary hover:bg-primary-hover text-background font-bold py-4 px-8 rounded-xl transition-all shadow-lg flex items-center justify-center gap-3 group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">bolt</span>
+<span data-i18n="clock.btn_increase">Aumentar aporte para acelerar</span>
+</button>
+<button class="flex-1 bg-white/5 hover:bg-white/10 text-text-main border border-white/10 font-bold py-4 px-8 rounded-xl transition-all flex items-center justify-center gap-3">
+<span class="material-symbols-outlined">visibility</span>
+<span data-i18n="clock.btn_simulate">Ver simulação completa</span>
+</button>
+</section>
+</div>
+</main>
+<!-- Orbit 3 (Dock) -->
+<aside class="orbit-dock border-l border-border-color bg-surface/50 hidden xl:flex flex-col">
+<div class="p-6 border-b border-border-color flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+<span class="text-xs font-bold uppercase tracking-widest" data-i18n="clock.aimon_title">AIMON Assistant</span>
+</div>
+<span class="material-symbols-outlined text-text-muted cursor-pointer">close</span>
+</div>
+<div class="flex-1 p-6 space-y-6 overflow-hidden">
+<!-- Block 4: AIMON Contextual Message -->
+<div class="bg-primary/10 border border-primary/20 p-5 rounded-2xl relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 opacity-10 group-hover:rotate-12 transition-transform">
+<span class="material-symbols-outlined text-8xl">auto_awesome</span>
+</div>
+<h5 class="text-primary font-bold text-sm mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">chat_bubble</span>
+<span data-i18n="clock.aimon_status">Status: Quase lá!</span>
+</h5>
+<p class="text-sm leading-relaxed italic font-display" data-i18n="clock.aimon_message">
+                        "Estás a apenas alguns ciclos de atingir o ponto de inflexão. Se aumentares o teu aporte no Catapulta em apenas 10%, cortas 2 meses do teu relógio."
+                    </p>
+</div>
+<div class="space-y-4">
+<h6 class="text-[10px] font-bold uppercase opacity-40 tracking-widest" data-i18n="clock.expert_tips">Dicas do Especialista</h6>
+<div class="flex gap-4 items-start">
+<div class="w-8 h-8 rounded-lg bg-background flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">lightbulb</span>
+</div>
+<p class="text-xs opacity-70 leading-normal" data-i18n="clock.tip_1">O mercado de Catapulta está em alta. Considera rebalancear teus lucros do Refúgio hoje.</p>
+</div>
+<div class="flex gap-4 items-start">
+<div class="w-8 h-8 rounded-lg bg-background flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">trending_up</span>
+</div>
+<p class="text-xs opacity-70 leading-normal" data-i18n="clock.tip_2">O teu rendimento passivo cresceu <span data-i18n="clock.growth_val">4.2%</span> na última semana. Mantém o foco!</p>
+</div>
+</div>
+<div class="mt-8">
+<div class="aspect-video rounded-xl bg-background overflow-hidden relative group cursor-pointer border border-white/5">
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+<img class="w-full h-full object-cover" data-alt="Gráfico financeiro" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAa7fDPJUfV6rVsxNt8Tmt015S5NjfK9kemKnt5o0y1gbLojsfau7xNY1jL3QkdcPN_67k0yj5USkzvrQqGqmkyqgdK4N-vrQ4FC2IXk8huN16tXOgxlwUwGII4VbjURk1htIbiVL9eIU4IJZoCyMYPbT-kCYK-RKxtHnMysmtxyZSnxipEYdrUDdI3KuCm7XUCBOwB2CFTQI9iSQtZ4PIRM-smnDG7_tLRXw8ZeneGs6JIr_gkZKc0BDja78a_Gwej-nPyFWlZcM3v"/>
+<div class="absolute bottom-3 left-3">
+<p class="text-[10px] font-bold uppercase tracking-widest opacity-60" data-i18n="clock.insight_label">Insight Semanal</p>
+<p class="text-xs font-bold text-text-main" data-i18n="clock.insight_title">Projeções de Mercado Q4</p>
+</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-4xl text-primary">play_circle</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 bg-background/50">
+<div class="relative">
+<input class="w-full bg-surface border-border-color rounded-xl px-4 py-3 pr-12 text-sm focus:ring-primary focus:border-primary text-main" data-i18n-placeholder="clock.aimon_input_placeholder" placeholder="Pergunta ao AIMON..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 text-primary p-2">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</aside>
+</div>
+<!-- Footer -->
+<footer class="h-footer border-t border-border-color bg-background flex items-center justify-between px-6 text-[10px] uppercase font-bold tracking-widest opacity-40">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+<span data-i18n="clock.sys_online">System Online</span>
+</div>
+<span data-i18n="clock.sys_version">Core v2.5.0</span>
+<span data-i18n="clock.sys_skin">Lux Lusitana Skin 14</span>
+</div>
+<div class="flex items-center gap-6">
+<span data-i18n="clock.sys_server">Server: EU-West-1</span>
+<span data-i18n="clock.sys_last_sync">Last Sync: 2m ago</span>
+</div>
+</footer>
+</body></html>

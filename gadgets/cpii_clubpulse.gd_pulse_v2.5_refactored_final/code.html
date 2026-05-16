@@ -1,0 +1,380 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:wght@700&amp;family=Material+Icons&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    :root {
+      --theme-bg: #161513;
+      --theme-surface: #1e1b14;
+      --theme-border: #35332c;
+      --theme-primary: #C1A85D;
+      --theme-primary-hover: #d4b86a;
+      --theme-text: #FDFBF6;
+      --theme-text-muted: #b2afa3;
+      --sidebar-width: 250px;
+      --dock-width: 320px;
+      --header-height: 64px;
+      --footer-height: 48px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--theme-bg);
+      color: var(--theme-text);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: var(--theme-border);
+      border-radius: 10px;
+    }
+
+    .glass-panel {
+      background: var(--theme-surface);
+      border: 1px solid var(--theme-border);
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "theme-bg": "var(--theme-bg)",
+            "theme-surface": "var(--theme-surface)",
+            "theme-border": "var(--theme-border)",
+            "theme-primary": "var(--theme-primary)",
+            "theme-primary-hover": "var(--theme-primary-hover)",
+            "theme-text": "var(--theme-text)",
+            "theme-text-muted": "var(--theme-text-muted)",
+          },
+          spacing: {
+            "sidebar": "var(--sidebar-width)",
+            "dock": "var(--dock-width)",
+            "header": "var(--header-height)",
+            "footer": "var(--footer-height)",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"],
+            "serif": ["Playfair Display", "serif"]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="overflow-hidden font-display flex flex-col h-screen">
+<!-- Header -->
+<header class="h-header border-b border-theme-border flex items-center justify-between px-6 bg-theme-bg sticky top-0 z-50">
+<div class="flex items-center gap-4 cursor-pointer" onclick="SceneManager.goTo('dashboard')">
+<div class="w-10 h-10 bg-theme-primary flex items-center justify-center rounded-lg">
+<span class="material-icons text-theme-bg">blur_on</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tight text-theme-primary uppercase">
+<span data-i18n="pulse.brand_cpii">CPII</span>
+<span class="opacity-50" data-i18n="pulse.brand_name">ClubPulse</span>
+</h1>
+<p class="text-[10px] text-theme-primary opacity-60 tracking-widest uppercase font-semibold" data-i18n="pulse.skin_info">Skin 15 • Lux Lusitana</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex items-center gap-4 text-sm font-medium text-theme-text-muted">
+<span class="hover:text-theme-primary cursor-pointer transition-colors" data-i18n="nav.markets" onclick="SceneManager.goTo('markets')">Mercados</span>
+<span class="hover:text-theme-primary cursor-pointer transition-colors" data-i18n="nav.assets" onclick="SceneManager.goTo('assets')">Ativos</span>
+<span class="text-theme-primary cursor-pointer" data-i18n="nav.pulse" onclick="SceneManager.goTo('clubpulse')">ClubPulse</span>
+</nav>
+<div class="flex items-center gap-3 border-l border-theme-border pl-6">
+<span class="material-icons text-theme-primary cursor-pointer">notifications_none</span>
+<div class="w-8 h-8 rounded-full bg-theme-surface border border-theme-border flex items-center justify-center overflow-hidden">
+<img alt="User" class="w-full h-full object-cover" data-i18n-placeholder="User profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxs77cmUNKR4bb_T0lR9GhoCFhBLh9rbnxsXCr6dTs7ecAX-2GEJzvsSxvvhjMobyRfPM5lvMn4iuXAX51_618YBa70WG-QXpIjKv_y1tKR0cxH-HUGEv54IK5KBF6iBSr5HoSh7KOQlMiTqy6OHGyQXVkIFrGWszkVGVqyya6NjINY3hd9qmp6J3kflhWiHeScjHlFlH8KsE_Ebbb9jSx9M719_1RJCBPEUlx2pGqDVs-U43MZYUgXwS6d2LXdsGI0vcbsGSfEF6w"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- Orbit 1 (Sidebar) -->
+<aside class="w-[var(--sidebar-width)] border-r border-theme-border flex flex-col p-4 bg-theme-bg/50">
+<nav class="space-y-2">
+<div class="p-3 rounded-lg bg-theme-primary/10 text-theme-primary flex items-center gap-3 cursor-pointer" onclick="SceneManager.goTo('dashboard')">
+<span class="material-icons text-xl">dashboard</span>
+<span class="font-medium" data-i18n="menu.dashboard">Global Dashboard</span>
+</div>
+<div class="p-3 rounded-lg hover:bg-theme-primary/5 text-theme-text-muted hover:text-theme-primary transition-all flex items-center gap-3 cursor-pointer" onclick="SceneManager.goTo('aum')">
+<span class="material-icons text-xl">account_balance_wallet</span>
+<span class="font-medium" data-i18n="menu.aum">Gestão AUM</span>
+</div>
+<div class="p-3 rounded-lg hover:bg-theme-primary/5 text-theme-text-muted hover:text-theme-primary transition-all flex items-center gap-3 cursor-pointer" onclick="SceneManager.goTo('investors')">
+<span class="material-icons text-xl">groups</span>
+<span class="font-medium" data-i18n="menu.investors">Investidores</span>
+</div>
+<div class="p-3 rounded-lg hover:bg-theme-primary/5 text-theme-text-muted hover:text-theme-primary transition-all flex items-center gap-3 cursor-pointer" onclick="SceneManager.goTo('reports')">
+<span class="material-icons text-xl">analytics</span>
+<span class="font-medium" data-i18n="menu.reports">Relatórios</span>
+</div>
+</nav>
+<div class="mt-auto space-y-4">
+<div class="p-4 rounded-xl bg-gradient-to-br from-theme-primary/10 to-transparent border border-theme-border">
+<p class="text-[10px] text-theme-primary font-bold uppercase mb-1" data-i18n="sidebar.status">Status do Fundo</p>
+<div class="flex items-center justify-between">
+<span class="text-xs text-theme-text-muted" data-i18n="sidebar.liquidity">Liquidez</span>
+<span class="text-xs font-bold text-emerald-500" data-i18n="sidebar.optimized">Otimizado</span>
+</div>
+<div class="w-full bg-theme-border h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-theme-primary h-full w-[82%]"></div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Orbit 2 (Main) -->
+<main class="flex-1 overflow-y-auto custom-scrollbar p-6">
+<div class="max-w-6xl mx-auto space-y-8">
+<!-- Thermometer -->
+<section class="gd-pulse-thermometer grid grid-cols-1 md:grid-cols-5 gap-4" data-hibernatable="true" data-state="">
+<div class="glass-panel p-5 rounded-xl border-l-4 border-l-theme-primary">
+<p class="text-[10px] text-theme-primary font-bold uppercase" data-i18n="card.aum">AUM Deployed</p>
+<div class="flex items-baseline gap-1 mt-2">
+<span class="text-3xl font-serif text-theme-text" data-i18n-placeholder="€245.8">€245.8</span>
+<span class="text-xs text-theme-text-muted font-medium" data-i18n="unit.million">M</span>
+</div>
+</div>
+<div class="glass-panel p-5 rounded-xl">
+<p class="text-[10px] text-theme-primary font-bold uppercase" data-i18n="card.apy">Average APY YTD</p>
+<div class="flex items-baseline gap-1 mt-2">
+<span class="text-3xl font-serif text-theme-text" data-i18n-placeholder="14.2">14.2</span>
+<span class="text-xs text-emerald-500 font-bold">%</span>
+</div>
+</div>
+<div class="glass-panel p-5 rounded-xl">
+<p class="text-[10px] text-theme-primary font-bold uppercase" data-i18n="card.investors">Active Investors</p>
+<div class="flex items-baseline gap-1 mt-2">
+<span class="text-3xl font-serif text-theme-text" data-i18n-placeholder="1,284">1,284</span>
+</div>
+</div>
+<div class="glass-panel p-5 rounded-xl">
+<p class="text-[10px] text-theme-primary font-bold uppercase" data-i18n="card.neg">In Negotiation</p>
+<div class="flex items-baseline gap-1 mt-2">
+<span class="text-3xl font-serif text-theme-text" data-i18n-placeholder="€12.5">€12.5</span>
+<span class="text-xs text-theme-text-muted font-medium" data-i18n="unit.million">M</span>
+</div>
+</div>
+<div class="glass-panel p-5 rounded-xl">
+<p class="text-[10px] text-theme-primary font-bold uppercase" data-i18n="card.liq">Next Liquidation</p>
+<div class="flex items-baseline gap-1 mt-2">
+<span class="text-3xl font-serif text-theme-primary" data-i18n-placeholder="12">12</span>
+<span class="text-xs text-theme-text-muted font-medium italic" data-i18n="unit.days">Dias</span>
+</div>
+</div>
+</section>
+<!-- Middle Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Vehicles -->
+<section class="gd-pulse-vehicles glass-panel p-6 rounded-xl flex flex-col h-full" data-hibernatable="true" data-state="">
+<h2 class="text-sm font-bold text-theme-primary uppercase mb-6 flex items-center gap-2">
+<span class="material-icons text-sm">pie_chart</span>
+<span data-i18n="section.vehicle_distribution">Distribuição de Veículos</span>
+</h2>
+<div class="space-y-6 flex-1">
+<div class="space-y-2">
+<div class="flex justify-between text-xs">
+<span class="font-bold text-theme-text" data-i18n="vehicle.tier_a">Catapulta Tier A</span>
+<span class="text-theme-primary font-serif" data-i18n-placeholder="68% AUM">68% AUM</span>
+</div>
+<div class="h-4 w-full bg-theme-border rounded-full overflow-hidden">
+<div class="h-full bg-theme-primary" style="width: 68%"></div>
+</div>
+<div class="flex justify-between text-[10px] text-theme-text-muted">
+<span data-i18n-placeholder="840 Investidores">840 Investidores</span>
+<span data-i18n-placeholder="14 Ciclos Ativos">14 Ciclos Ativos</span>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs">
+<span class="font-bold text-theme-text" data-i18n="vehicle.tier_b">Refúgio Tier B</span>
+<span class="text-theme-text-muted font-serif" data-i18n-placeholder="32% AUM">32% AUM</span>
+</div>
+<div class="h-4 w-full bg-theme-border rounded-full overflow-hidden">
+<div class="h-full bg-theme-text-muted" style="width: 32%"></div>
+</div>
+<div class="flex justify-between text-[10px] text-theme-text-muted">
+<span data-i18n-placeholder="444 Investidores">444 Investidores</span>
+<span data-i18n-placeholder="8 Ciclos Ativos">8 Ciclos Ativos</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Geo -->
+<section class="gd-pulse-geo glass-panel p-6 rounded-xl flex flex-col h-full" data-hibernatable="true" data-state="">
+<h2 class="text-sm font-bold text-theme-primary uppercase mb-6 flex items-center gap-2">
+<span class="material-icons text-sm">public</span>
+<span data-i18n="section.geo_distribution">Distribuição Geográfica</span>
+</h2>
+<div class="grid grid-cols-3 gap-3">
+<div class="bg-theme-primary/10 border border-theme-primary/20 p-4 rounded-lg flex flex-col items-center text-center">
+<span class="text-lg font-bold text-theme-primary mb-1">PT</span>
+<span class="text-[10px] text-theme-text-muted uppercase" data-i18n="label.investors">Investors</span>
+<span class="text-lg font-serif" data-i18n-placeholder="850">850</span>
+</div>
+<div class="bg-theme-primary/5 border border-theme-primary/10 p-4 rounded-lg flex flex-col items-center text-center">
+<span class="text-lg font-bold text-theme-primary/80 mb-1">ES</span>
+<span class="text-[10px] text-theme-text-muted uppercase" data-i18n="label.investors">Investors</span>
+<span class="text-lg font-serif" data-i18n-placeholder="210">210</span>
+</div>
+<div class="bg-theme-primary/5 border border-theme-primary/5 p-4 rounded-lg flex flex-col items-center text-center">
+<span class="text-lg font-bold text-theme-primary/60 mb-1">BR</span>
+<span class="text-[10px] text-theme-text-muted uppercase" data-i18n="label.investors">Investors</span>
+<span class="text-lg font-serif" data-i18n-placeholder="224">224</span>
+</div>
+</div>
+<div class="mt-4 flex-1 rounded-lg overflow-hidden relative min-h-[120px]">
+<div class="absolute inset-0 bg-theme-primary/5 flex items-center justify-center">
+<img alt="Map" class="w-full h-full object-cover opacity-20 grayscale" data-i18n-placeholder="Abstract Map" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCb72J6Wdo0AI5BvftVRPCwPC7Y8LSRb-tqNx4xyX02-jaA2mz4UgYnvBkF6G49zjdgV4hkgJQTpjvuppDb8OtbGDmb3gXko7slFQGwIQ6XamnwJDwudMejTV8q_9d4jaORMS8gtLI1-dHJwhEneQSdow2Qir5JVV-KRmuHu7mZ2xGxhniLfCMgacr7U6mqumH6qCYIValIazDbQNR-gZtj5m0w0iEB8-AH5zWtnKVlZ7SJ9QbaK0q_H56peI2a2cPftMQmHoJmTyKn"/>
+</div>
+</div>
+</section>
+</div>
+<!-- Liquidations -->
+<section class="gd-pulse-liquidations glass-panel p-6 rounded-xl" data-hibernatable="true" data-state="">
+<h2 class="text-sm font-bold text-theme-primary uppercase mb-6 flex items-center justify-between">
+<span class="flex items-center gap-2">
+<span class="material-icons text-sm">schedule</span>
+<span data-i18n="section.liquidation_windows">Próximas Janelas de Liquidação</span>
+</span>
+<span class="text-[10px] font-normal text-theme-text-muted lowercase tracking-normal cursor-pointer hover:text-theme-primary" data-i18n="label.view_calendar">Ver calendário completo</span>
+</h2>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead>
+<tr class="border-b border-theme-border text-[10px] uppercase text-theme-text-muted tracking-wider">
+<th class="pb-3 font-semibold" data-i18n="table.date">Data</th>
+<th class="pb-3 font-semibold" data-i18n="table.vehicle">Veículo</th>
+<th class="pb-3 font-semibold text-right" data-i18n="table.volume">Volume Est.</th>
+<th class="pb-3 font-semibold text-center" data-i18n="table.impact">Impacto</th>
+<th class="pb-3 font-semibold text-right" data-i18n="table.status">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-theme-border/50">
+<tr class="group hover:bg-theme-primary/5 transition-colors">
+<td class="py-4 font-serif text-theme-text-muted" data-i18n-placeholder="12 Out 2023">12 Out 2023</td>
+<td class="py-4 font-medium" data-i18n-placeholder="Catapulta A-09">Catapulta A-09</td>
+<td class="py-4 text-right" data-i18n-placeholder="€4.200.000">€4.200.000</td>
+<td class="py-4 text-center text-theme-text-muted" data-i18n-placeholder="142 Inv.">142 Inv.</td>
+<td class="py-4 text-right">
+<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-500 text-[10px] font-bold uppercase" data-i18n="status.confirmed">Confirmada</span>
+</td>
+</tr>
+<tr class="group hover:bg-theme-primary/5 transition-colors">
+<td class="py-4 font-serif text-theme-text-muted" data-i18n-placeholder="28 Out 2023">28 Out 2023</td>
+<td class="py-4 font-medium" data-i18n-placeholder="Refúgio B-04">Refúgio B-04</td>
+<td class="py-4 text-right" data-i18n-placeholder="€1.150.000">€1.150.000</td>
+<td class="py-4 text-center text-theme-text-muted" data-i18n-placeholder="89 Inv.">89 Inv.</td>
+<td class="py-4 text-right">
+<span class="px-2 py-0.5 rounded bg-theme-primary/20 text-theme-primary text-[10px] font-bold uppercase" data-i18n="status.predicted">Prevista</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Feed -->
+<section class="gd-pulse-feed glass-panel p-6 rounded-xl" data-hibernatable="true" data-state="">
+<h2 class="text-sm font-bold text-theme-primary uppercase mb-6 flex items-center gap-2">
+<span class="material-icons text-sm">history</span>
+<span data-i18n="section.activity_feed">Feed de Atividade Macro</span>
+</h2>
+<div class="space-y-4">
+<div class="flex gap-4 items-start border-l-2 border-theme-primary/30 pl-4 py-1">
+<div class="w-2 h-2 rounded-full bg-theme-primary mt-1.5 -ml-[21px] ring-4 ring-theme-bg"></div>
+<div class="flex-1">
+<p class="text-sm font-medium text-theme-text" data-i18n-placeholder="Novo ativo Catapulta captado em Lisboa">Novo ativo Catapulta captado em Lisboa</p>
+<div class="flex justify-between items-center mt-1">
+<span class="text-[10px] text-theme-text-muted" data-i18n-placeholder="Imobiliário Prime • Av. Liberdade">Imobiliário Prime • Av. Liberdade</span>
+<span class="text-[10px] text-theme-primary font-medium uppercase tracking-tighter" data-i18n-placeholder="há 2 horas">há 2 horas</span>
+</div>
+</div>
+</div>
+<div class="flex gap-4 items-start border-l-2 border-theme-border pl-4 py-1">
+<div class="w-2 h-2 rounded-full bg-theme-text-muted mt-1.5 -ml-[21px] ring-4 ring-theme-bg"></div>
+<div class="flex-1">
+<p class="text-sm font-medium text-theme-text-muted" data-i18n-placeholder="Revisão trimestral de risco Tier B concluída">Revisão trimestral de risco Tier B concluída</p>
+<div class="flex justify-between items-center mt-1">
+<span class="text-[10px] text-theme-text-muted" data-i18n-placeholder="Compliance • Global Risk Board">Compliance • Global Risk Board</span>
+<span class="text-[10px] text-theme-text-muted font-medium uppercase tracking-tighter" data-i18n-placeholder="há 5 horas">há 5 horas</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Orbit 3 (Dock) -->
+<aside class="w-[var(--dock-width)] border-l border-theme-border flex flex-col bg-theme-surface p-6">
+<div class="flex items-center gap-2 mb-8">
+<div class="w-8 h-8 rounded-full bg-theme-primary flex items-center justify-center">
+<span class="material-icons text-sm text-theme-bg">psychology</span>
+</div>
+<div>
+<h3 class="font-bold text-theme-text text-sm" data-i18n="assistant.name">AIMON Assistant</h3>
+<p class="text-[10px] text-theme-primary opacity-60 uppercase tracking-widest font-bold" data-i18n="assistant.title">Inteligência de Club</p>
+</div>
+</div>
+<div class="space-y-6">
+<div class="p-4 rounded-xl bg-theme-primary/10 border border-theme-primary/20">
+<p class="text-xs text-theme-primary font-bold mb-2 uppercase tracking-wide" data-i18n="assistant.insight_title">Insight do Dia</p>
+<p class="text-xs text-theme-text-muted leading-relaxed italic" data-i18n-placeholder="Insight content text here...">
+            "Observamos uma concentração de 42% do AUM em ativos de Lisboa. Recomenda-se diversificação para a região Norte (PT) ou Madrid (ES) para mitigar riscos geográficos no próximo trimestre."
+          </p>
+</div>
+<div class="space-y-4">
+<p class="text-[10px] text-theme-text-muted uppercase font-bold tracking-widest" data-i18n="assistant.trends_title">Tendências do Ecossistema</p>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+<span class="material-icons text-emerald-500 text-sm">trending_up</span>
+</div>
+<div>
+<p class="text-xs font-medium text-theme-text" data-i18n-placeholder="Interesse BR crescente">Interesse BR crescente</p>
+<p class="text-[9px] text-theme-text-muted" data-i18n-placeholder="+12% leads qualificados">+12% leads qualificados este mês</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8">
+<button class="w-full py-3 bg-theme-primary text-theme-bg rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-theme-primary-hover transition-all" data-i18n="button.generate_report">
+            Gerar Relatório Macro
+          </button>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-theme-border">
+<div class="flex items-center gap-2 p-3 rounded-lg bg-theme-bg border border-theme-border">
+<span class="material-icons text-theme-text-muted text-sm">chat_bubble_outline</span>
+<span class="text-xs text-theme-text-muted" data-i18n="assistant.placeholder">Pergunte algo à AIMON...</span>
+</div>
+</div>
+</aside>
+</div>
+<!-- Footer -->
+<footer class="h-footer border-t border-theme-border flex items-center justify-between px-6 bg-theme-bg text-[10px] text-theme-text-muted font-medium">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+<span data-i18n="footer.status">Sistema Operacional</span>
+</div>
+<span class="text-theme-primary opacity-30">|</span>
+<span data-i18n="footer.version">v2.5.0 Skeleton Core</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="uppercase tracking-widest" data-i18n="footer.copyright">© 2023 ClubPulse Global</span>
+<span class="text-theme-primary font-bold" data-i18n-placeholder="0.024s Latency">0.024s Latency</span>
+</div>
+</footer>
+</body></html>

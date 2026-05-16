@@ -1,0 +1,624 @@
+/**
+ * CPII — i18n.js
+ * Versión: v2.2
+ * FECHA    : 2026-03-14
+ * Motor de traducción universal del ecosistema
+ * Ruta: core/i18n.js
+ *
+ * Propósito:   - Añadir claves brand_name y brand_tooltip_text en los
+ *              - 4 idiomas. Actualizar brand_subtitle (eliminar prefijo CPII).
+ *              - Inyectar claves de los 6 pilares de Órbita 1 en los
+ *              - 4 idiomas. Sustituir claves nav_* obsoletas.
+ *              - Inyectar nomenclatura fiduciaria final en los 6 pilares
+                de Órbita 1. Conversión de formato anidado a plano.
+ * 
+ *              - Sin balizas nuevas. Cambios dentro del bloque translations.
+ *              - Bloque translations — sección UI Global × 4 idiomas.
+ * Índice: 
+ *              [UI Global] — 4 idiomas
+ *              [Órbita 1] — 4 idiomas
+ *              [Órbita 2] — 4 idiomas
+ *              [Órbita 3] — 4 idiomas
+ *              [Órbita 4] — 4 idiomas
+ *              [Órbita 5] — 4 idiomas
+ *              [Órbita 6] — 4 idiomas
+ * 
+ *
+ * Doctrina: R0 Sin hardcode | R4 data-i18n obligatorio
+ */
+
+const translations = {
+    pt: {
+        // ── UI Global ─────────────────────────────────────────
+        "brand_name": "Gestor de Relações",
+        "brand_subtitle": "Clube Privado",
+        "brand_tooltip_text": "Estratégia de Inteligência Patrimonial: Gestão centralizada com visão 360° para otimizar cada oportunidade de investimento.",
+        "nav_dashboard": "Posição Global",
+        "nav_vault": "Meus Ativos",
+        "nav_crm": "Gestão de Relações",
+        "nav_network": "Minha Rede",
+        "nav_academy": "Academy",
+        "nav_audit": "Histórico e Documentos",
+        "nav_settings": "Definições",
+        "nav_manuals": "Manuais",
+        "tooltip_phase2": "Habilitação Pendente: Conclua a Academy e o seu KYC.",
+        "tooltip_phase3": "Acesso Reservado: Staff ou Nível de Gestão Mínimo.",
+        "search_placeholder": "Pesquisar...",
+        "tenant_label": "Utilizador",
+        "welcome_title": "Espaço de Trabalho",
+        "empty_state": "Selecione uma opção no menu para começar.",
+        "explore_btn": "Explorar",
+        "kyc_required": "Acesso Restrito",
+        "kyc_description": "A sua verificação KYC está pendente. Algumas funcionalidades estão limitadas até à aprovação.",
+        "simulate_kyc": "Simular KYC Verificado",
+        "gatekeeper_title": "Estado Gatekeeper",
+        "kyc_status": "KYC Pendente",
+        "kyc_action": "Requer atenção imediata",
+        "aimon_title": "Painel AIMON",
+        "aimon_msg": "Bem-vindo ao seu workspace. Como posso assistir o seu investimento hoje?",
+        "open_assistant": "Abrir Assistente",
+        "recent_activity": "Atividade Recente",
+        // ── Admin Gate ────────────────────────────────────────
+        "gate.title": "Acesso Reservado",
+        "gate.subtitle": "Autentique-se com as suas credenciais de staff.",
+        "gate.btn_google": "Continuar com Google",
+        "gate.btn_apple": "Continuar com Apple",
+        "gate.divider": "ou",
+        "gate.email_label": "Email institucional",
+        "gate.email_placeholder": "nome@cpii.pt",
+        "gate.btn_email_send": "Enviar acesso seguro",
+        "gate.confirm_title": "Link enviado",
+        "gate.confirm_text": "Verifique a sua caixa de entrada.",
+        "gate.loading": "A verificar credenciais...",
+        "gate.success": "Acesso concedido. A redirecionar...",
+        "gate.custody_title": "Acesso bloqueado",
+        "gate.tenant": "cpii_v1.1 · Staff",
+        // ── Tab Manager ───────────────────────────────────────
+        "tab_manual": "Manual",
+        "tab_simulador": "Simulador",
+        "tab_calculadora": "Calculadora",
+        "tab_dashboard": "Dashboard",
+        "omnibox_placeholder": "Abrir recurso...",
+        "omnibox_no_results": "Sem resultados",
+        // ── gd-manual ─────────────────────────────────────────
+        "manual.version": "Versão 1.0 · Março 2026",
+        "manual.title": "Manual de Boas Práticas",
+        "manual.subtitle": "Gestão e Crescimento do Clube",
+        "manual.purpose": "Este manual recolhe as diretrizes operativas para que qualquer membro da equipa possa replicar o sistema de captação, integração e fidelização de membros do clube de forma consistente e escalável.",
+        "manual.s1.title": "Princípio Orientador: Um Sistema Duplicável",
+        "manual.s1.intro": "O objetivo é criar um sistema tão claro que qualquer pessoa possa executá-lo e transmiti-lo corretamente.",
+        "manual.s1.avoid": "❌ Erros a evitar",
+        "manual.s1.err1": "Que cada membro explique o projeto com as suas próprias palavras.",
+        "manual.s1.err2": "Que os prescritores tentem responder todas as perguntas antes do tempo.",
+        "manual.s1.err3": "Que se misturem mensagens, etapas e audiências distintas numa mesma conversa.",
+        "manual.s1.principle_label": "Princípio do Profano",
+        "manual.s1.principle": "Um prescritor bem formado não convence: abre a porta. O especialista toma o relevo.",
+        "manual.s2.title": "O Fluxo de Captação Passo a Passo",
+        "manual.s2.f1.action": "O prescritor envia o vídeo de apresentação ao seu contacto.",
+        "manual.s2.f1.note": "Sem explicações adicionais. Apenas o vídeo.",
+        "manual.s2.f2.action": "O contacto pergunta: o que é isto?",
+        "manual.s2.f2.note": "É o sinal que esperamos. O gancho está a funcionar.",
+        "manual.s2.f3.action": "O prescritor convida o contacto para o webinar com o link de inscrição.",
+        "manual.s2.f3.note": "O prescritor NÃO responde mais perguntas. Redireciona para o webinar.",
+        "manual.s2.f4.action": "O contacto inscreve-se no webinar: nome, telefone, email, quem o convidou?",
+        "manual.s2.f4.note": "Rastreabilidade: permite identificar a origem de cada contacto.",
+        "manual.s2.f5.action": "Durante o webinar é dado o próximo passo: inscrição no site.",
+        "manual.s2.f5.note": "Apenas no final do webinar se apresenta a oportunidade de avançar.",
+        "manual.s2.warning": "O prescritor assiste ao webinar com o seu convidado. O especialista toma o relevo. Ambos ouvem o mesmo.",
+        "manual.s3.title": "Percurso do Novo Membro (Onboarding)",
+        "manual.s3.step1": "Inscreve-se na página web do clube.",
+        "manual.s3.step2": "Acede à plataforma e completa o onboarding completo.",
+        "manual.s3.step3": "Ao finalizar o onboarding recebe um email de boas-vindas.",
+        "manual.s3.step4": "Entra na sequência de emails de acompanhamento.",
+        "manual.s4.title": "Dois Tipos de Webinar, Duas Audiências",
+        "manual.s4.wa.label": "Webinar A — Profissionais",
+        "manual.s4.wa.profile": "Agentes, gestores, promotores",
+        "manual.s4.wa.role": "Papel: produtores e investidores",
+        "manual.s4.wa.content": "Como funciona a plataforma, como produzem e como investem.",
+        "manual.s4.wb.label": "Webinar B — Investidores",
+        "manual.s4.wb.profile": "Investidores fora do setor imobiliário",
+        "manual.s4.wb.role": "Papel: investidores e referenciadores",
+        "manual.s4.wb.content": "Como investir, que retorno esperar, como referenciar outros.",
+        "manual.s5.title": "Sequência de Emails",
+        "manual.s5.e1.when": "Após completar onboarding",
+        "manual.s5.e1.goal": "Boas-vindas. Confirmar acesso. Tom motivador.",
+        "manual.s5.e2.when": "Primeiros dias",
+        "manual.s5.e2.goal": "Explicar como funciona a plataforma. Facilitar os primeiros passos.",
+        "manual.s5.e3.when": "Newsletter recorrente",
+        "manual.s5.e3.goal": "Manter o membro ligado e focado. Novidades e oportunidades.",
+        "manual.s6.title": "Comunicação Interna: Notas de Áudio",
+        "manual.s6.norm": "Qualquer ideia, sugestão, dúvida ou proposta deve ser enviada como nota de áudio. A IA processará e converterá em ação.",
+        "manual.s6.step1": "Grava a tua nota com WhatsApp, Telegram ou qualquer mensageiro.",
+        "manual.s6.step2": "Explica o tema, o contexto e o que precisas ou propões.",
+        "manual.s6.step3": "Envia ao responsável correspondente ou ao grupo da equipa.",
+        "manual.s6.step4": "A nota é transcrita, processada com IA e convertida em tarefa ou documento.",
+        "manual.s7.title": "Papéis e Responsabilidades",
+        "manual.s7.r1.role": "Liderança",
+        "manual.s7.r1.desc": "Define o sistema, aprova conteúdos, marca o rumo. Comunica via notas de áudio.",
+        "manual.s7.r2.role": "Operações",
+        "manual.s7.r2.desc": "Gestão de webinars, apresentações e comunicação com membros.",
+        "manual.s7.r3.role": "Equipa IA",
+        "manual.s7.r3.desc": "Processar notas de áudio, redigir emails, criar apresentações.",
+        "manual.s7.r4.role": "Prescritores",
+        "manual.s7.r4.desc": "Enviar o vídeo. Convidar para o webinar. Assistir com o convidado. Apenas abrir a porta.",
+        "manual.s7.r5.role": "Novos Staff",
+        "manual.s7.r5.desc": "Contribuir com ideias em formato nota de áudio. Seguir o sistema. Não improvisar.",
+        "manual.s8.title": "Avaliações e Perguntas da Equipa",
+        "manual.s8.q1": "Avaliações da equipa",
+        "manual.s8.q2": "Perguntas ou dúvidas",
+        "manual.s8.q3": "Sugestões de melhoria",
+        "manual.s8.placeholder": "Escreve aqui...",
+        "manual.footer": "Manual de Boas Práticas · v1.0 · Março 2026",
+        "manual.reminder": "Lembra-te: ideias, dúvidas e sugestões → nota de áudio para a equipa.",
+    },
+
+    es: {
+        // ── UI Global ─────────────────────────────────────────
+        "brand_name": "Gestor de Relaciones",
+        "brand_subtitle": "Club Privado",
+        "brand_tooltip_text": "Estrategia de Inteligencia Patrimonial: Gestión centralizada con visión 360° para optimizar cada oportunidad de inversión.",
+        "nav_dashboard": "Posición Global",
+        "nav_vault": "Mi Cartera",
+        "nav_crm": "Gestión de Relaciones",
+        "nav_network": "Mi Red",
+        "nav_academy": "Academy",
+        "nav_audit": "Historial y Documentos",
+        "nav_settings": "Ajustes",
+        "nav_manuals": "Manuales",
+        "tooltip_phase2": "Habilitación Pendiente: Completa la Academy y tu KYC.",
+        "tooltip_phase3": "Acceso Reservado: Staff o Nivel de Gestión Mínimo.",
+        "search_placeholder": "Buscar...",
+        "tenant_label": "Usuario",
+        "welcome_title": "Espacio de Trabajo",
+        "empty_state": "Selecciona una opción del menú para empezar.",
+        "explore_btn": "Explorar",
+        "kyc_required": "Acceso Restringido",
+        "kyc_description": "Tu verificación KYC está pendiente. Algunas funciones están limitadas hasta su aprobación.",
+        "simulate_kyc": "Simular KYC Verificado",
+        "gatekeeper_title": "Estado Gatekeeper",
+        "kyc_status": "KYC Pendiente",
+        "kyc_action": "Requiere atención inmediata",
+        "aimon_title": "Panel AIMON",
+        "aimon_msg": "Bienvenido a tu workspace. ¿Cómo puedo asistirte hoy?",
+        "open_assistant": "Abrir Asistente",
+        "recent_activity": "Actividad Reciente",
+        // ── Órbita 3 — Dock: usuario y activity feed ─────────
+        "nav.user.role": "Administrador",
+        "activity.feed.login_new_device": "Inicio de sesión desde nuevo dispositivo",
+        "activity.feed.time_2min": "Hace 2 minutos",
+        "activity.feed.kyc_received": "Documentación KYC recibida",
+        "activity.feed.time_yesterday": "Ayer a las 18:45",
+        // ── Admin Gate ────────────────────────────────────────
+        "gate.title": "Acceso Reservado",
+        "gate.subtitle": "Autentícate con tus credenciales de staff.",
+        "gate.btn_google": "Continuar con Google",
+        "gate.btn_apple": "Continuar con Apple",
+        "gate.divider": "o",
+        "gate.email_label": "Email institucional",
+        "gate.email_placeholder": "nombre@cpii.es",
+        "gate.btn_email_send": "Enviar acceso seguro",
+        "gate.confirm_title": "Enlace enviado",
+        "gate.confirm_text": "Revisa tu bandeja de entrada.",
+        "gate.loading": "Verificando credenciales...",
+        "gate.success": "Acceso concedido. Redirigiendo...",
+        "gate.custody_title": "Acceso bloqueado",
+        "gate.tenant": "cpii_v1.1 · Staff",
+        // ── Tab Manager ───────────────────────────────────────
+        "tab_manual": "Manual",
+        "tab_simulador": "Simulador",
+        "tab_calculadora": "Calculadora",
+        "tab_dashboard": "Dashboard",
+        "omnibox_placeholder": "Abrir recurso...",
+        "omnibox_no_results": "Sin resultados",
+        // ── gd-manual ─────────────────────────────────────────
+        "manual.version": "Versión 1.0 · Marzo 2026",
+        "manual.title": "Manual de Buenas Prácticas",
+        "manual.subtitle": "Gestión y Crecimiento del Club",
+        "manual.purpose": "Este manual recoge las directrices operativas para que cualquier miembro del equipo pueda replicar el sistema de captación, incorporación y fidelización de miembros del club de forma consistente y escalable.",
+        "manual.s1.title": "Principio Rector: Un Sistema Duplicable",
+        "manual.s1.intro": "El objetivo es crear un sistema tan claro que cualquier persona pueda ejecutarlo y transmitirlo correctamente.",
+        "manual.s1.avoid": "❌ Errores a evitar",
+        "manual.s1.err1": "Que cada miembro explique el proyecto con sus propias palabras.",
+        "manual.s1.err2": "Que los prescriptores intenten responder todas las preguntas antes de tiempo.",
+        "manual.s1.err3": "Que se mezclen mensajes, etapas y audiencias distintas en una misma conversación.",
+        "manual.s1.principle_label": "Principio del Profano",
+        "manual.s1.principle": "Un prescriptor bien formado no convence: abre la puerta. El experto toma el relevo.",
+        "manual.s2.title": "El Flujo de Captación Paso a Paso",
+        "manual.s2.f1.action": "El prescriptor envía el vídeo de presentación a su contacto.",
+        "manual.s2.f1.note": "Sin explicaciones adicionales. Solo el vídeo.",
+        "manual.s2.f2.action": "El contacto pregunta: ¿qué es esto?",
+        "manual.s2.f2.note": "Es la señal que esperamos. El gancho está funcionando.",
+        "manual.s2.f3.action": "El prescriptor invita al contacto al webinar con el link de inscripción.",
+        "manual.s2.f3.note": "El prescriptor NO responde más preguntas. Redirige al webinar.",
+        "manual.s2.f4.action": "El contacto se inscribe en el webinar: nombre, teléfono, email, ¿quién le invita?",
+        "manual.s2.f4.note": "Trazabilidad: permite rastrear el origen de cada contacto.",
+        "manual.s2.f5.action": "Durante el webinar se da el paso siguiente: inscripción en la web.",
+        "manual.s2.f5.note": "Solo al final del webinar se presenta la oportunidad de avanzar.",
+        "manual.s2.warning": "El prescriptor asiste al webinar junto a su invitado. El experto toma el relevo. Ambos escuchan lo mismo.",
+        "manual.s3.title": "Recorrido del Nuevo Miembro (Onboarding)",
+        "manual.s3.step1": "Se inscribe en la página web del club.",
+        "manual.s3.step2": "Accede a la plataforma y completa el onboarding completo.",
+        "manual.s3.step3": "Al finalizar el onboarding recibe un email de bienvenida.",
+        "manual.s3.step4": "Entra en la secuencia de emails de seguimiento.",
+        "manual.s4.title": "Dos Tipos de Webinar, Dos Audiencias",
+        "manual.s4.wa.label": "Webinar A — Profesionales",
+        "manual.s4.wa.profile": "Agentes, gestores, promotores",
+        "manual.s4.wa.role": "Rol: productores e inversores",
+        "manual.s4.wa.content": "Cómo funciona la plataforma, cómo producen y cómo invierten.",
+        "manual.s4.wb.label": "Webinar B — Inversores",
+        "manual.s4.wb.profile": "Inversores fuera del sector inmobiliario",
+        "manual.s4.wb.role": "Rol: inversores y referenciadores",
+        "manual.s4.wb.content": "Cómo invertir, qué retorno esperar, cómo referir a otros.",
+        "manual.s5.title": "Secuencia de Emails",
+        "manual.s5.e1.when": "Tras completar onboarding",
+        "manual.s5.e1.goal": "Bienvenida. Confirmar acceso. Tono motivador.",
+        "manual.s5.e2.when": "Primeros días",
+        "manual.s5.e2.goal": "Explicar cómo funciona la plataforma. Facilitar los primeros pasos.",
+        "manual.s5.e3.when": "Newsletter recurrente",
+        "manual.s5.e3.goal": "Mantener al miembro conectado y enfocado. Novedades y oportunidades.",
+        "manual.s6.title": "Comunicación Interna: Notas de Audio",
+        "manual.s6.norm": "Cualquier idea, sugerencia, duda o propuesta debe enviarse como nota de audio. La IA la procesará y convertirá en acción.",
+        "manual.s6.step1": "Graba tu nota con WhatsApp, Telegram o cualquier mensajería.",
+        "manual.s6.step2": "Explica el tema, el contexto y lo que necesitas o propones.",
+        "manual.s6.step3": "Envíala al responsable correspondiente o al grupo del equipo.",
+        "manual.s6.step4": "La nota se transcribe, se procesa con IA y se convierte en tarea o documento.",
+        "manual.s7.title": "Roles y Responsabilidades",
+        "manual.s7.r1.role": "Liderazgo",
+        "manual.s7.r1.desc": "Define el sistema, aprueba contenidos, marca el rumbo. Comunica mediante notas de audio.",
+        "manual.s7.r2.role": "Operaciones",
+        "manual.s7.r2.desc": "Gestión de webinars, presentaciones y comunicación con miembros.",
+        "manual.s7.r3.role": "Equipo IA",
+        "manual.s7.r3.desc": "Procesar notas de audio, redactar emails, crear presentaciones.",
+        "manual.s7.r4.role": "Prescriptores",
+        "manual.s7.r4.desc": "Enviar el vídeo. Invitar al webinar. Asistir junto al invitado. Solo abrir la puerta.",
+        "manual.s7.r5.role": "Nuevos Staff",
+        "manual.s7.r5.desc": "Aportar ideas en formato nota de audio. Seguir el sistema. No improvisar.",
+        "manual.s8.title": "Valoraciones y Preguntas del Equipo",
+        "manual.s8.q1": "Valoraciones del equipo",
+        "manual.s8.q2": "Preguntas o dudas",
+        "manual.s8.q3": "Sugerencias de mejora",
+        "manual.s8.placeholder": "Escribe aquí...",
+        "manual.footer": "Manual de Buenas Prácticas · v1.0 · Marzo 2026",
+        "manual.reminder": "Recuerda: ideas, dudas y sugerencias → nota de audio al equipo.",
+    },
+
+    en: {
+        // ── UI Global ─────────────────────────────────────────
+        "brand_name": "Relationship Manager",
+        "brand_subtitle": "Private Club",
+        "brand_tooltip_text": "Wealth Intelligence Strategy: Centralized 360° management to optimize every investment opportunity.",
+        "nav_dashboard": "Global Position",
+        "nav_vault": "Private Assets",
+        "nav_crm": "Relationship Management",
+        "nav_network": "My Network",
+        "nav_academy": "Academy",
+        "nav_audit": "History & Docs",
+        "nav_settings": "Settings",
+        "nav_manuals": "Guides",
+        "tooltip_phase2": "Pending Enablement: Complete Academy and KYC.",
+        "tooltip_phase3": "Restricted Access: Staff or Minimum Management Level.",
+        "search_placeholder": "Search...",
+        "tenant_label": "User",
+        "welcome_title": "Workspace",
+        "empty_state": "Select an option from the menu to get started.",
+        "explore_btn": "Explore",
+        "kyc_required": "Restricted Access",
+        "kyc_description": "Your KYC verification is pending. Some features are limited until approval.",
+        "simulate_kyc": "Simulate KYC Verified",
+        "gatekeeper_title": "Gatekeeper Status",
+        "kyc_status": "KYC Pending",
+        "kyc_action": "Requires immediate attention",
+        "aimon_title": "AIMON Panel",
+        "aimon_msg": "Welcome to your workspace. How can I assist your investment today?",
+        "open_assistant": "Open Assistant",
+        "recent_activity": "Recent Activity",
+        // ── Admin Gate ────────────────────────────────────────
+        "gate.title": "Restricted Access",
+        "gate.subtitle": "Sign in with your staff credentials.",
+        "gate.btn_google": "Continue with Google",
+        "gate.btn_apple": "Continue with Apple",
+        "gate.divider": "or",
+        "gate.email_label": "Institutional email",
+        "gate.email_placeholder": "name@cpii.com",
+        "gate.btn_email_send": "Send secure access",
+        "gate.confirm_title": "Link sent",
+        "gate.confirm_text": "Check your inbox.",
+        "gate.loading": "Verifying credentials...",
+        "gate.success": "Access granted. Redirecting...",
+        "gate.custody_title": "Access blocked",
+        "gate.tenant": "cpii_v1.1 · Staff",
+        // ── Tab Manager ───────────────────────────────────────
+        "tab_manual": "Guide",
+        "tab_simulador": "Simulator",
+        "tab_calculadora": "Calculator",
+        "tab_dashboard": "Dashboard",
+        "omnibox_placeholder": "Open resource...",
+        "omnibox_no_results": "No results",
+        // ── gd-manual ─────────────────────────────────────────
+        "manual.version": "Version 1.0 · March 2026",
+        "manual.title": "Best Practices Manual",
+        "manual.subtitle": "Club Management and Growth",
+        "manual.purpose": "This manual gathers the operational guidelines so that any team member can replicate the club member acquisition, onboarding and retention system in a consistent and scalable way.",
+        "manual.s1.title": "Core Principle: A Duplicable System",
+        "manual.s1.intro": "The goal is to create a system so clear that anyone can execute it and pass it on correctly.",
+        "manual.s1.avoid": "❌ Errors to avoid",
+        "manual.s1.err1": "Members explaining the project in their own words.",
+        "manual.s1.err2": "Prescribers trying to answer all questions before the right time.",
+        "manual.s1.err3": "Mixing messages, stages and different audiences in the same conversation.",
+        "manual.s1.principle_label": "The Layman Principle",
+        "manual.s1.principle": "A well-trained prescriber does not convince: they open the door. The expert takes over.",
+        "manual.s2.title": "The Acquisition Flow Step by Step",
+        "manual.s2.f1.action": "The prescriber sends the presentation video to their contact.",
+        "manual.s2.f1.note": "No additional explanations. Just the video.",
+        "manual.s2.f2.action": "The contact asks: what is this?",
+        "manual.s2.f2.note": "That is the signal we are waiting for. The hook is working.",
+        "manual.s2.f3.action": "The prescriber invites the contact to the webinar with the registration link.",
+        "manual.s2.f3.note": "The prescriber does NOT answer more questions. Redirects to the webinar.",
+        "manual.s2.f4.action": "The contact registers for the webinar: name, phone, email, who invited them?",
+        "manual.s2.f4.note": "Traceability: allows tracking the origin of each contact.",
+        "manual.s2.f5.action": "During the webinar the next step is given: registration on the website.",
+        "manual.s2.f5.note": "Only at the end of the webinar is the opportunity to advance presented.",
+        "manual.s2.warning": "The prescriber attends the webinar with their guest. The expert takes over. Both hear the same thing.",
+        "manual.s3.title": "New Member Journey (Onboarding)",
+        "manual.s3.step1": "Registers on the club website.",
+        "manual.s3.step2": "Accesses the platform and completes full onboarding.",
+        "manual.s3.step3": "Upon completing onboarding receives a welcome email.",
+        "manual.s3.step4": "Enters the follow-up email sequence.",
+        "manual.s4.title": "Two Types of Webinar, Two Audiences",
+        "manual.s4.wa.label": "Webinar A — Professionals",
+        "manual.s4.wa.profile": "Agents, managers, developers",
+        "manual.s4.wa.role": "Role: producers and investors",
+        "manual.s4.wa.content": "How the platform works, how they produce and invest.",
+        "manual.s4.wb.label": "Webinar B — Investors",
+        "manual.s4.wb.profile": "Investors outside the real estate sector",
+        "manual.s4.wb.role": "Role: investors and referrers",
+        "manual.s4.wb.content": "How to invest, what return to expect, how to refer others.",
+        "manual.s5.title": "Email Sequence",
+        "manual.s5.e1.when": "After completing onboarding",
+        "manual.s5.e1.goal": "Welcome. Confirm access. Motivating tone.",
+        "manual.s5.e2.when": "First days",
+        "manual.s5.e2.goal": "Explain how the platform works. Facilitate first steps.",
+        "manual.s5.e3.when": "Recurring newsletter",
+        "manual.s5.e3.goal": "Keep member connected and focused. News and opportunities.",
+        "manual.s6.title": "Internal Communication: Audio Notes",
+        "manual.s6.norm": "Any idea, suggestion, doubt or proposal must be sent as an audio note. AI will process and convert it into action.",
+        "manual.s6.step1": "Record your note with WhatsApp, Telegram or any messaging app.",
+        "manual.s6.step2": "Explain the topic, context and what you need or propose.",
+        "manual.s6.step3": "Send it to the relevant person or team group.",
+        "manual.s6.step4": "The note is transcribed, processed with AI and converted into a task or document.",
+        "manual.s7.title": "Roles and Responsibilities",
+        "manual.s7.r1.role": "Leadership",
+        "manual.s7.r1.desc": "Defines the system, approves content, sets direction. Communicates via audio notes.",
+        "manual.s7.r2.role": "Operations",
+        "manual.s7.r2.desc": "Webinar management, presentations and member communication.",
+        "manual.s7.r3.role": "AI Team",
+        "manual.s7.r3.desc": "Process audio notes, write emails, create presentations.",
+        "manual.s7.r4.role": "Prescribers",
+        "manual.s7.r4.desc": "Send the video. Invite to webinar. Attend with guest. Just open the door.",
+        "manual.s7.r5.role": "New Staff",
+        "manual.s7.r5.desc": "Contribute ideas as audio notes. Follow the system. Do not improvise.",
+        "manual.s8.title": "Team Feedback and Questions",
+        "manual.s8.q1": "Team feedback",
+        "manual.s8.q2": "Questions or doubts",
+        "manual.s8.q3": "Improvement suggestions",
+        "manual.s8.placeholder": "Write here...",
+        "manual.footer": "Best Practices Manual · v1.0 · March 2026",
+        "manual.reminder": "Remember: ideas, doubts and suggestions → audio note to the team.",
+    },
+
+    fr: {
+        // ── UI Global ─────────────────────────────────────────
+        "brand_name": "Gestionnaire de Relations",
+        "brand_subtitle": "Club Privé",
+        "brand_tooltip_text": "Stratégie d'Intelligence Patrimoniale : Gestion centralisée avec vision 360° pour optimiser chaque opportunité d'investissement.",
+        "nav_dashboard": "Position Globale",
+        "nav_vault": "Le Portfolio",
+        "nav_crm": "Gestion des Relations",
+        "nav_network": "Mon Réseau",
+        "nav_academy": "Academy",
+        "nav_audit": "Historique et Docs",
+        "nav_settings": "Paramètres",
+        "nav_manuals": "Manuels",
+        "tooltip_phase2": "Habilitation en Attente : Complétez l'Academy et votre KYC.",
+        "tooltip_phase3": "Accès Réservé : Staff ou Niveau de Gestion Minimum.",
+        "search_placeholder": "Rechercher...",
+        "tenant_label": "Utilisateur",
+        "welcome_title": "Espace de Travail",
+        "empty_state": "Sélectionnez une option dans le menu pour commencer.",
+        "explore_btn": "Explorer",
+        "kyc_required": "Accès Restreint",
+        "kyc_description": "Votre vérification KYC est en attente. Certaines fonctionnalités sont limitées jusqu'à l'approbation.",
+        "simulate_kyc": "Simuler KYC Vérifié",
+        "gatekeeper_title": "Statut Gatekeeper",
+        "kyc_status": "KYC En attente",
+        "kyc_action": "Nécessite une attention immédiate",
+        "aimon_title": "Panneau AIMON",
+        "aimon_msg": "Bienvenue dans votre espace de travail. Comment puis-je vous aider aujourd'hui?",
+        "open_assistant": "Ouvrir l'Assistant",
+        "recent_activity": "Activité Récente",
+        // ── Admin Gate ────────────────────────────────────────
+        "gate.title": "Accès Réservé",
+        "gate.subtitle": "Connectez-vous avec vos identifiants staff.",
+        "gate.btn_google": "Continuer avec Google",
+        "gate.btn_apple": "Continuer avec Apple",
+        "gate.divider": "ou",
+        "gate.email_label": "Email institutionnel",
+        "gate.email_placeholder": "nom@cpii.fr",
+        "gate.btn_email_send": "Envoyer l'accès sécurisé",
+        "gate.confirm_title": "Lien envoyé",
+        "gate.confirm_text": "Vérifiez votre boîte de réception.",
+        "gate.loading": "Vérification des identifiants...",
+        "gate.success": "Accès accordé. Redirection en cours...",
+        "gate.custody_title": "Accès bloqué",
+        "gate.tenant": "cpii_v1.1 · Staff",
+        // ── Tab Manager ───────────────────────────────────────
+        "tab_manual": "Manuel",
+        "tab_simulador": "Simulateur",
+        "tab_calculadora": "Calculatrice",
+        "tab_dashboard": "Tableau de bord",
+        "omnibox_placeholder": "Ouvrir ressource...",
+        "omnibox_no_results": "Aucun résultat",
+        // ── gd-manual ─────────────────────────────────────────
+        "manual.version": "Version 1.0 · Mars 2026",
+        "manual.title": "Manuel des Bonnes Pratiques",
+        "manual.subtitle": "Gestion et Croissance du Club",
+        "manual.purpose": "Ce manuel rassemble les directives opérationnelles pour que tout membre de l'équipe puisse répliquer le système d'acquisition, d'intégration et de fidélisation des membres du club.",
+        "manual.s1.title": "Principe Directeur: Un Système Duplicable",
+        "manual.s1.intro": "L'objectif est de créer un système si clair que n'importe qui peut l'exécuter et le transmettre correctement.",
+        "manual.s1.avoid": "❌ Erreurs à éviter",
+        "manual.s1.err1": "Que chaque membre explique le projet avec ses propres mots.",
+        "manual.s1.err2": "Que les prescripteurs tentent de répondre à toutes les questions avant le bon moment.",
+        "manual.s1.err3": "Que l'on mélange messages, étapes et audiences dans une même conversation.",
+        "manual.s1.principle_label": "Le Principe du Profane",
+        "manual.s1.principle": "Un prescripteur bien formé ne convainc pas: il ouvre la porte. L'expert prend le relais.",
+        "manual.s2.title": "Le Flux d'Acquisition Étape par Étape",
+        "manual.s2.f1.action": "Le prescripteur envoie la vidéo de présentation à son contact.",
+        "manual.s2.f1.note": "Sans explications supplémentaires. Juste la vidéo.",
+        "manual.s2.f2.action": "Le contact demande: qu'est-ce que c'est?",
+        "manual.s2.f2.note": "C'est le signal que nous attendons. L'accroche fonctionne.",
+        "manual.s2.f3.action": "Le prescripteur invite le contact au webinaire avec le lien d'inscription.",
+        "manual.s2.f3.note": "Le prescripteur NE répond PLUS aux questions. Redirige vers le webinaire.",
+        "manual.s2.f4.action": "Le contact s'inscrit au webinaire: nom, téléphone, email, qui l'a invité?",
+        "manual.s2.f4.note": "Traçabilité: permet d'identifier l'origine de chaque contact.",
+        "manual.s2.f5.action": "Pendant le webinaire, l'étape suivante est donnée: inscription sur le site.",
+        "manual.s2.f5.note": "Seulement à la fin du webinaire est présentée l'opportunité d'avancer.",
+        "manual.s2.warning": "Le prescripteur assiste au webinaire avec son invité. L'expert prend le relais. Les deux entendent la même chose.",
+        "manual.s3.title": "Parcours du Nouveau Membre (Onboarding)",
+        "manual.s3.step1": "S'inscrit sur le site web du club.",
+        "manual.s3.step2": "Accède à la plateforme et complète l'onboarding complet.",
+        "manual.s3.step3": "À la fin de l'onboarding, reçoit un email de bienvenue.",
+        "manual.s3.step4": "Entre dans la séquence d'emails de suivi.",
+        "manual.s4.title": "Deux Types de Webinaire, Deux Audiences",
+        "manual.s4.wa.label": "Webinaire A — Professionnels",
+        "manual.s4.wa.profile": "Agents, gestionnaires, promoteurs",
+        "manual.s4.wa.role": "Rôle: producteurs et investisseurs",
+        "manual.s4.wa.content": "Comment fonctionne la plateforme, comment ils produisent et investissent.",
+        "manual.s4.wb.label": "Webinaire B — Investisseurs",
+        "manual.s4.wb.profile": "Investisseurs hors du secteur immobilier",
+        "manual.s4.wb.role": "Rôle: investisseurs et référenceurs",
+        "manual.s4.wb.content": "Comment investir, quel rendement attendre, comment référencer d'autres.",
+        "manual.s5.title": "Séquence d'Emails",
+        "manual.s5.e1.when": "Après l'onboarding",
+        "manual.s5.e1.goal": "Bienvenue. Confirmer l'accès. Ton motivant.",
+        "manual.s5.e2.when": "Premiers jours",
+        "manual.s5.e2.goal": "Expliquer le fonctionnement de la plateforme. Faciliter les premiers pas.",
+        "manual.s5.e3.when": "Newsletter récurrente",
+        "manual.s5.e3.goal": "Garder le membre connecté et concentré. Actualités et opportunités.",
+        "manual.s6.title": "Communication Interne: Notes Audio",
+        "manual.s6.norm": "Toute idée, suggestion, doute ou proposition doit être envoyée en note audio. L'IA la traitera et la convertira en action.",
+        "manual.s6.step1": "Enregistre ta note avec WhatsApp, Telegram ou toute messagerie.",
+        "manual.s6.step2": "Explique le sujet, le contexte et ce dont tu as besoin ou proposes.",
+        "manual.s6.step3": "Envoie-la au responsable correspondant ou au groupe de l'équipe.",
+        "manual.s6.step4": "La note est transcrite, traitée par IA et convertie en tâche ou document.",
+        "manual.s7.title": "Rôles et Responsabilités",
+        "manual.s7.r1.role": "Direction",
+        "manual.s7.r1.desc": "Définit le système, approuve les contenus, fixe la direction. Communique via notes audio.",
+        "manual.s7.r2.role": "Opérations",
+        "manual.s7.r2.desc": "Gestion des webinaires, présentations et communication avec les membres.",
+        "manual.s7.r3.role": "Équipe IA",
+        "manual.s7.r3.desc": "Traiter les notes audio, rédiger des emails, créer des présentations.",
+        "manual.s7.r4.role": "Prescripteurs",
+        "manual.s7.r4.desc": "Envoyer la vidéo. Inviter au webinaire. Assister avec l'invité. Juste ouvrir la porte.",
+        "manual.s7.r5.role": "Nouveaux Staff",
+        "manual.s7.r5.desc": "Contribuer avec des idées en note audio. Suivre le système. Ne pas improviser.",
+        "manual.s8.title": "Évaluations et Questions de l'Équipe",
+        "manual.s8.q1": "Évaluations de l'équipe",
+        "manual.s8.q2": "Questions ou doutes",
+        "manual.s8.q3": "Suggestions d'amélioration",
+        "manual.s8.placeholder": "Écris ici...",
+        "manual.footer": "Manuel des Bonnes Pratiques · v1.0 · Mars 2026",
+        "manual.reminder": "Rappelle-toi: idées, doutes et suggestions → note audio à l'équipe.",
+    }
+};
+
+// ── Motor de traducción ───────────────────────────────────────
+/**
+ * t(key) — función de traducción pura
+ * Disponible en window.__CPII__.i18n.t()
+ * Usada por Web Components (gd-manual._applyI18n, etc.)
+ */
+function t(key) {
+    const lang = localStorage.getItem('cpii_locale') || 'pt';
+    const dict = translations[lang] || translations['pt'];
+    return dict[key] || key;
+}
+
+/**
+ * applyTranslations(lang)
+ * Aplica traducciones a todo el DOM, incluyendo Web Components montados
+ */
+function applyTranslations(lang) {
+    const dict = translations[lang] || translations['pt'];
+
+    // ── DOM estático ──────────────────────────────────────────
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key]) el.placeholder = dict[key];
+    });
+
+    document.documentElement.lang = lang;
+
+    // ── Web Components (Light DOM) ────────────────────────────
+    // Busca cualquier gd-* montado y llama su _applyI18n si lo tiene
+    document.querySelectorAll('[class^="gd-"], gd-manual, gd-simulador, gd-calculadora').forEach(component => {
+        if (typeof component._applyI18n === 'function') {
+            component._applyI18n();
+        }
+    });
+}
+
+/**
+ * setLanguage(lang)
+ * Cambia idioma, persiste con clave canónica cpii:locale y aplica al DOM
+ */
+function setLanguage(lang) {
+    try {
+        localStorage.setItem('cpii_locale', lang);
+    } catch (e) {
+        // Modo privado o storage lleno: fallback a session-only
+        console.warn('[i18n] localStorage no disponible, usando solo sesión');
+    }
+    applyTranslations(lang);
+    document.dispatchEvent(new CustomEvent('cpii:lang:change', {
+        detail: { lang, persistent: true }
+    }));
+}
+
+// ── Inicialización ────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    let saved;
+    try {
+        saved = localStorage.getItem('cpii_locale');
+    } catch (e) {
+        saved = null;
+    }
+    const lang = saved || 'pt';
+
+    // Delegación de cambio de idioma en contenedor padre (R2 optimizado)
+    document.body.addEventListener('change', (e) => {
+        if (e.target.id === 'lang-selector') {
+            setLanguage(e.target.value);
+        }
+    });
+
+    applyTranslations(lang);
+
+    // Sincronización entre pestañas (Cross-tab sync)
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'cpii_locale') {
+            const newLang = e.newValue || 'pt';
+            const selector = document.getElementById("lang-selector");
+            if (selector) selector.value = newLang;
+            applyTranslations(newLang);
+        }
+    });
+});
+
+// ── Exponer motor en window.__CPII__ ──────────────────────────
+// Permite que Web Components llamen window.__CPII__.i18n.t(key)
+window.__CPII__ = window.__CPII__ || {};
+window.__CPII__.i18n = { t, setLanguage, applyTranslations };
