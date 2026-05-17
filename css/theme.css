@@ -41,6 +41,65 @@
     --theme-border: var(--theme-border-subtle);
     --theme-bg-secondary: var(--theme-surface);
     --theme-surface-hover: rgba(var(--theme-primary-rgb), 0.08);
+
+    /* 6. Tokens de Componentes (tab-manager, gd-manual, omnibox) */
+    --theme-spacing-xs: 4px;
+    --theme-spacing-sm: 8px;
+    --theme-spacing-md: 16px;
+    --theme-spacing-lg: 24px;
+
+    --theme-radius-sm: 4px;
+    --theme-radius-md: 8px;
+
+    --theme-bg-elevated: #252018;
+    --theme-text-primary: #F1F0EE;
+    --theme-text-secondary: #9B9996;
+
+    --theme-font-sm: 12px;
+    --theme-font-md: 14px;
+    --theme-font-lg: 16px;
+    --theme-font-xl: 20px;
+
+    --theme-transition: all 0.15s ease;
+    --theme-accent-subtle: rgba(var(--theme-primary-rgb), 0.08);
+
+    --theme-danger-rgb: 220, 38, 38;
+    --theme-danger-bg: rgba(var(--theme-danger-rgb), 0.1);
+    --theme-danger-text: #FCA5A5;
+    --theme-danger-border: rgba(var(--theme-danger-rgb), 0.2);
+
+    /* 7. Tokens de Layout Dimensional */
+    --theme-sidebar-width: 250px;
+    --theme-sidebar-collapsed: 64px;
+    --theme-dock-width: 320px;
+    --theme-radius-lg: 12px;
+    --theme-radius-xl: 16px;
+    --theme-surface-elevated-2: #2A2620;
+
+    /* 8. Tokens Semánticos de Estado */
+    --theme-text-inverse: var(--theme-ink);
+    --theme-surface-accent: rgba(var(--theme-primary-rgb), 0.12);
+    --theme-border-active: rgba(var(--theme-primary-rgb), 0.5);
+
+    /* 9. Nav Accordion */
+    --theme-nav-indent: 12px;
+    --theme-nav-transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* 10. Pipeline Stage Colors (CPD-07 — changeStage()) */
+    --theme-stage-prospect-rgb: 99, 130, 167;
+    --theme-stage-qualified-rgb: 59, 130, 183;
+    --theme-stage-proposal-rgb: 193, 168, 93;
+    --theme-stage-negotiation-rgb: 217, 119, 6;
+    --theme-stage-won-rgb: 34, 139, 87;
+    --theme-stage-lost-rgb: 160, 62, 62;
+    --theme-stage-paused-rgb: 107, 107, 107;
+    --theme-stage-prospect:    rgba(var(--theme-stage-prospect-rgb), 1);
+    --theme-stage-qualified:   rgba(var(--theme-stage-qualified-rgb), 1);
+    --theme-stage-proposal:    rgba(var(--theme-stage-proposal-rgb), 1);
+    --theme-stage-negotiation: rgba(var(--theme-stage-negotiation-rgb), 1);
+    --theme-stage-won:         rgba(var(--theme-stage-won-rgb), 1);
+    --theme-stage-lost:        rgba(var(--theme-stage-lost-rgb), 1);
+    --theme-stage-paused:      rgba(var(--theme-stage-paused-rgb), 1);
 }
 
 /* ── Utilidades Globales ── */
@@ -59,4 +118,131 @@ body {
 .gatekeeper-overlay {
     backdrop-filter: blur(8px);
     background: rgba(var(--theme-bg-rgb), 0.4);
+}
+
+/* ══════════════════════════════════════════════════════════════
+ * ORBIT 1 — Sidebar Colapsable
+ * ══════════════════════════════════════════════════════════════ */
+
+.orbit1-sidebar {
+    width: var(--theme-sidebar-width);
+    transition: width var(--theme-nav-transition);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.orbit1-sidebar.is-collapsed {
+    width: var(--theme-sidebar-collapsed);
+}
+
+/* Labels: visibles en estado expandido, ocultos al colapsar */
+.orbit1-sidebar .sidebar-label {
+    opacity: 1;
+    max-width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: opacity var(--theme-nav-transition), max-width var(--theme-nav-transition);
+    display: inline-block;
+}
+
+.orbit1-sidebar.is-collapsed .sidebar-label {
+    opacity: 0;
+    pointer-events: none;
+    max-width: 0;
+}
+
+/* Botón toggle — posición absoluta en borde derecho */
+.orbit1-collapse-btn {
+    position: absolute;
+    bottom: var(--theme-spacing-lg);
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    border-radius: 9999px;
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border-active);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--theme-transition);
+    z-index: 40;
+    color: var(--theme-primary);
+    padding: 0;
+}
+
+.orbit1-collapse-btn:hover {
+    background: var(--theme-surface-accent);
+}
+
+/* Icono del toggle — tamaño reducido para el botón circular */
+.orbit1-toggle-icon {
+    font-size: 14px;
+    line-height: 1;
+    user-select: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+ * NAV ACCORDION — Exclusivo, máximo 1 grupo abierto
+ * ══════════════════════════════════════════════════════════════ */
+
+.nav-accordion-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-accordion-header {
+    display: flex;
+    align-items: center;
+    gap: var(--theme-spacing-sm);
+    padding: 10px var(--theme-spacing-md);
+    border-radius: var(--theme-radius-md);
+    cursor: pointer;
+    transition: var(--theme-transition);
+    user-select: none;
+    color: var(--theme-text-secondary);
+}
+
+.nav-accordion-header:hover {
+    background: var(--theme-surface-hover);
+    color: var(--theme-text-primary);
+}
+
+.nav-accordion-header.is-open {
+    color: var(--theme-primary);
+    background: var(--theme-surface-accent);
+}
+
+.nav-accordion-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height var(--theme-nav-transition);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: var(--theme-nav-indent);
+}
+
+.nav-accordion-body.is-open {
+    max-height: 500px;
+}
+
+/* Icono del header del grupo */
+.nav-accordion-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+/* Chevron rotable */
+.nav-accordion-chevron {
+    margin-left: auto;
+    transition: transform var(--theme-nav-transition);
+    font-size: 18px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.nav-accordion-header.is-open .nav-accordion-chevron {
+    transform: rotate(180deg);
 }

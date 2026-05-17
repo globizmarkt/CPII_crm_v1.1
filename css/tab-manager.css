@@ -392,3 +392,80 @@
     font-family: monospace;
     line-height: 1.6;
 }
+
+/* ── [SEC-08] Orbit 2 Header Bar ──────────────────────────────── */
+
+.orbit2-header {
+    display: flex;
+    align-items: center;
+    gap: var(--theme-spacing-sm);
+    padding: 0 var(--theme-spacing-md);
+    height: 48px;
+    background: var(--theme-bg-secondary);
+    border-bottom: 1px solid var(--theme-border);
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.orbit2-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--theme-spacing-xs);
+    font-size: var(--theme-font-sm);
+    color: var(--theme-text-secondary);
+    overflow: hidden;
+    flex: 1;
+    white-space: nowrap;
+}
+
+.orbit2-breadcrumb__sep {
+    color: var(--theme-border-strong);
+    user-select: none;
+    font-size: 10px;
+    flex-shrink: 0;
+}
+
+.orbit2-breadcrumb__active {
+    color: var(--theme-text-primary);
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── [SEC-09] Lang Selector Component ──────────────────────────── */
+
+.cpii-lang-selector {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: var(--theme-surface-accent);
+    border: 1px solid var(--theme-border-subtle);
+    border-radius: var(--theme-radius-md);
+    padding: 2px;
+    flex-shrink: 0;
+}
+
+.cpii-lang-btn {
+    padding: 3px 8px;
+    border-radius: var(--theme-radius-sm);
+    font-size: var(--theme-font-sm);
+    font-weight: 700;
+    color: var(--theme-text-secondary);
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: var(--theme-transition);
+    letter-spacing: 0.05em;
+    line-height: 1.5;
+}
+
+.cpii-lang-btn:hover {
+    color: var(--theme-text-primary);
+    background: var(--theme-surface-hover);
+}
+
+.cpii-lang-btn.is-active {
+    background: var(--theme-surface);
+    color: var(--theme-primary);
+    border-color: var(--theme-border-active);
+}
