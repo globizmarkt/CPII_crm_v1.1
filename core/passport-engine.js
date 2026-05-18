@@ -254,6 +254,51 @@
     },
 
     /**
+     * Sincroniza overlay gatekeeper y widget KYC con el estado real de claims.
+     * Oculta el overlay cuando kyc_status === 'approved'; lo muestra en cualquier otro caso.
+     * @private
+     */
+    _syncGatekeeperUI: function (claims) {
+      const approved = claims.kyc_status === 'approved';
+
+      // Overlay blur (P0-1)
+      const overlay = document.getElementById('gatekeeper-overlay');
+      if (overlay) {
+        overlay.style.display = approved ? 'none' : '';
+      }
+
+      // KYC status widget (P0-6)
+      const dot    = document.getElementById('gk-status-dot');
+      const iconBg = document.getElementById('gk-icon-bg');
+      const icon   = document.getElementById('gk-icon');
+
+      if (!dot || !iconBg || !icon) return;
+
+      if (approved) {
+        dot.className    = 'size-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]';
+        iconBg.className = 'size-10 bg-green-500/10 rounded-lg flex items-center justify-center';
+        icon.className   = 'material-symbols-outlined text-green-500';
+        icon.textContent = 'verified_user';
+      } else {
+        dot.className    = 'size-2 rounded-full bg-orange-500 animate-pulse shadow-[0_0_8px_rgba(249,115,22,0.6)]';
+        iconBg.className = 'size-10 bg-orange-500/10 rounded-lg flex items-center justify-center';
+        icon.className   = 'material-symbols-outlined text-orange-500';
+        icon.textContent = 'shield_with_heart';
+      }
+    },
+
+    /**
+     * Hidrata el avatar del usuario desde session.user.photoURL
+     * @private
+     */
+    _syncAvatar: function () {
+      const photoURL = window.__CPII__?.session?.user?.photoURL;
+      if (!photoURL) return;
+      const img = document.getElementById('user-avatar');
+      if (img) img.src = photoURL;
+    },
+
+    /**
      * Mantiene o aplica estado de Custody Hold visual
      * @private
      */
@@ -295,9 +340,12 @@
   function initEngine() {
     // Helper O(1): Refresco de auditoría post-evento (R5: DRY)
     const triggerAudit = () => {
-      if (!window.__CPII__?.PassportEngine) return;
-      window.__CPII__.PassportEngine.invalidateCache();
-      window.__CPII__.PassportEngine.auditGateZones();
+      const pe = window.__CPII__?.PassportEngine;
+      if (!pe) return;
+      pe.invalidateCache();
+      pe.auditGateZones();
+      pe._syncGatekeeperUI(window.__CPII__?.session?.claims || {});
+      pe._syncAvatar();
     };
 
     // [SEC-01] Listeners Document-level (acoplamiento con at-admin-gate.js)

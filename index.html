@@ -90,7 +90,7 @@ PROPÓSITO: Conectar brand_name y brand_subtitle al motor i18n.
 
     <!-- [SEC-04] Gatekeeper Overlay — KYC security layer -->
     <!-- Security Overlay (Visible when KYC is pending) -->
-    <div id="gatekeeper-overlay" class="fixed inset-0 z-50 flex items-center justify-center gatekeeper-overlay pointer-events-none">
+    <div id="gatekeeper-overlay" class="fixed inset-0 z-50 flex items-center justify-center gatekeeper-overlay">
         <div
             class="pointer-events-auto luxury-glass p-8 rounded-xl border border-primary/30 flex flex-col items-center gap-6 max-w-md text-center shadow-2xl">
             <div class="size-16 rounded-full bg-primary/20 flex items-center justify-center text-primary">
@@ -110,7 +110,7 @@ PROPÓSITO: Conectar brand_name y brand_subtitle al motor i18n.
 
         <!-- [SEC-06] Órbita 1 — Sidebar colapsable: acordeón 4 áreas + footer área 5 (Admin) -->
         <!-- Orbit 1: Left Sidebar — orbit1-sidebar, acordeón exclusivo, Born Locked admin -->
-        <aside class="orbit1-sidebar bg-surface border-r border-primary/10 flex flex-col h-full z-30 relative"
+        <aside class="orbit1-sidebar bg-surface border-r border-primary/10 flex flex-col h-full z-[60] relative"
                id="orbit1-sidebar">
 
             <!-- Brand + Nav accordion (Áreas 1–4) -->
@@ -327,7 +327,7 @@ PROPÓSITO: Conectar brand_name y brand_subtitle al motor i18n.
 
         <!-- [SEC-08] Órbita 3 — Dock (320px): perfil, gatekeeper, AIMON -->
         <!-- Orbit 3: Right Dock (320px) -->
-        <aside class="w-[320px] flex-shrink-0 bg-surface border-l border-primary/10 flex flex-col h-full z-30">
+        <aside class="w-[320px] flex-shrink-0 bg-surface border-l border-primary/10 flex flex-col h-full relative z-[60]">
             <!-- Top Controls -->
             <div class="p-6 border-b border-primary/10 flex flex-col gap-6">
                 <!-- User Profile & Tenant -->
