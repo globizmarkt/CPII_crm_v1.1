@@ -117,7 +117,9 @@ body {
 
 .gatekeeper-overlay {
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     background: rgba(var(--theme-bg-rgb), 0.4);
+    pointer-events: all;
 }
 
 /* ══════════════════════════════════════════════════════════════
