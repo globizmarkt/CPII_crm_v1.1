@@ -37,11 +37,11 @@
         'contacts': {
             id: 'contacts',
             type: 'gadget',
-            url: null,
+            url: 'gadgets/cpii_contacts/code.html',
             labelKey: 'nav.business.contacts',
             icon: 'contacts',
             tagName: 'gd-contacts',
-            status: 'placeholder'
+            status: 'production'
         },
         'dealroom': {
             id: 'dealroom',
