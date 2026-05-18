@@ -64,6 +64,9 @@ const translations = {
         "activity.feed.time_2min": "Há 2 minutos",
         "activity.feed.kyc_received": "Documentação KYC recebida",
         "activity.feed.time_yesterday": "Ontem às 18:45",
+        // ── AIP Bridge Banner ─────────────────────────────────
+        "aip_bridge.title": "Mercado Global de Commodities",
+        "aip_bridge.subtitle": "Conecte com investidores e operadores internacionais.",
         // ── Admin Gate ────────────────────────────────────────
         "gate.title": "Acesso Reservado",
         "gate.subtitle": "Autentique-se com as suas credenciais de staff.",
@@ -262,6 +265,9 @@ const translations = {
         "activity.feed.time_2min": "Hace 2 minutos",
         "activity.feed.kyc_received": "Documentación KYC recibida",
         "activity.feed.time_yesterday": "Ayer a las 18:45",
+        // ── AIP Bridge Banner ─────────────────────────────────
+        "aip_bridge.title": "Mercado Global de Commodities",
+        "aip_bridge.subtitle": "Conéctate con inversores y operadores internacionales.",
         // ── Admin Gate ────────────────────────────────────────
         "gate.title": "Acceso Reservado",
         "gate.subtitle": "Autentícate con tus credenciales de staff.",
@@ -447,6 +453,9 @@ const translations = {
         "activity.feed.time_2min": "2 minutes ago",
         "activity.feed.kyc_received": "KYC documentation received",
         "activity.feed.time_yesterday": "Yesterday at 6:45 PM",
+        // ── AIP Bridge Banner ─────────────────────────────────
+        "aip_bridge.title": "Global Commodities Market",
+        "aip_bridge.subtitle": "Connect with international investors and operators.",
         // ── Admin Gate ────────────────────────────────────────
         "gate.title": "Restricted Access",
         "gate.subtitle": "Sign in with your staff credentials.",
@@ -632,6 +641,9 @@ const translations = {
         "activity.feed.time_2min": "Il y a 2 minutes",
         "activity.feed.kyc_received": "Documentation KYC reçue",
         "activity.feed.time_yesterday": "Hier à 18h45",
+        // ── AIP Bridge Banner ─────────────────────────────────
+        "aip_bridge.title": "Marché Mondial des Commodités",
+        "aip_bridge.subtitle": "Connectez-vous avec des investisseurs et opérateurs internationaux.",
         // ── Admin Gate ────────────────────────────────────────
         "gate.title": "Accès Réservé",
         "gate.subtitle": "Connectez-vous avec vos identifiants staff.",
