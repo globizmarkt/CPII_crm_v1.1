@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "on-primary": "#002e6a",
+          "error": "#ffb4ab",
+          "on-primary-fixed-variant": "#004395",
+          "on-primary-container": "#00285d",
+          "primary-fixed": "#d8e2ff",
+          "on-surface": "#e1e2ec",
+          "secondary-container": "#39485a",
+          "secondary-fixed": "#d4e4fa",
+          "on-primary-fixed": "#001a42",
+          "tertiary-fixed-dim": "#ffb786",
+          "secondary": "#b9c8de",
+          "on-tertiary-fixed-variant": "#723600",
+          "tertiary-fixed": "#ffdcc6",
+          "on-error-container": "#ffdad6",
+          "surface-container-highest": "#32353c",
+          "surface-dim": "#10131a",
+          "inverse-primary": "#005ac2",
+          "error-container": "#93000a",
+          "on-background": "#e1e2ec",
+          "secondary-fixed-dim": "#b9c8de",
+          "on-secondary-fixed-variant": "#39485a",
+          "outline": "#8c909f",
+          "outline-variant": "#424754",
+          "primary-container": "#4d8eff",
+          "tertiary-container": "#df7412",
+          "background": "#10131a",
+          "surface": "#10131a",
+          "surface-bright": "#363941",
+          "on-tertiary-fixed": "#311400",
+          "inverse-on-surface": "#2e3038",
+          "primary": "#adc6ff",
+          "on-surface-variant": "#c2c6d6",
+          "on-error": "#690005",
+          "on-secondary-fixed": "#0d1c2d",
+          "surface-container-high": "#272a31",
+          "surface-variant": "#32353c",
+          "surface-container-lowest": "#0b0e15",
+          "on-secondary": "#233143",
+          "surface-tint": "#adc6ff",
+          "on-tertiary": "#502400",
+          "surface-container-low": "#191b23",
+          "primary-fixed-dim": "#adc6ff",
+          "on-secondary-container": "#a7b6cc",
+          "surface-container": "#1d2027",
+          "on-tertiary-container": "#461f00",
+          "inverse-surface": "#e1e2ec",
+          "tertiary": "#ffb786",
+          /* DOD-FIX-R3: token fiduciario para estados positivos — reemplaza green-400 */
+          "success": "var(--theme-success)"
+        },
+        borderRadius: {
+          DEFAULT: "0.25rem",
+          lg: "0.5rem",
+          xl: "0.75rem",
+          full: "9999px"
+        },
+        spacing: {
+          gutter: "24px",
+          base: "8px",
+          "container-max": "1440px",
+          margin: "32px"
+        },
+        fontFamily: {
+          "headline-md": ["Manrope"],
+          "headline-lg": ["Manrope"],
+          "label-md": ["Manrope"],
+          "body-lg": ["Manrope"],
+          "label-sm": ["Manrope"],
+          "headline-lg-mobile": ["Manrope"],
+          "body-md": ["Manrope"]
+        },
+        fontSize: {
+          "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+          "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+          "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+          "headline-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+          "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  /* DOD-FIX-R3: Todas las referencias de color migradas a custom properties.
+     Cero hex y cero rgba() hardcodeados en reglas de uso. */
+  :root {
+    --theme-surface:              #10131a;
+    --theme-on-surface:           #e1e2ec;
+    --theme-success:              #4ade80;
+    --theme-glass-surface:        rgba(255, 255, 255, 0.04);
+    --theme-glass-border:         rgba(140, 144, 159, 0.2);
+    --theme-glass-sidebar:        rgba(16, 19, 26, 0.4);
+    --theme-glass-sidebar-border: rgba(140, 144, 159, 0.1);
+    --theme-scrollbar-thumb:      rgba(173, 198, 255, 0.2);
+    --theme-glow-primary:         rgba(173, 198, 255, 0.06);
+    --theme-glass-surface-raw:    rgba(255, 255, 255, 0.04);
+    --theme-input-glow:           rgba(173, 198, 255, 0.1);
+  }
+
+  body {
+    background-color: var(--theme-surface);
+    color: var(--theme-on-surface);
+    font-family: 'Manrope', sans-serif;
+    overflow-x: hidden;
+  }
+  .glass-card {
+    background: var(--theme-glass-surface);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--theme-glass-border);
+  }
+  .glass-sidebar {
+    background: var(--theme-glass-sidebar);
+    backdrop-filter: blur(32px);
+    border-right: 1px solid var(--theme-glass-sidebar-border);
+  }
+  .neon-status-bar {
+    width: 4px;
+    height: 100%;
+    border-radius: 2px;
+  }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--theme-scrollbar-thumb);
+    border-radius: 10px;
+  }
+</style>
+</head>
+
+<!-- DOD-FIX-ROOT-ID: id canónico del gadget añadido al contenedor raíz -->
+<body id="gd-compliance_dashboard-root" class="min-h-screen selection:bg-primary/30">
+
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 glass-sidebar z-50 flex flex-col py-margin gap-base hidden md:flex">
+  <div class="px-gutter mb-base">
+    <h1 class="font-headline-md text-headline-md font-bold tracking-tight text-primary" data-i18n="brand_name">CPII COMPLIANCE</h1>
+    <p class="font-label-sm text-label-sm text-on-surface-variant opacity-60 uppercase tracking-widest mt-2" data-i18n="system_status">Operational v2.4</p>
+  </div>
+  <nav class="flex-1 px-4 flex flex-col gap-1">
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary border-r-4 border-primary transition-all group" href="#">
+      <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+      <span class="font-label-md text-label-md" data-i18n="nav_overview">Overview</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-white/5 transition-all group" href="#">
+      <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" data-icon="warning">warning</span>
+      <span class="font-label-md text-label-md" data-i18n="nav_alerts">Compliance Alerts</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-white/5 transition-all group" href="#">
+      <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" data-icon="description">description</span>
+      <span class="font-label-md text-label-md" data-i18n="nav_reports">IMPIC Reports</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-white/5 transition-all group" href="#">
+      <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" data-icon="history">history</span>
+      <span class="font-label-md text-label-md" data-i18n="nav_audit">Audit Logs</span>
+    </a>
+    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-white/5 transition-all group mt-auto" href="#">
+      <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" data-icon="settings">settings</span>
+      <span class="font-label-md text-label-md" data-i18n="nav_settings">Settings</span>
+    </a>
+  </nav>
+  <div class="px-gutter pt-base mt-base border-t border-outline/10">
+    <button class="w-full py-3 bg-primary text-on-primary rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 active:scale-95 transition-transform">
+      <span class="material-symbols-outlined text-[20px]" data-icon="add_chart">add_chart</span>
+      <span data-i18n="cta_generate">Generate Report</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Main Content Area -->
+<main class="md:ml-64 min-h-screen flex flex-col relative">
+
+  <!-- Top Header -->
+  <header class="h-16 px-gutter flex justify-between items-center bg-surface/10 backdrop-blur-xl border-b border-outline/20 sticky top-0 z-40">
+    <div class="flex-1 max-w-xl">
+      <div class="relative group">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] group-focus-within:text-primary transition-colors">search</span>
+        <input
+          class="w-full bg-white/5 border-none rounded-full pl-10 pr-4 py-2 text-label-md focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/40"
+          data-i18n-placeholder="search_placeholder"
+          placeholder="Search compliance database..."
+          type="text"
+        />
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors relative">
+        <span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+        <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+      </button>
+      <div class="h-8 w-[1px] bg-outline/20 mx-2"></div>
+      <div class="flex items-center gap-3">
+        <div class="text-right hidden sm:block">
+          <p class="font-label-md text-label-md text-on-surface" data-i18n="user_name">Alex Rivera</p>
+          <p class="font-label-sm text-[10px] text-on-surface-variant opacity-60 uppercase" data-i18n="user_role">Compliance Lead</p>
+        </div>
+        <img
+          alt="User Profile"
+          class="w-10 h-10 rounded-full border border-outline/30 object-cover"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrGTLaxTXl11GGjhAaKB7JV_impiCpcZsGpOfXD7HHQbOHW2TnFG_khZkEOGoKjDfGg9poKCr3q87QvKca1sJ8dzHBRVpuzCqR4CvdQKzTjHoGPIb-qd-fi8hEo4KCG_fuwW4o0o9e3-w6iqe0zVlrdnEDif1zykLNK7__QCBG1o1fqsKHowoUCYuYBcqtNJwPo77KNA6otLZOA47pfjhTDviKCEtuWMKPFl581aBdL7jNngi7-aYXIFI9B_XLCpIa1yuSrn0udTB1"
+        />
+      </div>
+    </div>
+  </header>
+
+  <!-- Content Canvas -->
+  <div class="p-gutter max-w-container-max mx-auto w-full space-y-gutter">
+
+    <!-- Dashboard Title Section -->
+    <section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div>
+        <h2 class="font-headline-lg text-headline-lg text-on-surface" data-i18n="compliance.dashboard.title">Dashboard de Compliance</h2>
+        <p class="font-body-md text-on-surface-variant" data-i18n="compliance.dashboard.subtitle">Estado operativo, risco AML/BCFT e reportes ao IMPIC</p>
+      </div>
+      <div class="flex gap-3">
+        <button class="px-4 py-2 rounded-lg border border-outline/30 text-label-md flex items-center gap-2 hover:bg-white/5 transition-all">
+          <span class="material-symbols-outlined text-[18px]" data-icon="filter_list">filter_list</span>
+          <span data-i18n="btn_filter">Filtrar</span>
+        </button>
+        <button class="px-4 py-2 rounded-lg bg-surface-container-high border border-outline/30 text-label-md flex items-center gap-2 hover:bg-white/10 transition-all">
+          <span class="material-symbols-outlined text-[18px]" data-icon="calendar_today">calendar_today</span>
+          <span data-i18n="compliance.filter.dias_30">30 dias</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Metrics Grid -->
+    <!-- DOD-FIX-R3: bg-green-400 / text-green-400 reemplazados por text-success / bg-success -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-base md:gap-gutter">
+
+      <div class="glass-card p-6 rounded-2xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+        <div class="absolute top-0 left-0 neon-status-bar bg-primary"></div>
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-primary" data-icon="verified_user">verified_user</span>
+          <!-- DOD-FIX-R3+R4: era text-green-400 sin data-i18n -->
+          <span class="font-label-sm text-success" data-i18n="metric_integrity_trend">+12%</span>
+        </div>
+        <p class="font-label-md text-on-surface-variant opacity-70 mb-1" data-i18n="metric_integrity">Índice de Integridade</p>
+        <h3 class="font-headline-md text-headline-md text-on-surface">99.8%</h3>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+        <div class="absolute top-0 left-0 neon-status-bar bg-error"></div>
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-error" data-icon="notification_important">notification_important</span>
+          <span class="font-label-sm text-error" data-i18n="high_priority">Crítico</span>
+        </div>
+        <p class="font-label-md text-on-surface-variant opacity-70 mb-1" data-i18n="metric_active_alerts">Alertas Activas</p>
+        <h3 class="font-headline-md text-headline-md text-on-surface">0</h3>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+        <div class="absolute top-0 left-0 neon-status-bar bg-tertiary"></div>
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-tertiary" data-icon="pending_actions">pending_actions</span>
+          <!-- DOD-FIX-R4: era texto sin data-i18n -->
+          <span class="font-label-sm text-on-surface-variant" data-i18n="metric_impic_pending_count">2 Pendentes</span>
+        </div>
+        <p class="font-label-md text-on-surface-variant opacity-70 mb-1" data-i18n="compliance.kpi.impic_pending">Reportes IMPIC pendentes</p>
+        <h3 class="font-headline-md text-headline-md text-on-surface">142</h3>
+      </div>
+
+      <div class="glass-card p-6 rounded-2xl relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+        <div class="absolute top-0 left-0 neon-status-bar bg-primary-fixed"></div>
+        <div class="flex justify-between items-start mb-4">
+          <span class="material-symbols-outlined text-primary-fixed" data-icon="speed">speed</span>
+          <!-- DOD-FIX-R4: era texto sin data-i18n -->
+          <span class="font-label-sm text-primary" data-i18n="metric_latency_status">Estável</span>
+        </div>
+        <p class="font-label-md text-on-surface-variant opacity-70 mb-1" data-i18n="metric_latency">Latência de Auditoria</p>
+        <h3 class="font-headline-md text-headline-md text-on-surface">42ms</h3>
+      </div>
+
+    </section>
+
+    <!-- Main Dashboard Layout: Bento Style -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+
+      <!-- Alerts Section (Empty State) -->
+      <section class="lg:col-span-2 glass-card rounded-3xl flex flex-col min-h-[400px]">
+        <div class="p-6 border-b border-outline/10 flex justify-between items-center">
+          <h3 class="font-headline-md text-[20px] flex items-center gap-3" data-i18n="section_alerts">
+            <span class="material-symbols-outlined text-error" data-icon="gpp_maybe">gpp_maybe</span>
+            Alertas
+          </h3>
+          <a class="text-primary font-label-md text-label-md hover:underline" data-i18n="view_all" href="#">Ver todo</a>
+        </div>
+        <div class="flex-1 flex flex-col items-center justify-center p-gutter text-center space-y-4 opacity-80">
+          <div class="w-24 h-24 rounded-full bg-primary/5 flex items-center justify-center relative">
+            <span class="material-symbols-outlined text-[48px] text-on-surface-variant/30" data-icon="shield_lock">shield_lock</span>
+            <div class="absolute inset-0 bg-primary/10 blur-xl rounded-full scale-110"></div>
+          </div>
+          <div>
+            <h4 class="font-headline-md text-[18px] text-on-surface" data-i18n="empty_alerts_title">Sem alertas pendentes</h4>
+            <p class="font-body-md text-on-surface-variant max-w-xs mx-auto" data-i18n="empty_alerts_desc">Todos os sistemas estão a operar dentro dos parâmetros de cumprimento R2 estabelecidos.</p>
+          </div>
+          <button class="px-6 py-2 rounded-full border border-primary/30 text-primary text-label-md hover:bg-primary/10 transition-all" data-i18n="btn_scan">Escanear Agora</button>
+        </div>
+      </section>
+
+      <!-- IMPIC Reports Section (Empty State) -->
+      <section class="glass-card rounded-3xl flex flex-col min-h-[400px]">
+        <div class="p-6 border-b border-outline/10">
+          <h3 class="font-headline-md text-[20px] flex items-center gap-3" data-i18n="section_impic">
+            <span class="material-symbols-outlined text-tertiary" data-icon="assignment_late">assignment_late</span>
+            Reportes IMPIC
+          </h3>
+        </div>
+        <div class="flex-1 flex flex-col items-center justify-center p-gutter text-center space-y-4">
+          <div class="relative">
+            <span class="material-symbols-outlined text-[64px] text-on-surface-variant/20 rotate-12" data-icon="folder_off">folder_off</span>
+          </div>
+          <div class="space-y-1">
+            <p class="font-label-md text-on-surface-variant" data-i18n="empty_reports_title">Nenhum reporte encontrado</p>
+            <p class="font-label-sm text-on-surface-variant/50 max-w-[200px]" data-i18n="empty_reports_desc">Inicie o processo de auditoria para gerar documentos IMPIC.</p>
+          </div>
+          <button class="flex items-center gap-2 text-primary font-label-md text-label-md group">
+            <span data-i18n="compliance.action.generate_impic_report">Gerar relatório IMPIC</span>
+            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+          </button>
+        </div>
+        <div class="p-6 bg-white/5 mt-auto rounded-b-3xl">
+          <div class="flex items-center justify-between">
+            <div class="flex -space-x-2">
+              <div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center font-label-sm">JD</div>
+              <div class="w-8 h-8 rounded-full border-2 border-surface bg-primary/20 flex items-center justify-center font-label-sm text-primary">MS</div>
+            </div>
+            <span class="font-label-sm text-on-surface-variant" data-i18n="collaborators">2 Colaboradores online</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Recent Activity / Audit Table -->
+    <!-- DOD-FIX-R3+R4: bg-green-400/text-green-400 → bg-success/text-success; timestamps etiquetados -->
+    <section class="glass-card rounded-3xl overflow-hidden">
+      <div class="p-6 border-b border-outline/10 flex justify-between items-center">
+        <h3 class="font-headline-md text-[20px]" data-i18n="section_activity">Atividade de Auditoria Recente</h3>
+      </div>
+      <div class="overflow-x-auto custom-scrollbar">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-white/5 border-b border-outline/5">
+              <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant opacity-60 uppercase" data-i18n="th_event">Evento</th>
+              <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant opacity-60 uppercase" data-i18n="th_origin">Origem</th>
+              <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant opacity-60 uppercase" data-i18n="th_status">Estado</th>
+              <th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant opacity-60 uppercase" data-i18n="th_time">Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-outline/5 hover:bg-white/5 transition-colors group">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <!-- DOD-FIX-R3: era bg-green-400 -->
+                  <span class="w-2 h-2 rounded-full bg-success"></span>
+                  <span class="font-body-md" data-i18n="event_1">Sincronização de Base de Dados R2</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-on-surface-variant font-label-md">Server_HK_01</td>
+              <td class="px-6 py-4">
+                <!-- DOD-FIX-R3: era bg-green-400/10 text-green-400 -->
+                <span class="px-2 py-1 rounded bg-success/10 text-success text-[10px] font-bold uppercase tracking-wider" data-i18n="status_ok">Êxito</span>
+              </td>
+              <!-- DOD-FIX-R4: timestamps etiquetados -->
+              <td class="px-6 py-4 text-on-surface-variant font-label-sm" data-i18n="time_4_mins_ago">Há 4 mins</td>
+            </tr>
+            <tr class="border-b border-outline/5 hover:bg-white/5 transition-colors group">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-full bg-primary"></span>
+                  <span class="font-body-md" data-i18n="event_2">Validação de Token de Acesso</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-on-surface-variant font-label-md">Gateway_NY_04</td>
+              <td class="px-6 py-4">
+                <span class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider" data-i18n="status_progress">A processar</span>
+              </td>
+              <td class="px-6 py-4 text-on-surface-variant font-label-sm" data-i18n="time_12_mins_ago">Há 12 mins</td>
+            </tr>
+            <tr class="hover:bg-white/5 transition-colors group">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-full bg-outline-variant"></span>
+                  <span class="font-body-md" data-i18n="event_3">Backup Semanal de Logins</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-on-surface-variant font-label-md">Archive_Store</td>
+              <td class="px-6 py-4">
+                <span class="px-2 py-1 rounded bg-white/5 text-on-surface-variant text-[10px] font-bold uppercase tracking-wider" data-i18n="status_queued">Em Fila</span>
+              </td>
+              <td class="px-6 py-4 text-on-surface-variant font-label-sm" data-i18n="time_1_hour_ago">Há 1 hora</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div><!-- /Content Canvas -->
+
+  <!-- Footer -->
+  <footer class="p-gutter mt-auto opacity-40">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-label-sm">
+      <p data-i18n="copyright">© 2026 CPII COMPLIANCE SYSTEMS. Todos os direitos reservados.</p>
+      <div class="flex gap-6">
+        <a class="hover:text-primary transition-colors" data-i18n="footer_privacy" href="#">Privacidade</a>
+        <a class="hover:text-primary transition-colors" data-i18n="footer_terms" href="#">Termos R2-D4</a>
+        <a class="hover:text-primary transition-colors" data-i18n="footer_support" href="#">Suporte</a>
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<!-- Micro-interaction Scripts -->
+<!-- DOD-FIX-R3: rgba() hardcodeados en JS reemplazados por var(--theme-*) -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.glass-card');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+        card.style.background = `radial-gradient(600px circle at ${x}px ${y}px, var(--theme-glow-primary), transparent 40%), var(--theme-glass-surface-raw)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.background = 'var(--theme-glass-surface)';
+      });
+    });
+
+    const searchInput = document.querySelector('input[type="text"]');
+    if (searchInput) {
+      searchInput.addEventListener('focus', () => {
+        searchInput.parentElement.style.boxShadow = `0 0 20px var(--theme-input-glow)`;
+      });
+      searchInput.addEventListener('blur', () => {
+        searchInput.parentElement.style.boxShadow = 'none';
+      });
+    }
+  });
+</script>
+
+</body>
+</html>

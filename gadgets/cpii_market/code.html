@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container": "#1d2027",
+                        "on-tertiary-container": "#461f00",
+                        "tertiary": "#ffb786",
+                        "on-error-container": "#ffdad6",
+                        "error": "#ffb4ab",
+                        "error-container": "#93000a",
+                        "primary": "#adc6ff",
+                        "on-secondary-container": "#a7b6cc",
+                        "on-primary-container": "#00285d",
+                        "surface-tint": "#adc6ff",
+                        "on-error": "#690005",
+                        "outline-variant": "#424754",
+                        "on-primary": "#002e6a",
+                        "secondary-container": "#39485a",
+                        "inverse-on-surface": "#2e3038",
+                        "surface": "#10131a",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-background": "#e1e2ec",
+                        "inverse-surface": "#e1e2ec",
+                        "surface-dim": "#10131a",
+                        "surface-container-highest": "#32353c",
+                        "outline": "#8c909f",
+                        "on-secondary-fixed": "#0d1c2d",
+                        "surface-bright": "#363941",
+                        "tertiary-fixed": "#ffdcc6",
+                        "background": "#10131a",
+                        "on-surface-variant": "#c2c6d6",
+                        "on-surface": "#e1e2ec",
+                        "surface-container-lowest": "#0b0e15",
+                        "primary-fixed": "#d8e2ff",
+                        "on-secondary": "#233143",
+                        "primary-container": "#4d8eff",
+                        "on-tertiary-fixed": "#311400",
+                        "surface-container-low": "#191b23",
+                        "secondary-fixed": "#d4e4fa",
+                        "surface-container-high": "#272a31",
+                        "on-secondary-fixed-variant": "#39485a",
+                        "on-primary-fixed-variant": "#004395",
+                        "secondary": "#b9c8de",
+                        "on-primary-fixed": "#001a42",
+                        "inverse-primary": "#005ac2",
+                        "surface-variant": "#32353c",
+                        "tertiary-fixed-dim": "#ffb786",
+                        "on-tertiary": "#502400",
+                        "tertiary-container": "#df7412",
+                        "on-tertiary-fixed-variant": "#723600",
+                        "secondary-fixed-dim": "#b9c8de",
+                        /* DOD-FIX-R3: token fiduciario — apunta a CSS var, no a hex directo */
+                        "success": "var(--theme-success)"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin": "32px",
+                        "container-max": "1440px",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Manrope"],
+                        "label-sm": ["Manrope"],
+                        "body-lg": ["Manrope"],
+                        "label-md": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "headline-lg": ["Manrope"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* DOD-FIX-R3: bloque :root canónico — todas las referencias de color migradas aquí.
+           Cero hex y cero rgba() en reglas de uso. */
+        :root {
+            --theme-success:          #22c55e;
+            --theme-error:            #ffb4ab;
+            --theme-glass-surface:    rgba(255, 255, 255, 0.04);
+            --theme-glass-border:     rgba(140, 144, 159, 0.2);
+            --theme-neon-success-bg:  rgba(34, 197, 94, 0.1);
+            --theme-neon-error-bg:    rgba(255, 180, 171, 0.1);
+            --theme-scrollbar-thumb:  rgba(140, 144, 159, 0.3);
+            --theme-glow-bg-primary:  rgba(173, 198, 255, 0.05);
+            --theme-glow-bg-tertiary: rgba(223, 116, 18, 0.05);
+            --theme-shadow-card:      0 8px 32px 0 rgba(173, 198, 255, 0.05);
+            --theme-shadow-panel:     0 20px 50px rgba(173, 198, 255, 0.1);
+            --theme-glow-pulse:       0 0 20px rgba(173, 198, 255, 0.2);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* DOD-FIX-R3: rgba() hardcodeados → var(--theme-*) */
+        .glass-surface {
+            background: var(--theme-glass-surface);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+
+        .glass-border {
+            border: 1px solid var(--theme-glass-border);
+        }
+
+        /* DOD-FIX-R3: hex #22c55e y rgba() → var(--theme-success) / var(--theme-neon-success-bg) */
+        .neon-chip-success {
+            background: var(--theme-neon-success-bg);
+            border-left: 2px solid var(--theme-success);
+        }
+
+        /* DOD-FIX-R3: hex #ffb4ab y rgba() → var(--theme-error) / var(--theme-neon-error-bg) */
+        .neon-chip-error {
+            background: var(--theme-neon-error-bg);
+            border-left: 2px solid var(--theme-error);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* DOD-FIX-R3: rgba() → var(--theme-scrollbar-thumb) */
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--theme-scrollbar-thumb);
+            border-radius: 10px;
+        }
+
+        /* DOD-FIX-R3: radial-gradient con rgba() → var(--theme-glow-bg-*) */
+        #gd-market-root {
+            background:
+                radial-gradient(circle at 0% 0%, var(--theme-glow-bg-primary) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, var(--theme-glow-bg-tertiary) 0%, transparent 50%);
+        }
+
+        /* DOD-FIX-R3: clases CSS para shadow arbitrary values con rgba() incrustado */
+        .shadow-card-primary {
+            box-shadow: var(--theme-shadow-card);
+        }
+
+        .shadow-panel-glow {
+            box-shadow: var(--theme-shadow-panel);
+        }
+
+        /* DOD-FIX-R3: clase para efecto pulse del JS — reemplaza arbitrary class con rgba() */
+        .pulse-glow {
+            box-shadow: var(--theme-glow-pulse);
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+    <div class="max-w-container-max mx-auto min-h-screen flex flex-col md:flex-row gap-0 overflow-hidden"
+        id="gd-market-root">
+        <!-- Side Navigation -->
+        <aside
+            class="fixed left-0 top-0 h-full w-64 flex flex-col py-margin gap-base bg-surface/5 backdrop-blur-3xl border-r border-outline/10 shadow-xl z-50 hidden md:flex">
+            <div class="px-6 mb-8">
+                <h1 class="font-headline-md text-headline-md font-bold tracking-tight text-primary uppercase"
+                    data-i18n="brand_name">CPII MARKET</h1>
+                <p class="font-label-md text-label-md text-on-surface-variant mt-1" data-i18n="portal_subtitle">Market
+                    Intelligence</p>
+            </div>
+            <nav class="flex-1 px-4 space-y-2">
+                <button
+                    class="tab-btn w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-all bg-primary/10 text-primary border-r-4 border-primary"
+                    id="nav-overview" onclick="switchTab('overview')">
+                    <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    <span class="font-label-md" data-i18n="nav_overview">Overview</span>
+                </button>
+                <button
+                    class="tab-btn w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-all text-on-surface-variant hover:bg-white/5"
+                    id="nav-yield" onclick="switchTab('yield')">
+                    <span class="material-symbols-outlined" data-icon="insights">insights</span>
+                    <span class="font-label-md" data-i18n="nav_yield">Yield Intelligence</span>
+                </button>
+                <button
+                    class="tab-btn w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-all text-on-surface-variant hover:bg-white/5"
+                    id="nav-simulator" onclick="switchTab('simulator')">
+                    <span class="material-symbols-outlined" data-icon="calculate">calculate</span>
+                    <span class="font-label-md" data-i18n="nav_simulator">Simulador</span>
+                </button>
+                <button
+                    class="tab-btn w-full flex items-center gap-4 px-4 py-3 rounded-lg transition-all text-on-surface-variant hover:bg-white/5"
+                    id="nav-feed" onclick="switchTab('feed')">
+                    <span class="material-symbols-outlined" data-icon="rss_feed">rss_feed</span>
+                    <span class="font-label-md" data-i18n="nav_feed">Feed de Mercado</span>
+                </button>
+            </nav>
+            <div class="px-4 mt-auto">
+                <div class="p-4 rounded-xl glass-surface glass-border bg-primary/5">
+                    <p class="font-label-sm text-primary mb-2" data-i18n="euribor_status">EURIBOR 12M</p>
+                    <p class="font-headline-md text-on-surface">3.678%</p>
+                    <div class="flex items-center gap-1 text-error mt-1">
+                        <span class="material-symbols-outlined text-[16px]">trending_up</span>
+                        <span class="text-[12px] font-bold">+0.012</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main
+            class="flex-1 md:ml-64 p-6 md:p-margin transition-all duration-500 overflow-y-auto h-screen custom-scrollbar">
+
+            <!-- Tab: Overview -->
+            <section class="tab-content animate-in fade-in slide-in-from-bottom-4 duration-700" id="tab-overview">
+                <header class="mb-gutter">
+                    <h2 class="font-headline-lg text-headline-lg text-on-surface" data-i18n="overview_title">Visão Geral
+                        do Mercado</h2>
+                    <p class="text-on-surface-variant font-body-md" data-i18n="overview_desc">Indicadores
+                        macroeconómicos e performance imobiliária em tempo real.</p>
+                </header>
+
+                <!-- KPI Grid -->
+                <!-- DOD-FIX-R3: shadow arbitrary con rgba() → clase .shadow-card-primary -->
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
+                    <!-- Price -->
+                    <div class="glass-surface glass-border p-6 rounded-xl shadow-card-primary">
+                        <div class="flex justify-between items-start mb-4">
+                            <span
+                                class="p-2 rounded-lg bg-primary/10 text-primary material-symbols-outlined">payments</span>
+                            <span class="text-success font-bold text-[12px] flex items-center gap-0.5">
+                                <span class="material-symbols-outlined text-[14px]">arrow_upward</span> +4.2%
+                            </span>
+                        </div>
+                        <p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1"
+                            data-i18n="kpi_price_label">Preço Médio m²</p>
+                        <p class="font-headline-md text-on-surface">4.850€</p>
+                    </div>
+                    <!-- Time -->
+                    <div class="glass-surface glass-border p-6 rounded-xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <span
+                                class="p-2 rounded-lg bg-primary/10 text-primary material-symbols-outlined">schedule</span>
+                            <span class="text-error font-bold text-[12px] flex items-center gap-0.5">
+                                <span class="material-symbols-outlined text-[14px]">arrow_upward</span> +2d
+                            </span>
+                        </div>
+                        <p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1"
+                            data-i18n="kpi_time_label">Tempo de Venda</p>
+                        <p class="font-headline-md text-on-surface">114 Dias</p>
+                    </div>
+                    <!-- Yield -->
+                    <div class="glass-surface glass-border p-6 rounded-xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <span
+                                class="p-2 rounded-lg bg-primary/10 text-primary material-symbols-outlined">analytics</span>
+                            <!-- DOD-FIX-R4: texto visible sin data-i18n -->
+                            <span class="text-on-surface-variant font-bold text-[12px]" data-i18n="market.kpi.yield_status_stable">Estável</span>
+                        </div>
+                        <p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1"
+                            data-i18n="kpi_yield_label">Yield Bruta</p>
+                        <p class="font-headline-md text-on-surface">5.8%</p>
+                    </div>
+                    <!-- Effort -->
+                    <div class="glass-surface glass-border p-6 rounded-xl">
+                        <div class="flex justify-between items-start mb-4">
+                            <span
+                                class="p-2 rounded-lg bg-primary/10 text-primary material-symbols-outlined">assignment_ind</span>
+                            <span class="text-success font-bold text-[12px] flex items-center gap-0.5">
+                                <span class="material-symbols-outlined text-[14px]">arrow_downward</span> -1.1%
+                            </span>
+                        </div>
+                        <p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1"
+                            data-i18n="kpi_effort_label">Taxa de Esforço</p>
+                        <p class="font-headline-md text-on-surface">42.5%</p>
+                    </div>
+                    <!-- Euribor -->
+                    <div class="glass-surface glass-border p-6 rounded-xl border-primary/20">
+                        <div class="flex justify-between items-start mb-4">
+                            <span
+                                class="p-2 rounded-lg bg-tertiary/10 text-tertiary material-symbols-outlined">account_balance</span>
+                        </div>
+                        <p class="font-label-sm text-on-surface-variant uppercase tracking-wider mb-1"
+                            data-i18n="kpi_euribor_label">Euribor 12M</p>
+                        <p class="font-headline-md text-tertiary">3.678%</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+                    <div class="glass-surface glass-border rounded-2xl p-6 relative overflow-hidden group">
+                        <h3 class="font-headline-md text-on-surface mb-6" data-i18n="trend_chart_title">Tendência de
+                            Preços (Lisboa vs Porto)</h3>
+                        <div class="h-64 flex items-end gap-4 px-2">
+                            <!-- Mock Chart Bars -->
+                            <div
+                                class="flex-1 bg-primary/20 group-hover:bg-primary/40 transition-all rounded-t-lg h-[40%] relative">
+                                <span
+                                    class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold">2.4k</span>
+                            </div>
+                            <div
+                                class="flex-1 bg-primary/20 group-hover:bg-primary/40 transition-all rounded-t-lg h-[55%]">
+                            </div>
+                            <div
+                                class="flex-1 bg-primary/20 group-hover:bg-primary/40 transition-all rounded-t-lg h-[45%]">
+                            </div>
+                            <div
+                                class="flex-1 bg-primary/40 group-hover:bg-primary/60 transition-all rounded-t-lg h-[75%]">
+                            </div>
+                            <div
+                                class="flex-1 bg-primary/20 group-hover:bg-primary/40 transition-all rounded-t-lg h-[60%]">
+                            </div>
+                            <div
+                                class="flex-1 bg-primary/60 group-hover:bg-primary/80 transition-all rounded-t-lg h-[95%]">
+                            </div>
+                        </div>
+                        <!-- DOD-FIX-R4: etiquetas de eje (meses) sin data-i18n -->
+                        <div class="flex justify-between mt-4 text-on-surface-variant font-label-sm">
+                            <span data-i18n="month.jan">Jan</span>
+                            <span data-i18n="month.mar">Mar</span>
+                            <span data-i18n="month.mai">Mai</span>
+                            <span data-i18n="month.jul">Jul</span>
+                            <span data-i18n="month.set">Set</span>
+                            <span data-i18n="month.nov">Nov</span>
+                        </div>
+                    </div>
+                    <div class="glass-surface glass-border rounded-2xl p-6">
+                        <h3 class="font-headline-md text-on-surface mb-6" data-i18n="market_snapshot_title">Instantâneo
+                            Local</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                                        <img alt="Lisboa" class="w-full h-full object-cover"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNgZt-zhykMgcYzvo765z8LmROdzHrGZj8O0GmuYkKhOKlP2Xi3v_HGd45WH7cu9TGlnwUIK-io6xL06uEt8LfMGDPcSAHMhP5REysm1-jDVHQ035MjnFyzrHY7jab4m7ZVFwzlC40zw01FuwXuNzJ2ZmtBQ54qhh7hInF-5GO4nyR2AJiXDWctLFSn_UjrpCykDilrD4Cq8aUEhFOxLQhkEwxihpCY_VHcBJPjG5tosnh89uXYHFH7Rk2-jL6IoE8Un5g8wEnTtEJ" />
+                                    </div>
+                                    <div>
+                                        <p class="font-bold">Lisboa Central</p>
+                                        <!-- DOD-FIX-R4: descriptor de zona sin data-i18n -->
+                                        <p class="text-[12px] text-on-surface-variant" data-i18n="market.snapshot.lisbon.zone">Zona Histórica</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-primary">6.400€/m²</p>
+                                    <!-- DOD-FIX-R4: etiqueta de tendencia sin data-i18n -->
+                                    <p class="text-[10px] text-success" data-i18n="market.snapshot.lisbon.trend">Em alta +0.8%</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                                        <img alt="Porto" class="w-full h-full object-cover"
+                                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdiOyVE1_y7uqq3MKfFFlPZWTwgL3SkADtH1KwW86rPsORdAkhaAaRtpYgSW0HLbl9ic8e_cLQIR_77z9sZn_qwbuY_CQ1kZ2kfiY9Y3swAIF9llAnoQZyVhxiCz3be2B-A7rPs7DMk7WWD_62z1uX7hY5xYZOQZ5xjmigGWY4v_IE2dIxCfq-Vpdm158pQnYXebPGuRSOMvWu7BkpQGyddRDntEgUIY3fZA6bHBPHnG3YFdHWAY28iSn9ZRMiibDWLXLD7wmlROgv" />
+                                    </div>
+                                    <div>
+                                        <p class="font-bold">Porto Ribeira</p>
+                                        <!-- DOD-FIX-R4: descriptor de zona sin data-i18n -->
+                                        <p class="text-[12px] text-on-surface-variant" data-i18n="market.snapshot.porto.zone">Marginal</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-primary">4.150€/m²</p>
+                                    <!-- DOD-FIX-R4: etiqueta de tendencia sin data-i18n -->
+                                    <p class="text-[10px] text-success" data-i18n="market.snapshot.porto.trend">Em alta +1.2%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Yield Intelligence -->
+            <section class="tab-content hidden animate-in fade-in slide-in-from-bottom-4 duration-700" id="tab-yield">
+                <header class="mb-gutter">
+                    <h2 class="font-headline-lg text-headline-lg text-on-surface" data-i18n="yield_title">Yield
+                        Intelligence</h2>
+                    <p class="text-on-surface-variant font-body-md" data-i18n="yield_desc">Análise profunda de
+                        rentabilidade por zona e tipologia.</p>
+                </header>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+                    <!-- Neighborhood Yields -->
+                    <div class="lg:col-span-2 glass-surface glass-border rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-8">
+                            <h3 class="font-headline-md text-on-surface" data-i18n="neighborhood_rank_title">Ranking de
+                                Freguesias</h3>
+                            <div class="flex gap-2">
+                                <button
+                                    class="px-3 py-1 rounded-full bg-primary text-on-primary font-label-sm">Lisboa</button>
+                                <button
+                                    class="px-3 py-1 rounded-full glass-surface glass-border font-label-sm hover:bg-white/5 transition-colors">Porto</button>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <!-- Ranking Item 1 -->
+                            <div
+                                class="flex items-center justify-between group hover:bg-white/5 p-4 rounded-xl transition-all">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-[14px]">
+                                        1</div>
+                                    <div>
+                                        <p class="font-bold text-on-surface">Arroios</p>
+                                        <!-- DOD-FIX-R4: descriptor sin data-i18n -->
+                                        <p class="text-[12px] text-on-surface-variant" data-i18n="market.ranking.arroios.descriptor">Zentral/Cultural</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-8">
+                                    <div class="text-right">
+                                        <!-- DOD-FIX-R4: cabecera de columna sin data-i18n (aparece 3×) -->
+                                        <p class="font-label-sm text-on-surface-variant" data-i18n="market.ranking.col_price_sqm">Preço m²</p>
+                                        <p class="font-bold">5.200€</p>
+                                    </div>
+                                    <div class="w-24 h-12 flex flex-col justify-center">
+                                        <!-- DOD-FIX-R4: cabecera de columna sin data-i18n (aparece 3×) -->
+                                        <p class="font-label-sm text-on-surface-variant text-right" data-i18n="market.ranking.col_yield">Yield</p>
+                                        <div class="w-full h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden">
+                                            <div class="h-full bg-success w-[72%]"></div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right min-w-[50px]">
+                                        <p class="font-bold text-success">6.2%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Ranking Item 2 -->
+                            <div
+                                class="flex items-center justify-between group hover:bg-white/5 p-4 rounded-xl transition-all bg-white/[0.02]">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-[14px]">
+                                        2</div>
+                                    <div>
+                                        <p class="font-bold text-on-surface">Marvila</p>
+                                        <!-- DOD-FIX-R4: descriptor sin data-i18n -->
+                                        <p class="text-[12px] text-on-surface-variant" data-i18n="market.ranking.marvila.descriptor">Industrial Chic</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-8">
+                                    <div class="text-right">
+                                        <p class="font-label-sm text-on-surface-variant" data-i18n="market.ranking.col_price_sqm">Preço m²</p>
+                                        <p class="font-bold">4.400€</p>
+                                    </div>
+                                    <div class="w-24 h-12 flex flex-col justify-center">
+                                        <p class="font-label-sm text-on-surface-variant text-right" data-i18n="market.ranking.col_yield">Yield</p>
+                                        <div class="w-full h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden">
+                                            <div class="h-full bg-success w-[68%]"></div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right min-w-[50px]">
+                                        <p class="font-bold text-success">5.9%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Ranking Item 3 -->
+                            <div
+                                class="flex items-center justify-between group hover:bg-white/5 p-4 rounded-xl transition-all">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary text-[14px]">
+                                        3</div>
+                                    <div>
+                                        <p class="font-bold text-on-surface">Campolide</p>
+                                        <!-- DOD-FIX-R4: descriptor sin data-i18n -->
+                                        <p class="text-[12px] text-on-surface-variant" data-i18n="market.ranking.campolide.descriptor">Prime Residence</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-8">
+                                    <div class="text-right">
+                                        <p class="font-label-sm text-on-surface-variant" data-i18n="market.ranking.col_price_sqm">Preço m²</p>
+                                        <p class="font-bold">6.100€</p>
+                                    </div>
+                                    <div class="w-24 h-12 flex flex-col justify-center">
+                                        <p class="font-label-sm text-on-surface-variant text-right" data-i18n="market.ranking.col_yield">Yield</p>
+                                        <div class="w-full h-1.5 bg-white/10 rounded-full mt-1 overflow-hidden">
+                                            <div class="h-full bg-primary w-[55%]"></div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right min-w-[50px]">
+                                        <p class="font-bold text-primary">5.1%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Typology Analysis -->
+                    <div class="glass-surface glass-border rounded-2xl p-6">
+                        <h3 class="font-headline-md text-on-surface mb-6" data-i18n="typology_title">Performance por
+                            Tipologia</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 glass-surface rounded-xl border border-white/5">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="font-bold text-primary">T1</span>
+                                    <!-- DOD-FIX-R4: badge de clasificación sin data-i18n -->
+                                    <span class="neon-chip-success px-2 py-0.5 rounded text-[10px] font-bold text-success uppercase" data-i18n="market.typology.badge.hot">Hot Asset</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <!-- DOD-FIX-R4: cabeceras de columna sin data-i18n (aparece 3×) -->
+                                        <p class="text-[10px] text-on-surface-variant uppercase" data-i18n="market.typology.col_rent_avg">Renda Média</p>
+                                        <p class="font-bold">1.250€</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <!-- DOD-FIX-R4: cabeceras de columna sin data-i18n (aparece 3×) -->
+                                        <p class="text-[10px] text-on-surface-variant uppercase" data-i18n="market.typology.col_yield_gross">Yield Bruta</p>
+                                        <p class="font-bold text-success">6.4%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 glass-surface rounded-xl border border-white/5">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="font-bold text-primary">T2</span>
+                                    <!-- DOD-FIX-R4: badge de clasificación sin data-i18n -->
+                                    <span class="bg-white/5 px-2 py-0.5 rounded text-[10px] font-bold text-on-surface-variant uppercase" data-i18n="market.typology.badge.balanced">Balanced</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-[10px] text-on-surface-variant uppercase" data-i18n="market.typology.col_rent_avg">Renda Média</p>
+                                        <p class="font-bold">1.680€</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[10px] text-on-surface-variant uppercase" data-i18n="market.typology.col_yield_gross">Yield Bruta</p>
+                                        <p class="font-bold text-primary">5.2%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 glass-surface rounded-xl border border-white/5">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="font-bold text-primary">T3+</span>
+                                    <!-- DOD-FIX-R4: badge de clasificación sin data-i18n -->
+                                    <span class="neon-chip-error px-2 py-0.5 rounded text-[10px] font-bold text-error uppercase" data-i18n="market.typology.badge.low_yield">Low Yield</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-[10px] text-on-surface-variant uppercase" data-i18n="market.typology.col_rent_avg">Renda Média</p>
+                                        <p class="font-bold">2.450€</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[10px] text-on-surface-variant uppercase" data-i18n="market.typology.col_yield_gross">Yield Bruta</p>
+                                        <p class="font-bold text-error">4.1%</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Simulator -->
+            <section class="tab-content hidden animate-in fade-in slide-in-from-bottom-4 duration-700"
+                id="tab-simulator">
+                <header class="mb-gutter">
+                    <h2 class="font-headline-lg text-headline-lg text-on-surface" data-i18n="simulator_title">Simulador
+                        de Investimento</h2>
+                    <p class="text-on-surface-variant font-body-md" data-i18n="simulator_desc">Projete a rentabilidade
+                        do seu próximo ativo com precisão institucional.</p>
+                </header>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter items-start">
+                    <!-- Controls Column -->
+                    <div class="lg:col-span-2 space-y-gutter">
+                        <div class="glass-surface glass-border rounded-2xl p-6">
+                            <h3 class="font-label-md text-primary mb-6 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">real_estate_agent</span>
+                                <span data-i18n="group_property_income">Aquisição &amp; Rendimento</span>
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[12px] font-bold text-on-surface-variant mb-2"
+                                        data-i18n="input_purchase_price">Preço de Aquisição (€)</label>
+                                    <input
+                                        class="w-full bg-white/5 border-b border-outline/30 focus:border-primary focus:ring-0 transition-colors text-on-surface py-2 outline-none"
+                                        type="number" value="350000" />
+                                </div>
+                                <div>
+                                    <label class="block text-[12px] font-bold text-on-surface-variant mb-2"
+                                        data-i18n="input_monthly_rent">Renda Mensal Estimada (€)</label>
+                                    <input
+                                        class="w-full bg-white/5 border-b border-outline/30 focus:border-primary focus:ring-0 transition-colors text-on-surface py-2 outline-none"
+                                        type="number" value="1600" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-surface glass-border rounded-2xl p-6">
+                            <h3 class="font-label-md text-primary mb-6 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+                                <span data-i18n="group_financing">Financiamento</span>
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <label class="block text-[12px] font-bold text-on-surface-variant mb-2"
+                                        data-i18n="input_lvt">LTV (%)</label>
+                                    <input
+                                        class="w-full bg-white/5 border-b border-outline/30 focus:border-primary focus:ring-0 transition-colors text-on-surface py-2 outline-none"
+                                        type="number" value="80" />
+                                </div>
+                                <div>
+                                    <label class="block text-[12px] font-bold text-on-surface-variant mb-2"
+                                        data-i18n="input_interest">Taxa de Juro (%)</label>
+                                    <input
+                                        class="w-full bg-white/5 border-b border-outline/30 focus:border-primary focus:ring-0 transition-colors text-on-surface py-2 outline-none"
+                                        type="number" value="4.2" />
+                                </div>
+                                <div>
+                                    <label class="block text-[12px] font-bold text-on-surface-variant mb-2"
+                                        data-i18n="input_term">Prazo (Anos)</label>
+                                    <input
+                                        class="w-full bg-white/5 border-b border-outline/30 focus:border-primary focus:ring-0 transition-colors text-on-surface py-2 outline-none"
+                                        type="number" value="30" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-surface glass-border rounded-2xl p-6">
+                            <h3 class="font-label-md text-primary mb-6 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[20px]">settings_suggest</span>
+                                <span data-i18n="group_operational">Custos Operacionais</span>
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-[12px] font-bold text-on-surface-variant mb-2"
+                                        data-i18n="input_condo_tax">Condomínio &amp; IMI (€/mês)</label>
+                                    <input
+                                        class="w-full bg-white/5 border-b border-outline/30 focus:border-primary focus:ring-0 transition-colors text-on-surface py-2 outline-none"
+                                        type="number" value="120" />
+                                </div>
+                                <div>
+                                    <label class="block text-[12px] font-bold text-on-surface-variant mb-2"
+                                        data-i18n="input_management">Gestão (8% Renda)</label>
+                                    <input
+                                        class="w-full bg-white/5 border-b border-outline/30 focus:border-primary focus:ring-0 transition-colors text-on-surface py-2 outline-none"
+                                        type="number" value="128" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Column -->
+                    <!-- DOD-FIX-R3: shadow arbitrary con rgba() → clase .shadow-panel-glow -->
+                    <div
+                        class="glass-surface glass-border rounded-2xl p-8 border-primary/30 shadow-panel-glow sticky top-gutter">
+                        <h3 class="font-headline-md text-on-surface mb-8" data-i18n="results_panel_title">Análise de
+                            Performance</h3>
+                        <div class="space-y-8">
+                            <div>
+                                <p class="text-[12px] text-on-surface-variant uppercase font-bold tracking-widest mb-1"
+                                    data-i18n="result_gross_yield">Yield Bruta</p>
+                                <p class="text-[48px] font-extrabold text-primary leading-tight">5.48%</p>
+                            </div>
+                            <div class="h-px bg-outline/20 w-full"></div>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-on-surface-variant font-medium" data-i18n="result_net_yield">Yield
+                                        Líquida (Cash-on-Cash)</span>
+                                    <span class="text-success font-bold">4.12%</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-on-surface-variant font-medium"
+                                        data-i18n="result_monthly_cashflow">Cash Flow Mensal</span>
+                                    <span class="text-success font-bold">+245€</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-on-surface-variant font-medium"
+                                        data-i18n="result_break_even">Break Even (Anos)</span>
+                                    <span class="text-on-surface font-bold">18.2</span>
+                                </div>
+                            </div>
+                            <button
+                                class="w-full py-4 bg-primary text-on-primary rounded-xl font-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-lg"
+                                data-i18n="cta_generate_pdf">
+                                Gerar Relatório de Projeção
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Feed -->
+            <section class="tab-content hidden animate-in fade-in slide-in-from-bottom-4 duration-700" id="tab-feed">
+                <header class="mb-gutter">
+                    <h2 class="font-headline-lg text-headline-lg text-on-surface" data-i18n="feed_title">Feed de Mercado
+                    </h2>
+                    <p class="text-on-surface-variant font-body-md" data-i18n="feed_desc">Notícias e alertas em tempo
+                        real que impactam o valor dos seus ativos.</p>
+                </header>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+                    <!-- News List -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <div
+                            class="glass-surface glass-border rounded-xl p-6 hover:translate-x-1 transition-transform cursor-pointer group">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span
+                                    class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-[10px] font-bold uppercase">Bloomberg</span>
+                                <!-- DOD-FIX-R4: timestamp sin data-i18n -->
+                                <span class="text-[12px] text-on-surface-variant" data-i18n="market.feed.time_2h">Há 2 horas</span>
+                                <span
+                                    class="ml-auto neon-chip-success px-2 py-0.5 rounded text-[10px] font-bold text-success uppercase" data-i18n="market.feed.impact_positive">Impacto
+                                    Positivo</span>
+                            </div>
+                            <h4 class="font-headline-md text-on-surface group-hover:text-primary transition-colors">
+                                Banco Central Europeu sinaliza possível corte de taxas em Junho.</h4>
+                            <p class="mt-2 text-on-surface-variant line-clamp-2">A flexibilização da política monetária
+                                poderá impulsionar a procura no mercado residencial português, diminuindo a pressão
+                                sobre os créditos à habitação.</p>
+                        </div>
+                        <div
+                            class="glass-surface glass-border rounded-xl p-6 hover:translate-x-1 transition-transform cursor-pointer group">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span
+                                    class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-[10px] font-bold uppercase">ECO
+                                    News</span>
+                                <!-- DOD-FIX-R4: timestamp sin data-i18n -->
+                                <span class="text-[12px] text-on-surface-variant" data-i18n="market.feed.time_5h">Há 5 horas</span>
+                                <span
+                                    class="ml-auto neon-chip-error px-2 py-0.5 rounded text-[10px] font-bold text-error uppercase" data-i18n="market.feed.alert_legislative">Alerta
+                                    Legislativo</span>
+                            </div>
+                            <h4 class="font-headline-md text-on-surface group-hover:text-primary transition-colors">
+                                Novas regras para o Alojamento Local entram em vigor na próxima semana.</h4>
+                            <p class="mt-2 text-on-surface-variant line-clamp-2">Câmaras municipais ganham maior poder
+                                de decisão sobre a suspensão de licenças em zonas de alta densidade turística.</p>
+                        </div>
+                        <div
+                            class="glass-surface glass-border rounded-xl p-6 hover:translate-x-1 transition-transform cursor-pointer group">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span
+                                    class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-[10px] font-bold uppercase">Reuters</span>
+                                <!-- DOD-FIX-R4: timestamp sin data-i18n -->
+                                <span class="text-[12px] text-on-surface-variant" data-i18n="market.feed.time_1d">Há 1 dia</span>
+                                <span
+                                    class="ml-auto bg-white/5 px-2 py-0.5 rounded text-[10px] font-bold text-on-surface-variant uppercase" data-i18n="market.feed.impact_neutral">Neutro</span>
+                            </div>
+                            <h4 class="font-headline-md text-on-surface group-hover:text-primary transition-colors">
+                                Investimento estrangeiro em imobiliário comercial atinge recorde no 1º trimestre.</h4>
+                            <p class="mt-2 text-on-surface-variant line-clamp-2">Portugal continua a ser um destino
+                                atrativo para fundos institucionais americanos e europeus.</p>
+                        </div>
+                    </div>
+
+                    <!-- Market Alerts -->
+                    <div class="space-y-6">
+                        <div class="glass-surface glass-border rounded-2xl p-6">
+                            <h3 class="font-label-md text-on-surface mb-6 flex items-center justify-between">
+                                <span data-i18n="alerts_title">Alertas de Ativos</span>
+                                <span class="material-symbols-outlined text-primary">notifications_active</span>
+                            </h3>
+                            <div class="space-y-4">
+                                <div
+                                    class="flex gap-4 items-start p-3 bg-error-container/20 rounded-xl border-l-2 border-error">
+                                    <span class="material-symbols-outlined text-error mt-1">warning</span>
+                                    <div>
+                                        <p class="font-bold text-on-error-container text-[14px]">Queda de Yield: Benfica
+                                        </p>
+                                        <p class="text-[12px] text-on-surface-variant">Preços de venda subiram +12%
+                                            acima das rendas locais.</p>
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex gap-4 items-start p-3 bg-primary-container/20 rounded-xl border-l-2 border-primary">
+                                    <span class="material-symbols-outlined text-primary mt-1">info</span>
+                                    <div>
+                                        <p class="font-bold text-on-primary-container text-[14px]">Oportunidade:
+                                            Campanhã</p>
+                                        <p class="text-[12px] text-on-surface-variant">Anúncio de novo hub tecnológico
+                                            poderá valorizar zona em 15%.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Empty State -->
+                        <div
+                            class="glass-surface glass-border rounded-2xl p-8 flex flex-col items-center text-center opacity-50">
+                            <span
+                                class="material-symbols-outlined text-[48px] text-on-surface-variant mb-4">folder_off</span>
+                            <p class="font-bold" data-i18n="empty_saved_searches">Sem pesquisas guardadas</p>
+                            <!-- DOD-FIX-R4: descripción del empty state sin data-i18n -->
+                            <p class="text-[12px] text-on-surface-variant" data-i18n="market.empty.saved_searches_desc">As suas monitorizações personalizadas
+                                aparecerão aqui.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Tab Switching Script -->
+    <!-- DOD-FIX-R3: arbitrary class con rgba() → clase CSS .pulse-glow -->
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+
+            const activeTab = document.getElementById('tab-' + tabId);
+            if (activeTab) {
+                activeTab.classList.remove('hidden');
+            }
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-primary/10', 'text-primary', 'border-r-4', 'border-primary');
+                btn.classList.add('text-on-surface-variant', 'hover:bg-white/5');
+            });
+
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-on-surface-variant', 'hover:bg-white/5');
+                activeBtn.classList.add('bg-primary/10', 'text-primary', 'border-r-4', 'border-primary');
+            }
+        }
+
+        // Pulse effect for the Euribor card — DOD-FIX-R3: usa clase CSS, no arbitrary con rgba()
+        setInterval(() => {
+            const el = document.querySelector('.border-primary\\/20');
+            if (el) {
+                el.classList.add('pulse-glow');
+                setTimeout(() => el.classList.remove('pulse-glow'), 1000);
+            }
+        }, 3000);
+    </script>
+</body>
+
+</html>
