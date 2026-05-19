@@ -5,7 +5,7 @@
  * Tipo:         Motor de Autorización Fiduciaria O(1)
  * Rol:          Sistema de Custodia y Privilegio Compliance-Based
  * Autor:        Kimi | Unidad de Artifacts
- * Versión:      2.4.0
+ * Versión:      2.4.1
  * Timestamp:    2026-05-19T00:00:00Z
  * ============================================================
  * DOCTRINAS:    [R3] Zero-Hex | [R4] i18n Strict | [R5] Economía de Guerra
@@ -22,7 +22,7 @@
 (function () {
   'use strict';
 
-  const ENGINE_VERSION = '2.4.0';
+  const ENGINE_VERSION = '2.4.1';
   const CACHE_CLAIMS_KEY = '__claims_cache';
 
   /**
@@ -454,35 +454,51 @@
     ) ? firebase.auth() : null;
 
     if (_firebaseAuth) {
+      // SEC-02B — Expulsor (REBORN-02.3 HOTFIX):
+      // El expulsor redirige a /golden-gate.html cuando el usuario no está
+      // autenticado o tenantValidated=false. PERO passport-engine.js también
+      // se carga en golden-gate.html (la Segunda Esclusa misma). Si el expulsor
+      // se disparara allí, crearía un redirect loop infinito que impediría al
+      // usuario autenticarse en Firebase Auth.
+      // FIX: el expulsor solo actúa cuando NO estamos en golden-gate.html.
+      const _isOnGoldenGate = window.location.pathname.replace(/\/$/, '').endsWith('/golden-gate.html') ||
+                              window.location.pathname === '/golden-gate.html';
+
       _firebaseAuth.onAuthStateChanged(async function (user) {
         if (user) {
           // Usuario autenticado → construir sesión con claims reales
           await window.__CPII__.PassportEngine._buildSession(user);
 
-          // SEC-02B — Expulsor (REBORN-02.3):
-          // Si el JWT no contiene tenant_id='cpii_v1.1', el usuario ha llegado
-          // al dashboard sin pasar por la Segunda Esclusa correctamente.
-          // Redirección inmediata — no se permite usar la UI en ningún grado.
-          const session = window.__CPII__?.session;
-          if (!session || session.tenantValidated !== true) {
-            console.warn(
-              '[PassportEngine] SEC-02B: tenantValidated=' +
-              (session ? session.tenantValidated : 'session_null') +
-              ' — redirigiendo a golden-gate.html'
-            );
-            window.location.href = '/golden-gate.html';
-            return; // Cortar el flujo — no auditar una UI que se va a abandonar
+          // SEC-02B — Expulsor: solo en páginas protegidas (no en la propia Esclusa)
+          if (!_isOnGoldenGate) {
+            const session = window.__CPII__?.session;
+            if (!session || session.tenantValidated !== true) {
+              console.warn(
+                '[PassportEngine] SEC-02B: tenantValidated=' +
+                (session ? session.tenantValidated : 'session_null') +
+                ' — redirigiendo a golden-gate.html'
+              );
+              window.location.href = '/golden-gate.html';
+              return; // Cortar el flujo — no auditar una UI que se va a abandonar
+            }
           }
         } else {
-          // SEC-02B — Sin usuario autenticado: devolver a la Segunda Esclusa.
-          // No basta con difuminar el dashboard — expulsión activa obligatoria.
-          console.warn('[PassportEngine] SEC-02B: Usuario no autenticado — redirigiendo a golden-gate.html');
+          // Sin usuario autenticado
           window.__CPII__.session = { status: 'unauthenticated', claims: {} };
-          window.location.href = '/golden-gate.html';
-          return;
+
+          if (!_isOnGoldenGate) {
+            // SEC-02B — Expulsor: solo en páginas protegidas
+            console.warn('[PassportEngine] SEC-02B: Usuario no autenticado — redirigiendo a golden-gate.html');
+            window.location.href = '/golden-gate.html';
+            return;
+          } else {
+            // En golden-gate.html: estado sin usuario es NORMAL (usuario va a autenticarse)
+            // Solo auditar la UI sin redirigir
+            triggerAudit();
+          }
         }
       });
-      console.info('[PassportEngine] SEC-03: Firebase Auth listener activo. SEC-02B: Expulsor activado.');
+      console.info('[PassportEngine] SEC-03: Firebase Auth listener activo. SEC-02B: Expulsor activado (excluye golden-gate.html).');
     } else {
       console.warn('[PassportEngine] Firebase Auth no disponible — SEC-03 omitido.');
     }
