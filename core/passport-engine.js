@@ -5,8 +5,8 @@
  * Tipo:         Motor de Autorización Fiduciaria O(1)
  * Rol:          Sistema de Custodia y Privilegio Compliance-Based
  * Autor:        Kimi | Unidad de Artifacts
- * Versión:      2.1.2
- * Timestamp:    2026-03-19T22:20:00Z
+ * Versión:      2.3.0
+ * Timestamp:    2026-05-19T00:00:00Z
  * ============================================================
  * DOCTRINAS:    [R3] Zero-Hex | [R4] i18n Strict | [R5] Economía de Guerra
  * STATUS:       R5 Compliant | Zero-Deps | O(1) Complexity Guaranteed
@@ -22,7 +22,7 @@
 (function () {
   'use strict';
 
-  const ENGINE_VERSION = '2.1.2';
+  const ENGINE_VERSION = '2.3.0';
   const CACHE_CLAIMS_KEY = '__claims_cache';
 
   /**
@@ -134,6 +134,96 @@
      */
     invalidateCache: function () {
       permissionsCache.delete(CACHE_CLAIMS_KEY);
+    },
+
+    // ──────────────────────────────────────────────────────────────────────
+    // DT-AUTH-01 FIX — VIBE-CPII-REBORN-02.2 — 2026-05-19
+    // Fractura: _buildSession() no llamaba getIdTokenResult() → claims vacíos
+    // → Born Locked permanente → UI bloqueada indefinidamente.
+    // Solución: método async que fuerza refresh del JWT y extrae Custom Claims.
+    // ──────────────────────────────────────────────────────────────────────
+
+    /**
+     * Construye la sesión extrayendo Custom Claims reales del JWT de Firebase.
+     * Llama a user.getIdTokenResult(true) para forzar refresh desde el servidor
+     * (garantiza que claims inyectados por Cloud Functions sean los más recientes).
+     * Popula window.__CPII__.session y dispara passport:session-updated.
+     *
+     * @param  {firebase.User} user - Objeto Firebase Auth User (v8 compat)
+     * @returns {Promise<Object|null>}  Sesión construida, o null si hay error
+     */
+    _buildSession: async function (user) {
+      if (!user) {
+        console.warn('[PassportEngine._buildSession] user es null — sesión no construida.');
+        return null;
+      }
+
+      try {
+        // forceRefresh=true: lee claims frescos del servidor, nunca de caché local.
+        // Necesario para recoger claims inyectados por beforeUserCreated / Admin SDK.
+        const idTokenResult = await user.getIdTokenResult(/* forceRefresh= */true);
+        const claims = idTokenResult.claims;
+
+        window.__CPII__.session = {
+          uid:             user.uid,
+          status:          'authenticated',
+          // tenantValidated es el semáforo que Born Locked evalúa (index.html)
+          tenantValidated: claims.tenant_id === 'cpii_v1.1',
+          user: {
+            email:         user.email,
+            displayName:   user.displayName,
+            photoURL:      user.photoURL,
+            emailVerified: user.emailVerified
+          },
+          claims: {
+            // Campos canónicos — estructura documentada en 05.2 §2.2
+            uid:              user.uid,
+            tenant_id:        claims.tenant_id        || null,
+            role:             claims.role             || null,
+            kyc_status:       claims.kyc_status       || 'pending',
+            onboarding_phase: claims.onboarding_phase || 1,
+            custody_status:   claims.custody_status   || 'active',
+            // Árbol de atribución L1-L3 (ATOM-02)
+            l1Id:             claims.l1Id             || null,
+            l2Id:             claims.l2Id             || null,
+            l3Id:             claims.l3Id             || null,
+            // auth_time para cache key en _getCachedRoles
+            auth_time:        claims.auth_time         || null
+          },
+          authenticatedAt: Date.now()
+        };
+
+        console.info(
+          '[PassportEngine] ✅ Session construida.' +
+          ' uid=' + user.uid +
+          ' | tenant=' + (claims.tenant_id || 'MISSING') +
+          ' | role=' + (claims.role || 'MISSING') +
+          ' | tenantValidated=' + (claims.tenant_id === 'cpii_v1.1')
+        );
+
+        // Re-audita todas las gate zones con los claims reales
+        document.dispatchEvent(new CustomEvent('passport:session-updated', {
+          detail: { session: window.__CPII__.session, source: '_buildSession' },
+          bubbles: true
+        }));
+
+        return window.__CPII__.session;
+
+      } catch (err) {
+        console.error('[PassportEngine._buildSession] Error al leer claims del JWT:', err);
+        // Sesión de error: no bloquea el motor pero tenantValidated=false
+        window.__CPII__.session = {
+          uid:             user.uid,
+          status:          'auth_error',
+          tenantValidated: false,
+          claims:          {}
+        };
+        document.dispatchEvent(new CustomEvent('passport:session-updated', {
+          detail: { session: window.__CPII__.session, source: '_buildSession_error' },
+          bubbles: true
+        }));
+        return null;
+      }
     },
 
     /**
@@ -352,17 +442,47 @@
     document.addEventListener('passport:staff-authenticated', triggerAudit);
     document.addEventListener('passport:session-updated', triggerAudit);
 
+    // [SEC-03] Firebase Auth — onAuthStateChanged (DT-AUTH-01 FIX)
+    // Hook directo al ciclo de vida de Firebase Auth v8 compat.
+    // Cuando el usuario está autenticado, llama a _buildSession() para
+    // extraer Custom Claims reales del JWT (getIdTokenResult).
+    // Requiere que firebase-config.js haya inicializado la app antes.
+    const _firebaseAuth = (
+      typeof firebase !== 'undefined' &&
+      firebase.apps &&
+      firebase.apps.length > 0
+    ) ? firebase.auth() : null;
+
+    if (_firebaseAuth) {
+      _firebaseAuth.onAuthStateChanged(async function (user) {
+        if (user) {
+          // Usuario autenticado → construir sesión con claims reales
+          await window.__CPII__.PassportEngine._buildSession(user);
+        } else {
+          // Usuario no autenticado (logout o sesión expirada)
+          window.__CPII__.session = { status: 'unauthenticated', claims: {} };
+          triggerAudit();
+        }
+      });
+      console.info('[PassportEngine] SEC-03: Firebase Auth listener activo.');
+    } else {
+      console.warn('[PassportEngine] Firebase Auth no disponible — SEC-03 omitido.');
+    }
+
     // [SEC-02] Bootstrap inicial: Validación de sesión existente o fallback
+    // Solo actúa en modo fallback (sin Firebase disponible).
+    // Con Firebase, el SEC-03 onAuthStateChanged se encarga de la sesión.
     if (window.__CPII__?.session?.claims) {
       triggerAudit();
-    } else {
+    } else if (!_firebaseAuth) {
+      // Fallback exclusivo: Firebase no disponible → sesión vacía para no bloquear UI
       console.warn('[PassportEngine] Sesión no detectada, inicializando fallback.');
       if (!window.__CPII__.session) window.__CPII__.session = {};
       window.__CPII__.session.claims = {};
       triggerAudit();
     }
 
-    console.info(`[PassportEngine v${ENGINE_VERSION}] Inicializado. Modo: Document-Level | R5 Compliant`);
+    console.info(`[PassportEngine v${ENGINE_VERSION}] Inicializado. DT-AUTH-01 fix activo | R5 Compliant`);
   }
 
 })();
