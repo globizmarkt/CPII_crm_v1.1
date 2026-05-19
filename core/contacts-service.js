@@ -1,20 +1,21 @@
 // ============================================================
 // ARCHIVO  : contacts-service.js
-// VERSIÓN  : 1.0.0
-// FECHA    : 2026-05-17
+// VERSIÓN  : 1.1.0
+// FECHA    : 2026-05-19
 // PROPÓSITO: Capa de acceso a datos CRM — colección 'contacts'.
 //            Implementa operaciones CRUD + búsqueda + pipeline
 //            sobre Firebase Firestore (v8 compat CDN).
+//            GA-01: Electrificación transaccional con tenant dinámico.
 //            Depende de: contacts-schema.js (window.__CPII__.schema).
 //            Expone API pública en window.__CPII__.ContactsService.
 //            Despacha CustomEvents en cada mutación exitosa.
 //            Zero external deps. IIFE global.
-// TENANT   : cpii_v1.1
+// TENANT   : Dinámico vía session.claims.tenant_id (ATOM-02)
 // ============================================================
 //
 // ÍNDICE
 // [SEC-01] Namespace guard + boilerplate interno
-// [SEC-02] Helpers internos (_db, _fv, _emit, _validateStage)
+// [SEC-02] Helpers internos (_db, _fv, _tenant, _emit, _validateStage)
 // [SEC-03] create(data, creatorUid)
 // [SEC-04] getById(id)
 // [SEC-05] getBySlug(slug)
@@ -28,10 +29,10 @@
 // [SEC-13] remove(id, actorUid)
 // [SEC-14] Export al namespace window.__CPII__
 //
-// DOCTRINA: R5 (Economía O(1)) | R39 (Pozos de Sabiduría)
-//           DEC-01 (Firebase v8 compat) | DEC-03 (IIFE namespace)
-//           DEC-04 (colección contacts / tenant cpii_v1.1)
-//           PAT-01 (serverTimestamp inject) | PAT-02 (searchTokens)
+// DOCTRINA: R0 (Agnosticismo Radical) | R5 (Aislamiento Fiduciario)
+//           ATOM-02 (Tenant Dinámico) | DEC-01 (Firebase v8 compat)
+//           DEC-03 (IIFE namespace) | DEC-04 (colección contacts)
+//           PAT-01 (serverTimestamp) | PAT-02 (searchTokens)
 // ============================================================
 
 (function () {
@@ -44,7 +45,8 @@
   if (!window.__CPII__) window.__CPII__ = {};
 
   const COLLECTION = 'contacts';
-  const TENANT     = 'cpii_v1.1';
+  // [GA-01] ELIMINADO: const TENANT = 'cpii_v1.1';
+  // El tenant se resuelve dinámicamente vía _tenant() (ATOM-02)
 
   // ============================================================
   // [SEC-02] Helpers internos
@@ -73,6 +75,21 @@
       throw new Error('[ContactsService] firebase.firestore.FieldValue no disponible.');
     }
     return firebase.firestore.FieldValue;
+  }
+
+  // [GA-01] NUEVO: Hard Gate de Tenant (ATOM-02 / R5 / R0)
+  /**
+   * Resuelve el tenant_id del usuario activo.
+   * Operación Default-Deny: Sin tenant explícito, colapso inmediato.
+   * @returns {string}
+   * @throws {Error} si no hay tenant_id válido en sesión
+   */
+  function _tenant() {
+    const sessionTenant = window.__CPII__?.session?.claims?.tenant_id;
+    if (!sessionTenant || typeof sessionTenant !== 'string') {
+      throw new Error('[FiduciaryLock] Violación de Aislamiento: Intento de I/O sin tenant_id válido en sesión.');
+    }
+    return sessionTenant;
   }
 
   /**
@@ -124,16 +141,6 @@
   // ============================================================
   // [SEC-03] create(data, creatorUid)
   // ============================================================
-  // Crea un nuevo contacto en Firestore.
-  // - Usa createContactPayload() del schema para construir el objeto
-  // - Inyecta serverTimestamp() para createdAt, updatedAt, stageUpdatedAt
-  // - Si el contacto tiene l1Id, incrementa directReferralCount del referidor
-  //   en la misma operación batch (atomicidad)
-  // - Despacha 'cpii:contacts:created' al completar
-  //
-  // @param {Object} data        — campos del formulario / captación
-  // @param {string} creatorUid  — UID del gestor autenticado
-  // @returns {Promise<{id: string, slug: string, email: string}>}
 
   async function create(data, creatorUid) {
     if (!data || typeof data !== 'object') {
@@ -147,20 +154,17 @@
     const db      = _db();
     const FV      = _fv();
 
-    // Construir payload base (sin timestamps — los inyecta este servicio)
     const payload = schema.createContactPayload(data, creatorUid);
 
-    // Inyectar serverTimestamps (PAT-01)
     payload.createdAt      = FV.serverTimestamp();
     payload.updatedAt      = FV.serverTimestamp();
     payload.stageUpdatedAt = FV.serverTimestamp();
 
-    // Forzar tenant (guardrail multitenancy)
-    payload.tenant_id = TENANT;
+    // [GA-01] Tenant dinámico vía Hard Gate (ATOM-02)
+    payload.tenant_id = _tenant();
 
-    const contactRef = db.collection(COLLECTION).doc(); // Auto-ID de Firestore
+    const contactRef = db.collection(COLLECTION).doc();
 
-    // Si hay referidor L1 → operación batch para incrementar su contador
     if (payload.l1Id && typeof payload.l1Id === 'string') {
       const batch      = db.batch();
       const referrerRef = db.collection(COLLECTION).doc(payload.l1Id);
@@ -187,11 +191,6 @@
   // ============================================================
   // [SEC-04] getById(id)
   // ============================================================
-  // Obtiene un contacto por su Firestore Document ID.
-  // Verifica tenant_id para garantizar aislamiento.
-  //
-  // @param {string} id — Document ID de Firestore
-  // @returns {Promise<Object|null>} — datos del contacto o null si no existe
 
   async function getById(id) {
     if (!id || typeof id !== 'string') {
@@ -205,8 +204,8 @@
 
     const data = doc.data();
 
-    // Guardrail: verificar tenant
-    if (data.tenant_id !== TENANT) {
+    // [GA-01] Tenant dinámico (ATOM-02)
+    if (data.tenant_id !== _tenant()) {
       console.warn('[ContactsService] getById: tenant mismatch para doc', id);
       return null;
     }
@@ -217,10 +216,6 @@
   // ============================================================
   // [SEC-05] getBySlug(slug)
   // ============================================================
-  // Obtiene un contacto por su slug (índice secundario).
-  //
-  // @param {string} slug — slug normalizado del contacto
-  // @returns {Promise<Object|null>}
 
   async function getBySlug(slug) {
     if (!slug || typeof slug !== 'string') {
@@ -229,7 +224,8 @@
 
     const db = _db();
     const snapshot = await db.collection(COLLECTION)
-      .where('tenant_id', '==', TENANT)
+      // [GA-01] Tenant dinámico (ATOM-02)
+      .where('tenant_id', '==', _tenant())
       .where('slug', '==', slug.toLowerCase().trim())
       .limit(1)
       .get();
@@ -243,11 +239,6 @@
   // ============================================================
   // [SEC-06] getByEmail(email)
   // ============================================================
-  // Obtiene un contacto por email (índice secundario).
-  // Útil para deduplicación antes de crear un nuevo contacto.
-  //
-  // @param {string} email — email normalizado (lowercase)
-  // @returns {Promise<Object|null>}
 
   async function getByEmail(email) {
     if (!email || typeof email !== 'string') {
@@ -256,7 +247,8 @@
 
     const db = _db();
     const snapshot = await db.collection(COLLECTION)
-      .where('tenant_id', '==', TENANT)
+      // [GA-01] Tenant dinámico (ATOM-02)
+      .where('tenant_id', '==', _tenant())
       .where('email', '==', email.toLowerCase().trim())
       .limit(1)
       .get();
@@ -270,25 +262,17 @@
   // ============================================================
   // [SEC-07] getAll(options)
   // ============================================================
-  // Lista contactos con filtros opcionales y paginación por cursor.
-  //
-  // @param {Object} options
-  //   @param {string}  options.stage      — filtrar por currentStage
-  //   @param {string}  options.assignedTo — filtrar por UID gestor
-  //   @param {boolean} options.activeOnly — solo isActive:true (default: true)
-  //   @param {number}  options.limit      — máximo de docs (default: 25, max: 100)
-  //   @param {Object}  options.startAfter — DocumentSnapshot para paginación
-  // @returns {Promise<{contacts: Object[], lastDoc: Object|null}>}
 
   async function getAll(options) {
     const opts = options || {};
 
     const limitN    = Math.min(opts.limit || 25, 100);
-    const activeOnly = opts.activeOnly !== false; // default true
+    const activeOnly = opts.activeOnly !== false;
 
     const db = _db();
     let query = db.collection(COLLECTION)
-      .where('tenant_id', '==', TENANT);
+      // [GA-01] Tenant dinámico (ATOM-02)
+      .where('tenant_id', '==', _tenant());
 
     if (activeOnly) {
       query = query.where('isActive', '==', true);
@@ -321,14 +305,6 @@
   // ============================================================
   // [SEC-08] update(id, changes)
   // ============================================================
-  // Actualización parcial de un contacto.
-  // - Siempre inyecta updatedAt: serverTimestamp() (PAT-01)
-  // - Rechaza cambios de campos inmutables: slug, tenant_id, createdAt, createdBy
-  // - Despacha 'cpii:contacts:updated' al completar
-  //
-  // @param {string} id      — Document ID de Firestore
-  // @param {Object} changes — campos a actualizar (parcial)
-  // @returns {Promise<{id: string}>}
 
   async function update(id, changes) {
     if (!id || typeof id !== 'string') {
@@ -338,7 +314,6 @@
       throw new Error('[ContactsService] update: changes debe ser un objeto no vacío.');
     }
 
-    // Guardrail: campos inmutables
     const IMMUTABLE = ['slug', 'tenant_id', 'createdAt', 'createdBy', 'referralCode'];
     IMMUTABLE.forEach(field => {
       if (field in changes) {
@@ -349,7 +324,6 @@
     const db  = _db();
     const FV  = _fv();
 
-    // Inyectar updatedAt siempre (PAT-01)
     const safeChanges = Object.assign({}, changes, {
       updatedAt: FV.serverTimestamp(),
     });
@@ -365,15 +339,6 @@
   // ============================================================
   // [SEC-09] updatePipelineStage(id, newStage, actorUid)
   // ============================================================
-  // Avanza o retrocede el pipeline stage de un contacto.
-  // - Valida que newStage exista en PIPELINE_STAGES
-  // - Inyecta stageUpdatedAt + updatedAt
-  // - Despacha 'cpii:contacts:stage-changed' con stage anterior y nuevo
-  //
-  // @param {string} id       — Document ID
-  // @param {string} newStage — clave de PIPELINE_STAGES
-  // @param {string} actorUid — UID del gestor que realiza el cambio
-  // @returns {Promise<{id: string, previousStage: string, newStage: string}>}
 
   async function updatePipelineStage(id, newStage, actorUid) {
     if (!id)       throw new Error('[ContactsService] updatePipelineStage: id es requerido.');
@@ -386,7 +351,6 @@
     const FV  = _fv();
     const ref = db.collection(COLLECTION).doc(id);
 
-    // Leer etapa actual para el evento
     const docSnap = await ref.get();
     if (!docSnap.exists) throw new Error(`[ContactsService] updatePipelineStage: contacto "${id}" no encontrado.`);
 
@@ -408,14 +372,6 @@
   // ============================================================
   // [SEC-10] markLost(id, reason, actorUid)
   // ============================================================
-  // Marca un contacto como perdido (isActive: false).
-  // "Lost" es estado transversal — NO bloquea re-apertura (PAT-03).
-  // - Despacha 'cpii:contacts:lost'
-  //
-  // @param {string} id       — Document ID
-  // @param {string} reason   — motivo de pérdida (obligatorio)
-  // @param {string} actorUid — UID del gestor
-  // @returns {Promise<{id: string}>}
 
   async function markLost(id, reason, actorUid) {
     if (!id)     throw new Error('[ContactsService] markLost: id es requerido.');
@@ -442,14 +398,6 @@
   // ============================================================
   // [SEC-11] reactivate(id, newStage, actorUid)
   // ============================================================
-  // Re-abre un contacto perdido (isActive: true).
-  // "Lost" no bloquea re-apertura — doctrina PAT-03.
-  // - Despacha 'cpii:contacts:reactivated'
-  //
-  // @param {string} id       — Document ID
-  // @param {string} newStage — stage en el que se re-abre (default: 'contact_initiated')
-  // @param {string} actorUid — UID del gestor
-  // @returns {Promise<{id: string, newStage: string}>}
 
   async function reactivate(id, newStage, actorUid) {
     if (!id)     throw new Error('[ContactsService] reactivate: id es requerido.');
@@ -480,13 +428,6 @@
   // ============================================================
   // [SEC-12] search(queryStr, maxResults)
   // ============================================================
-  // Búsqueda de prefijo sobre el campo _searchTokens.
-  // Firestore array-contains → O(1) para colecciones < 50k docs (PAT-02).
-  // Mínimo 2 caracteres para evitar resultados masivos.
-  //
-  // @param {string} queryStr   — término de búsqueda (min 2 chars)
-  // @param {number} maxResults — límite de resultados (default: 20, max: 50)
-  // @returns {Promise<Object[]>} — array de contactos encontrados
 
   async function search(queryStr, maxResults) {
     if (!queryStr || typeof queryStr !== 'string' || queryStr.trim().length < 2) {
@@ -495,7 +436,6 @@
 
     const limit = Math.min(maxResults || 20, 50);
 
-    // Normalizar el query: NFD + strip diacríticos + lowercase + trim
     const normalizedQuery = queryStr
       .normalize('NFD')
       .replace(/[̀-ͯ]/g, '')
@@ -504,7 +444,8 @@
 
     const db = _db();
     const snapshot = await db.collection(COLLECTION)
-      .where('tenant_id',     '==',            TENANT)
+      // [GA-01] Tenant dinámico (ATOM-02)
+      .where('tenant_id',     '==',            _tenant())
       .where('isActive',      '==',            true)
       .where('_searchTokens', 'array-contains', normalizedQuery)
       .limit(limit)
@@ -518,11 +459,6 @@
   // ============================================================
   // Soft delete: marca el contacto como inactivo con deletedAt.
   // No realiza borrado físico del documento (preserva trazabilidad).
-  // Para borrado físico permanente usar la consola Firebase directamente.
-  //
-  // @param {string} id       — Document ID
-  // @param {string} actorUid — UID del gestor que realiza la eliminación
-  // @returns {Promise<{id: string}>}
 
   async function remove(id, actorUid) {
     if (!id)     throw new Error('[ContactsService] remove: id es requerido.');
@@ -562,15 +498,14 @@
     search,
     remove,
 
-    // Metadatos de versión para diagnóstico
     _meta: {
-      version:    '1.0.0',
-      date:       '2026-05-17',
+      version:    '1.1.0',           // [GA-01] Bump de versión
+      date:       '2026-05-19',      // [GA-01] Fecha de electrificación
       collection: COLLECTION,
-      tenant:     TENANT,
+      tenantMode: 'dynamic',         // [GA-01] ATOM-02 activo
     },
   };
 
-  console.info('[contacts-service v1.0.0] ContactsService registrado en window.__CPII__.ContactsService');
+  console.info('[contacts-service v1.1.0] ContactsService registrado en window.__CPII__.ContactsService');
 
 })();
