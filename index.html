@@ -836,6 +836,8 @@ PROPÓSITO: Conectar brand_name y brand_subtitle al motor i18n.
         }
     </script>
     <!-- CRUD layer — orden estricto: schema → service → passport -->
+    <!-- contacts-schema.js : CONTACT_SCHEMA + PIPELINE_STAGES → window.__CPII__.schema   -->
+    <!-- contacts-service.js: CRUD Firestore (GA-01) → window.__CPII__.ContactsService    -->
     <script src="core/contacts-schema.js"></script>
     <script src="core/contacts-service.js"></script>
     <script src="core/passport-engine.js" defer></script>
