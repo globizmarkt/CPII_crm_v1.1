@@ -142,6 +142,45 @@
   // [SEC-03] create(data, creatorUid)
   // ============================================================
 
+  /**
+   * Lee parámetros de atribución desde localStorage (GA-02).
+   * O(1) por clave directa. Sin iteración.
+   * @returns {Object} { l1Id, l2Id, l3Id, utmSource, utmMedium, utmCampaign, attributedAt }
+   */
+  function _readAttribution() {
+    const get = (key) => localStorage.getItem(key) || null;
+    const attributedAt = get('cpii:attribution:timestamp');
+
+    return {
+      l1Id:        get('cpii:attribution:l1'),
+      l2Id:        get('cpii:attribution:l2'),
+      l3Id:        get('cpii:attribution:l3'),
+      utmSource:   get('cpii:attribution:utm_source'),
+      utmMedium:   get('cpii:attribution:utm_medium'),
+      utmCampaign: get('cpii:attribution:utm_campaign'),
+      attributedAt: attributedAt ? new Date(attributedAt).toISOString() : null,
+    };
+  }
+
+  /**
+   * Fusiona atribución en payload respetando CONTACT_SCHEMA inmutable (R27).
+   * Solo inyecta campos definidos en schema. Campos nulos se omiten.
+   */
+  function _mergeAttribution(payload, attribution, schema) {
+    const schemaFields = schema.CONTACT_SCHEMA || {};
+    const frozenKeys = Object.keys(schemaFields);
+
+    Object.entries(attribution).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && frozenKeys.includes(key)) {
+        if (!(key in payload)) {
+          payload[key] = value;
+        }
+      }
+    });
+
+    return payload;
+  }
+
   async function create(data, creatorUid) {
     if (!data || typeof data !== 'object') {
       throw new Error('[ContactsService] create: data es requerido y debe ser un objeto.');
@@ -154,7 +193,12 @@
     const db      = _db();
     const FV      = _fv();
 
-    const payload = schema.createContactPayload(data, creatorUid);
+    // [GA-02] Payload base desde schema inmutable
+    let payload = schema.createContactPayload(data, creatorUid);
+
+    // [GA-02] Inyección de atribución desde localStorage
+    const attribution = _readAttribution();
+    payload = _mergeAttribution(payload, attribution, schema);
 
     payload.createdAt      = FV.serverTimestamp();
     payload.updatedAt      = FV.serverTimestamp();
@@ -162,6 +206,9 @@
 
     // [GA-01] Tenant dinámico vía Hard Gate (ATOM-02)
     payload.tenant_id = _tenant();
+
+    // [R27] Sello de inmutabilidad post-fusión
+    Object.freeze(payload);
 
     const contactRef = db.collection(COLLECTION).doc();
 

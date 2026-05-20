@@ -225,11 +225,11 @@
         'admin_gate': {
             id: 'admin_gate',
             type: 'gadget',
-            url: null,
+            url: 'gadgets/cpii_admin_provisioning/code.html',
             labelKey: 'nav.config.admin',
             icon: 'admin_panel_settings',
             tagName: 'gd-admin-gate',
-            status: 'placeholder'
+            status: 'draft'
         },
 
         // ── ESPECIALES ───────────────────────────────────────────────

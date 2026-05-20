@@ -1,0 +1,271 @@
+<html><head><style>
+  :root {
+    --surface-dark: #10131a;
+    --surface-glass: rgba(255, 255, 255, 0.04);
+    --surface-glass-heavy: rgba(255, 255, 255, 0.08);
+    --text-primary: #e1e2ec;
+    --text-secondary: #c2c6d6;
+    --accent-luxury: #adc6ff;
+    --state-success: #b9c8de;
+    --state-error: #ffb4ab;
+    --state-warning: #ffb786;
+    --outline-glass: rgba(140, 144, 159, 0.2);
+    --glow-primary: rgba(59, 130, 246, 0.1);
+  }
+
+  .admin-provisioning {
+    font-family: 'Manrope', sans-serif;
+    color: var(--text-primary);
+    background-color: var(--surface-dark);
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  .glass-card {
+    background: var(--surface-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--outline-glass);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 var(--glow-primary);
+  }
+
+  .silicon-badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--accent-luxury);
+    background: rgba(173, 198, 255, 0.1);
+    color: var(--accent-luxury);
+  }
+
+  .neon-status-bar {
+    width: 4px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .table-row-zebra:nth-child(even) {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .scroll-hide::-webkit-scrollbar {
+    display: none;
+  }
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body><div class="admin-provisioning dark" data-gate-lock="true" data-gate-zone="admin">
+<!-- Top Navigation (Shared Component Logic) -->
+<header class="fixed top-0 left-0 w-full h-16 glass-card border-none rounded-none flex items-center justify-between px-margin z-50">
+<div class="flex items-center gap-base">
+<span class="font-headline-md text-headline-md font-bold tracking-tight text-primary" data-i18n="product_name">CPII COMPLIANCE</span>
+<div class="h-6 w-[1px] bg-outline/20 mx-4"></div>
+<nav class="hidden md:flex gap-gutter">
+<a class="text-primary border-b-2 border-primary pb-1 font-label-md text-label-md" data-i18n="nav_dashboard" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-md text-label-md" data-i18n="nav_alerts" href="#">Alerts</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-md text-label-md" data-i18n="nav_reports" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-base">
+<button class="p-2 hover:bg-white/5 rounded-full transition-all" onclick="handleOpenInvitePanel()">
+<span class="material-symbols-outlined text-primary">person_add</span>
+</button>
+<img alt="User profile avatar" class="w-8 h-8 rounded-full border border-primary/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe2eZZczIaoG25aeiouQT-uwGcTugTmpZYMQuwHBDNofOmPuNpXXhTdXYgiqQo0xOTdS8Y9AMAQr22NRG1u2H0Gfi_HklsbVGwz5LE7Nib77N-rVHv0otD_BwBLjmLIb94_6voQLwEoFMZrnNWkvtClWsmp3H_PiboqnOhbpAOmxhHhBvxIR95wVYcveqtjfvRcuI0uUxnVPYiw72PEDnynbrmWodrB2m9hyNrm0hLC_U24zdoVskDHp_oYFvDdXGb-qzFJQsg2uqQ"/>
+</div>
+</header>
+<main class="mt-20 max-w-container-max mx-auto space-y-gutter">
+<!-- Header Actions -->
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-headline-lg text-headline-lg" data-i18n="page_title">Provisionamento de Utilizadores</h1>
+<p class="text-on-surface-variant font-body-md text-body-md" data-i18n="page_subtitle">Gestão de acessos e identidades de alta segurança</p>
+</div>
+<div class="flex gap-base">
+<button class="px-gutter py-2 glass-card hover:bg-white/10 transition-all font-label-md text-label-md" data-i18n="btn_generate_invite" onclick="handleGenerateInvite()">Gerar Convite</button>
+<button class="px-gutter py-2 bg-primary text-on-primary rounded-lg font-label-md text-label-md active:scale-95 transition-transform" data-i18n="btn_new_user" onclick="handleOpenInvitePanel()">Novo Utilizador</button>
+</div>
+</div>
+<!-- Summary Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="glass-card p-6 flex flex-col gap-2 relative overflow-hidden">
+<div class="neon-status-bar bg-primary"></div>
+<span class="text-on-surface-variant font-label-sm text-label-sm" data-i18n="stat_active">Utilizadores Ativos</span>
+<span class="font-headline-lg text-headline-lg">1,284</span>
+</div>
+<div class="glass-card p-6 flex flex-col gap-2 relative overflow-hidden">
+<div class="neon-status-bar bg-tertiary"></div>
+<span class="text-on-surface-variant font-label-sm text-label-sm" data-i18n="stat_pending">Pendentes</span>
+<span class="font-headline-lg text-headline-lg">42</span>
+</div>
+<div class="glass-card p-6 flex flex-col gap-2 relative overflow-hidden">
+<div class="neon-status-bar bg-secondary"></div>
+<span class="text-on-surface-variant font-label-sm text-label-sm" data-i18n="stat_compliance">Taxa de Compliance</span>
+<span class="font-headline-lg text-headline-lg">99.2%</span>
+</div>
+<div class="glass-card p-6 flex flex-col gap-2 relative overflow-hidden">
+<div class="neon-status-bar bg-error"></div>
+<span class="text-on-surface-variant font-label-sm text-label-sm" data-i18n="stat_flags">Sinalizações</span>
+<span class="font-headline-lg text-headline-lg">3</span>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row gap-gutter">
+<!-- Main Table Section -->
+<section class="flex-grow glass-card overflow-hidden">
+<div class="p-gutter border-b border-outline/10 flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md" data-i18n="table_header">Diretório de Acessos</h2>
+<div class="flex gap-2">
+<input class="bg-surface-container-low border-b border-outline/30 px-4 py-1 text-label-md focus:border-primary outline-none transition-all" placeholder="Procurar utilizador..." type="text"/>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-white/5 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+<tr>
+<th class="px-6 py-4" data-i18n="th_user">Utilizador</th>
+<th class="px-6 py-4" data-i18n="th_role">Função</th>
+<th class="px-6 py-4" data-i18n="th_claims">Claims R3</th>
+<th class="px-6 py-4" data-i18n="th_status">Estado</th>
+<th class="px-6 py-4"></th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md" id="user-table-body">
+<!-- JS Populated -->
+</tbody>
+</table>
+</div>
+</section>
+<!-- Right Invite Sidebar -->
+<aside class="w-full lg:w-80 space-y-gutter">
+<div class="glass-card p-6 space-y-4">
+<h3 class="font-headline-md text-headline-md" data-i18n="invite_panel_title">Painel de Convites</h3>
+<p class="text-on-surface-variant font-label-md text-label-md" data-i18n="invite_panel_desc">Envie links de provisionamento seguro com validade temporária.</p>
+<div class="space-y-base">
+<label class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="label_email">E-mail do Destinatário</label>
+<input class="w-full bg-surface-container-low border-b border-outline/30 p-2 text-label-md focus:border-primary outline-none" id="invite-email" placeholder="exemplo@cpii.gov" type="email"/>
+</div>
+<button class="w-full py-3 bg-secondary-container text-on-secondary-container rounded-lg font-label-md text-label-md hover:brightness-110 transition-all" data-i18n="btn_send_invite" onclick="handleSendInvite()">Enviar Convite Seguro</button>
+</div>
+<div class="glass-card p-6 border-error/20 bg-error/5">
+<h3 class="font-headline-md text-headline-md text-error" data-i18n="kill_switch_title">Protocolo de Emergência</h3>
+<p class="text-on-surface-variant font-label-md text-label-md mb-4" data-i18n="kill_switch_desc">Revogação imediata de todos os tokens de acesso ativos para o domínio.</p>
+<button class="w-full py-3 bg-error text-on-error rounded-lg font-label-md text-label-md active:scale-95 transition-transform" data-i18n="btn_kill_switch" onclick="handleEmergencyKillSwitch()">ATIVAR KILL-SWITCH</button>
+</div>
+</aside>
+</div>
+</main>
+<!-- Bottom Kill Switch Panel (Overlay Placeholder) -->
+<div class="fixed inset-0 bg-surface/80 backdrop-blur-xl z-[100] hidden flex items-center justify-center" id="kill-switch-modal">
+<div class="glass-card p-margin max-w-md w-full text-center space-y-gutter border-error">
+<span class="material-symbols-outlined text-error text-6xl">warning</span>
+<h2 class="font-headline-lg text-headline-lg text-error" data-i18n="confirm_kill">Confirmar Revogação Total?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant" data-i18n="confirm_kill_desc">Esta ação é irreversível e desconectará todos os utilizadores do sistema CPII Compliance instantaneamente.</p>
+<div class="flex gap-gutter">
+<button class="flex-1 py-3 glass-card" data-i18n="btn_cancel" onclick="document.getElementById('kill-switch-modal').classList.add('hidden')">Cancelar</button>
+<button class="flex-1 py-3 bg-error text-on-error rounded-lg font-bold" data-i18n="btn_confirm_kill" onclick="executeFinalKill()">CONFIRMAR</button>
+</div>
+</div>
+</div>
+</div>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+  // Mock Data from DOCUMENT_5
+  const mockUsers = [
+    { id: "1", name: "Ana Silva", email: "ana.silva@cpii.gov", role: "Auditor Sénior", claims: ["READ", "EXPORT", "AUDIT"], status: "Ativo" },
+    { id: "2", name: "Bruno Costa", email: "bruno.costa@cpii.gov", role: "Analista de Risco", claims: ["READ", "WRITE"], status: "Ativo" },
+    { id: "3", name: "Carla Matos", email: "carla.matos@cpii.gov", role: "Compliance Officer", claims: ["FULL_ACCESS", "ADMIN"], status: "Ativo" },
+    { id: "4", name: "Daniel Rocha", email: "daniel.rocha@cpii.gov", role: "Consultor Externo", claims: ["READ_ONLY"], status: "Pendente" }
+  ];
+
+  // Section 4 JS Stubs
+  function handleGenerateInvite() {
+    console.log("Generating unique provisioning token...");
+    alert("Token gerado: CPII-SECURE-" + Math.random().toString(36).substr(2, 9).toUpperCase());
+  }
+
+  function handleOpenInvitePanel() {
+    console.log("Opening invite sidebar or panel...");
+    const emailInput = document.getElementById('invite-email');
+    emailInput.focus();
+    emailInput.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function handleSendInvite() {
+    const email = document.getElementById('invite-email').value;
+    if(!email) return alert("Por favor insira um e-mail válido.");
+    console.log(`Sending secure invite to: ${email}`);
+    alert(`Convite enviado com sucesso para ${email}`);
+  }
+
+  function handleEmergencyKillSwitch() {
+    console.log("Emergency Kill-Switch triggered. Awaiting confirmation...");
+    document.getElementById('kill-switch-modal').classList.remove('hidden');
+  }
+
+  function executeFinalKill() {
+    console.warn("CRITICAL: ALL TOKENS REVOKED.");
+    document.body.style.filter = "grayscale(1) brightness(0.5)";
+    alert("SISTEMA BLOQUEADO. Todas as sessões foram encerradas.");
+    location.reload();
+  }
+
+  function handleRevokeAccess(userId) {
+    console.log(`Revoking access for user ID: ${userId}`);
+    const row = document.querySelector(`[data-user-id="${userId}"]`);
+    if(row) row.style.opacity = "0.3";
+  }
+
+  function handleEditUser(userId) {
+    console.log(`Editing properties for user ID: ${userId}`);
+  }
+
+  // Populate UI
+  function renderUsers() {
+    const tbody = document.getElementById('user-table-body');
+    tbody.innerHTML = mockUsers.map(user => `
+      <tr class="table-row-zebra border-b border-outline/5 group" data-user-id="${user.id}">
+        <td class="px-6 py-4">
+          <div class="flex items-center gap-3">
+            <img src="https://api.dicebear.com/7.x/initials/svg?seed=${user.name}" class="w-8 h-8 rounded-lg" alt="${user.name}">
+            <div class="flex flex-col">
+              <span class="font-bold text-on-surface">${user.name}</span>
+              <span class="text-xs text-on-surface-variant">${user.email}</span>
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4 text-on-surface-variant">${user.role}</td>
+        <td class="px-6 py-4">
+          <div class="flex flex-wrap gap-1">
+            ${user.claims.map(claim => `<span class="silicon-badge">${claim}</span>`).join('')}
+          </div>
+        </td>
+        <td class="px-6 py-4">
+          <span class="flex items-center gap-2 ${user.status === 'Ativo' ? 'text-primary' : 'text-state-warning'}">
+            <span class="w-2 h-2 rounded-full bg-current shadow-[0_0_8px_currentColor]"></span>
+            ${user.status}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-right">
+          <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onclick="handleEditUser('${user.id}')" class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-primary">
+              <span class="material-symbols-outlined text-sm">edit</span>
+            </button>
+            <button onclick="handleRevokeAccess('${user.id}')" class="p-2 hover:bg-white/5 rounded-lg text-on-surface-variant hover:text-error">
+              <span class="material-symbols-outlined text-sm">block</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    renderUsers();
+    console.log("Admin Provisioning Dashboard initialized.");
+  });
+</script></body></html>

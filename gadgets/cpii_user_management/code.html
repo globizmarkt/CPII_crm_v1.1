@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CPII User Management Portal</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap');
+        
+        :root {
+            --border-subtle: rgba(140, 144, 159, 0.15);
+            --state-danger: #ffb4ab;
+            --glass-bg: rgba(16, 19, 26, 0.4);
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #10131a; /* Fallback for surface */
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            background: var(--glass-bg);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        /* Zebra Layering Logic */
+        .data-grid-row:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .side-drawer {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .side-drawer.open {
+            transform: translateX(0);
+        }
+
+        .status-chip {
+            position: relative;
+            padding-left: 12px;
+        }
+        
+        .status-chip::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 4px;
+            bottom: 4px;
+            width: 3px;
+            border-radius: 2px;
+        }
+
+        .status-active::before { background-color: #adc6ff; }
+        .status-pending::before { background-color: #ffdcc6; }
+        .status-quarantine::before { background-color: #ffb4ab; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(140, 144, 159, 0.3); border-radius: 10px; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-variant": "#32353c",
+                      "surface-container": "#1d2027",
+                      "on-secondary-fixed-variant": "#39485a",
+                      "on-primary-container": "#00285d",
+                      "inverse-on-surface": "#2e3038",
+                      "surface-dim": "#10131a",
+                      "secondary-fixed": "#d4e4fa",
+                      "outline": "#8c909f",
+                      "inverse-primary": "#005ac2",
+                      "surface-container-highest": "#32353c",
+                      "on-tertiary-container": "#461f00",
+                      "primary-fixed": "#d8e2ff",
+                      "on-surface-variant": "#c2c6d6",
+                      "surface": "#10131a",
+                      "on-tertiary-fixed": "#311400",
+                      "error": "#ffb4ab",
+                      "tertiary-fixed": "#ffdcc6",
+                      "surface-tint": "#adc6ff",
+                      "on-tertiary-fixed-variant": "#723600",
+                      "on-error-container": "#ffdad6",
+                      "tertiary": "#ffb786",
+                      "primary-container": "#4d8eff",
+                      "on-primary": "#002e6a",
+                      "on-tertiary": "#502400",
+                      "on-background": "#e1e2ec",
+                      "primary-fixed-dim": "#adc6ff",
+                      "outline-variant": "#424754",
+                      "on-error": "#690005",
+                      "background": "#10131a",
+                      "on-primary-fixed": "#001a42",
+                      "secondary-container": "#39485a",
+                      "error-container": "#93000a",
+                      "inverse-surface": "#e1e2ec",
+                      "surface-container-lowest": "#0b0e15",
+                      "surface-bright": "#363941",
+                      "secondary": "#b9c8de",
+                      "on-secondary": "#233143",
+                      "tertiary-container": "#df7412",
+                      "on-secondary-container": "#a7b6cc",
+                      "surface-container-high": "#272a31",
+                      "primary": "#adc6ff",
+                      "surface-container-low": "#191b23",
+                      "on-primary-fixed-variant": "#004395",
+                      "secondary-fixed-dim": "#b9c8de",
+                      "on-secondary-fixed": "#0d1c2d",
+                      "on-surface": "#e1e2ec",
+                      "tertiary-fixed-dim": "#ffb786"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "8px",
+                      "margin": "32px",
+                      "container-max": "1440px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Manrope"],
+                      "body-lg": ["Manrope"],
+                      "body-md": ["Manrope"],
+                      "label-md": ["Manrope"],
+                      "label-sm": ["Manrope"],
+                      "headline-lg": ["Manrope"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full bg-white/5 dark:bg-white/5 backdrop-blur-xl border-b border-outline/20 shadow-[0_4px_30px_rgba(0,0,0,0.1)] z-50 h-16">
+<div class="flex justify-between items-center h-full px-margin max-w-container-max mx-auto">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-on-surface" data-i18n="brand_name">CPII Management</span>
+<nav class="hidden md:flex gap-6">
+<a class="font-body-md text-body-md text-primary dark:text-primary-fixed border-b-2 border-primary pb-1" data-i18n="nav.users" href="#">Users</a>
+<a class="font-body-md text-body-md text-on-surface-variant/80 hover:text-on-surface hover:bg-surface-variant/10 transition-colors" data-i18n="nav.roles" href="#">Roles</a>
+<a class="font-body-md text-body-md text-on-surface-variant/80 hover:text-on-surface hover:bg-surface-variant/10 transition-colors" data-i18n="nav.audit" href="#">Audit Log</a>
+<a class="font-body-md text-body-md text-on-surface-variant/80 hover:text-on-surface hover:bg-surface-variant/10 transition-colors" data-i18n="nav.compliance" href="#">Compliance</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-variant/20 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-variant/20 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+</button>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-outline/30" data-alt="A close-up portrait of a professional male administrator in a high-tech corporate environment. The lighting is cool-toned with subtle blue rim light, emphasizing a polished and authoritative aesthetic. He is wearing a dark, minimal suit, and the background is a blurred digital workspace with glass elements." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqRs3p7Yh9KTvszfuJvxsJHLyLwQ_VFm6b-PJsL-2ivo8HXDhrIskoKRLb3iQG6OmrIWUbcAAfeQz9-cF5uopGxjrQgJJW52Fup6t78rHuLYLgEhHD1O0B9o6CF-lb8JJvFD-FJQEeX1BNoH0SgPSm16SpQoj_RHQs4NKIiDnmuS-l_UkAPIdZaLOOi1waIBhyzxu-xN-FkhRsM583zC7U8m4qqOdhNZOISiuOoruEs8nOz65RGzqeP1MQwSZ14kKWIqjGXjdaoXYl"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Ghost Sidebar) -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-surface/30 backdrop-blur-2xl border-r border-outline/10 shadow-2xl hidden md:flex flex-col py-base pt-20 z-40">
+<div class="px-6 mb-8">
+<h2 class="font-label-md text-label-md text-on-surface-variant/50 uppercase tracking-widest" data-i18n="sidebar.title">Admin Portal</h2>
+</div>
+<div class="flex-1 flex flex-col gap-1 px-3">
+<button class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant/70 hover:text-on-surface hover:bg-surface-variant/5 transition-all duration-300">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md" data-i18n="sidebar.dashboard">Dashboard</span>
+</button>
+<button class="flex items-center gap-4 px-4 py-3 rounded-lg bg-primary/10 text-primary border-l-4 border-primary transition-all duration-300">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md" data-i18n="sidebar.users">User Directory</span>
+</button>
+<button class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant/70 hover:text-on-surface hover:bg-surface-variant/5 transition-all duration-300">
+<span class="material-symbols-outlined">security</span>
+<span class="font-label-md text-label-md" data-i18n="sidebar.roles">Role Controls</span>
+</button>
+<button class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant/70 hover:text-on-surface hover:bg-surface-variant/5 transition-all duration-300">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+<span class="font-label-md text-label-md" data-i18n="sidebar.security">Security Center</span>
+</button>
+</div>
+<div class="mt-auto px-3 flex flex-col gap-1 border-t border-outline/10 pt-4">
+<button class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant/70 hover:text-on-surface transition-all">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md" data-i18n="sidebar.support">Support</span>
+</button>
+<button class="flex items-center gap-4 px-4 py-3 rounded-lg text-error hover:bg-error/10 transition-all">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md" data-i18n="sidebar.signout">Sign Out</span>
+</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="md:ml-64 pt-24 px-margin pb-12">
+<div class="max-w-container-max mx-auto">
+<!-- Header Toolbar -->
+<section class="mb-gutter flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+<div>
+<h1 class="font-headline-lg text-headline-lg mb-1" data-i18n="users.title">User Management</h1>
+<p class="font-body-md text-body-md text-on-surface-variant" data-i18n="users.subtitle">Monitor and govern system-wide access claims.</p>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 items-center glass-panel p-2 rounded-xl">
+<div class="relative w-full sm:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-transparent border-none pl-10 pr-4 py-2 focus:ring-0 font-label-md text-label-md text-on-surface placeholder:text-outline/50" data-i18n-placeholder="users.search_placeholder" placeholder="Search identities..." type="text"/>
+</div>
+<div class="h-6 w-[1px] bg-outline/20 hidden sm:block"></div>
+<div class="flex gap-2">
+<button class="px-4 py-1.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm" data-i18n="roles.admin">Admin</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-variant/30 hover:bg-surface-variant/50 text-on-surface-variant font-label-sm text-label-sm" data-i18n="roles.staff">Staff</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-variant/30 hover:bg-surface-variant/50 text-on-surface-variant font-label-sm text-label-sm" data-i18n="roles.compliance">Compliance</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-variant/30 hover:bg-surface-variant/50 text-on-surface-variant font-label-sm text-label-sm" data-i18n="roles.agent">Agent</button>
+</div>
+</div>
+</section>
+<!-- Data Grid Table -->
+<div class="glass-panel rounded-2xl overflow-hidden shadow-2xl">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline/10 bg-surface-container/50">
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant/60" data-i18n="table.user">User</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant/60" data-i18n="table.email">Email Address</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant/60" data-i18n="table.role">Role</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant/60" data-i18n="table.status">Access Status</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant/60 text-right" data-i18n="table.actions">Actions</th>
+</tr>
+</thead>
+<tbody id="userTableBody">
+<!-- Row 1 -->
+<tr class="data-grid-row group cursor-pointer hover:bg-primary/5 transition-colors" onclick="window.handleUserClick('usr_01')">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5">
+<img class="w-full h-full rounded-full object-cover" data-alt="A professional headshot of a middle-aged male executive with glasses. He is set against a dark, minimalist office backdrop with bokeh highlights of glass and digital screens. The mood is sophisticated, authoritative, and sharp, aligning with a high-fidelity fintech design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDViHQVswAGtVMD5dxonhO6Ea0rPVZh4XkCzpWaQUpjbWYFmVPn4KATlgHbZ7PhAGzhm49utQYr86oHGbrfKikcc0qE0Qw_6NFFfoXj5buODnnAlI4WNVk6R38AWL8Ldvn3Me52-yPZIjAGUlz-_LHIAARvLR75Ug4Fjc-OcxRZ-_j4H100vjyKk2JFeP8mwsBGUjUsQC7E7lx_gglebXUrSNsBFPolrqTzbDk39-Z6gc1GosSMFzatfWkMCubG4fODEF7jL40BoTJ3"/>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Alexander Vance</span>
+</div>
+</td>
+<td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant/80">a.vance@cpii-global.com</td>
+<td class="px-6 py-5">
+<span class="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Administrator</span>
+</td>
+<td class="px-6 py-5">
+<div class="status-chip status-active font-label-sm text-label-sm text-primary" data-i18n="status.active">Active</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-outline">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="data-grid-row group cursor-pointer hover:bg-primary/5 transition-colors" onclick="window.handleUserClick('usr_02')">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border-2 border-outline/20 p-0.5">
+<img class="w-full h-full rounded-full object-cover" data-alt="A professional female compliance officer looking directly at the camera. She has a serene and focused expression, set in a bright yet moody minimalist space with frosted glass textures and soft blue ambient lighting. The visual style is premium and professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuJlTAxVz4EHsYGlx4gZ0Ia8mtJNoSBBi_Nn1817jO1r-EITKgRpMD21Aso7KkeFJi_kpXborBdPvdgUby3oGczdR7rcaS3sGfiurnqBdh9bIb226Uyrsf2WHey6gNpPX0nCV-JM_b_yLIdHjVToqXcLFoP7l1wmqTVFQZxfhx0EwuU54F4DzYQ6ofMktPUfSFBFW288UvBdxxXWqszYlZfXdPKIR4DjWk6ttjAbomkCd9vN8YYkZpYyzNACeAiTPmSHsO7f75PsUj"/>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Elena Rodriguez</span>
+</div>
+</td>
+<td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant/80">e.rodriguez@cpii-legal.net</td>
+<td class="px-6 py-5">
+<span class="bg-tertiary/10 text-tertiary border border-tertiary/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Compliance</span>
+</td>
+<td class="px-6 py-5">
+<div class="status-chip status-pending font-label-sm text-label-sm text-tertiary" data-i18n="status.pending">Pending Review</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-outline">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="data-grid-row group cursor-pointer hover:bg-primary/5 transition-colors" onclick="window.handleUserClick('usr_03')">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border-2 border-error/20 p-0.5">
+<img class="w-full h-full rounded-full object-cover" data-alt="Portrait of a male data analyst in a modern office with dark wood and glass partitions. Subtle red emergency or alert lighting reflects off glass surfaces in the background, suggesting a high-security environment. Minimalist and sharp artistic style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDVll7k9KGfN7mzb7iFnrr5VxRDnfgHjA7tVZbU0GTa76wa_5kcPsrTzCK0EMSs6UFlYP3KsTBuIuLL9wzJgxFod9B3w_MWMDkD2eytBNuYNYJv785hdx5KizH981A-eYsMTOLadlnI90eWA2TYZCvY2dV3zkf43edkLnP69omPsw0KwXgKAuIoCvFxFXh0bXMq7Ga_nletjk86TZjhqPA6I1e4CXXaYCKijgbL5_r_082yHP8AlsWt2bg1lHQSu5jKRdAG7-ydECd"/>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Marcus Thorne</span>
+</div>
+</td>
+<td class="px-6 py-5 font-body-md text-body-md text-on-surface-variant/80">m.thorne@shadow-corp.io</td>
+<td class="px-6 py-5">
+<span class="bg-surface-variant/40 text-on-surface-variant border border-outline/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Agent</span>
+</td>
+<td class="px-6 py-5">
+<div class="status-chip status-quarantine font-label-sm text-label-sm text-error" data-i18n="status.quarantine">Quarantine</div>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-outline">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<!-- Side Drawer (User Details) -->
+<div class="fixed inset-0 bg-background/60 backdrop-blur-sm z-[60] hidden opacity-0 transition-opacity duration-300" id="sideDrawerOverlay" onclick="window.closeDrawer()"></div>
+<div class="side-drawer fixed top-0 right-0 h-full w-full max-w-md glass-panel z-[70] shadow-[-20px_0_40px_rgba(0,0,0,0.3)] flex flex-col" id="sideDrawer">
+<div class="p-8 border-b border-outline/10 flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md" data-i18n="drawer.title">Identity Context</h2>
+<button class="p-2 hover:bg-surface-variant/20 rounded-full transition-colors" onclick="window.closeDrawer()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-8 space-y-8">
+<!-- Profile Section -->
+<div class="flex flex-col items-center text-center">
+<div class="w-24 h-24 rounded-full border-4 border-primary/20 mb-4 p-1">
+<img class="w-full h-full rounded-full object-cover" data-alt="A detailed, large-scale portrait for a profile view. The subject is a professional male in his 40s. The background is a sophisticated gradient of deep navy and charcoal with delicate architectural line art in the style of glass etchings. Bright, clean light highlights the facial features for a premium feel." id="drawerAvatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtvrkxlxA0vwl_U-X1Byph0eB1ynAGLd4YgLcxgy9vSuB_CYX2Aspf5m1xviabxa4E7EykQCJssh2UiBud9ECKOirAJDVu4c7_lJ0LF4ja9BhgGA0jMHjI1eqw1PEnSzJ4LHJOg-p3pbiYGY-o-BCN-OeL_EZus_A68omfBwHscEuPPI8qSS0LAFewQMpp2Lg0gcdlqJvxY27IPWZksPJInNGZviEWwj3GS4zQ7W-Bl1vj2n105yA5jaoIvvbpxzgLOxC8wjm-16k0"/>
+</div>
+<h3 class="font-headline-md text-headline-md mb-1" id="drawerName">Alexander Vance</h3>
+<p class="font-body-md text-body-md text-on-surface-variant" id="drawerEmail">a.vance@cpii-global.com</p>
+</div>
+<!-- Role Selector -->
+<div class="space-y-4">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest" data-i18n="drawer.roles_label">Custom Claims &amp; Roles</label>
+<div class="grid grid-cols-1 gap-3">
+<button class="flex items-center justify-between p-4 rounded-xl border border-primary bg-primary/5 text-on-surface transition-all">
+<span class="font-label-md text-label-md">Administrator</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</button>
+<button class="flex items-center justify-between p-4 rounded-xl border border-outline/20 hover:border-outline/40 transition-all">
+<span class="font-label-md text-label-md">Audit Specialist</span>
+<span class="material-symbols-outlined text-outline">circle</span>
+</button>
+<button class="flex items-center justify-between p-4 rounded-xl border border-outline/20 hover:border-outline/40 transition-all">
+<span class="font-label-md text-label-md">Policy Editor</span>
+<span class="material-symbols-outlined text-outline">circle</span>
+</button>
+</div>
+</div>
+<!-- Meta Data -->
+<div class="glass-panel rounded-xl p-4 space-y-3">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="drawer.last_login">Last Active</span>
+<span class="font-body-md text-body-md">24m ago • New York, US</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="drawer.security_level">Security Tier</span>
+<span class="font-body-md text-body-md text-primary">Level 4 (Elite)</span>
+</div>
+</div>
+</div>
+<div class="p-8 border-t border-outline/10 flex flex-col gap-3">
+<button class="w-full bg-primary text-on-primary py-3 rounded-xl font-label-md text-label-md hover:brightness-110 active:scale-95 transition-all flex justify-center items-center gap-2" onclick="window.syncClaims()">
+<span class="material-symbols-outlined text-[20px]">sync</span>
+<span data-i18n="drawer.save_changes">Apply Permission Logic</span>
+</button>
+<button class="w-full border border-error text-error py-3 rounded-xl font-label-md text-label-md hover:bg-error/10 active:scale-95 transition-all flex justify-center items-center gap-2" onclick="window.handleRevokeAccess()">
+<span class="material-symbols-outlined text-[20px]">block</span>
+<span data-i18n="drawer.revoke">Revoke Access</span>
+</button>
+</div>
+</div>
+<!-- Async Feedback Overlay -->
+<div class="fixed inset-0 bg-surface/90 backdrop-blur-2xl z-[100] flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-300" id="syncingOverlay">
+<div class="relative w-16 h-16 mb-6">
+<div class="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
+<div class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
+</div>
+<p class="font-headline-md text-headline-md text-on-surface animate-pulse" data-i18n="feedback.syncing">Actualizando permisos...</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2 tracking-widest uppercase" data-i18n="feedback.wait">Propagating Identity Claims</p>
+</div>
+<!-- Marca Obligatoria -->
+<footer class="fixed bottom-4 right-6 pointer-events-none opacity-40">
+<span class="text-[10px] font-mono tracking-tighter">[PROTOTIPO STITCH — Requiere revisión de Kimi para inyección de lógica]</span>
+</footer>
+<script>
+        // Drawer Logic
+        window.handleUserClick = function(userId) {
+            const drawer = document.getElementById('sideDrawer');
+            const overlay = document.getElementById('sideDrawerOverlay');
+            
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.add('opacity-100'), 10);
+            drawer.classList.add('open');
+            
+            // Stub: Update drawer content based on userId
+            console.log(`Loading context for: ${userId}`);
+        };
+
+        window.closeDrawer = function() {
+            const drawer = document.getElementById('sideDrawer');
+            const overlay = document.getElementById('sideDrawerOverlay');
+            
+            drawer.classList.remove('open');
+            overlay.classList.remove('opacity-100');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        };
+
+        window.syncClaims = function() {
+            const overlay = document.getElementById('syncingOverlay');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.add('opacity-100'), 10);
+
+            // Mock sync duration
+            setTimeout(() => {
+                overlay.classList.remove('opacity-100');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    window.closeDrawer();
+                }, 300);
+            }, 2400);
+        };
+
+        window.handleRevokeAccess = function() {
+            if(confirm("Confirm security revocation for this identity?")) {
+                console.log("Revoking access...");
+                window.syncClaims();
+            }
+        };
+
+        // i18n Simulation Utility
+        const i18n_map = {
+            "brand_name": "CPII Management",
+            "nav.users": "Users",
+            "nav.roles": "Roles",
+            "nav.audit": "Audit Log",
+            "nav.compliance": "Compliance",
+            "sidebar.title": "Admin Portal",
+            "sidebar.dashboard": "Dashboard",
+            "sidebar.users": "User Directory",
+            "sidebar.roles": "Role Controls",
+            "sidebar.security": "Security Center",
+            "sidebar.support": "Support",
+            "sidebar.signout": "Sign Out",
+            "users.title": "User Management",
+            "users.subtitle": "Monitor and govern system-wide access claims.",
+            "users.search_placeholder": "Search identities...",
+            "roles.admin": "Admin",
+            "roles.staff": "Staff",
+            "roles.compliance": "Compliance",
+            "roles.agent": "Agent",
+            "table.user": "User Identity",
+            "table.email": "Email Address",
+            "table.role": "Role Authority",
+            "table.status": "Access Status",
+            "table.actions": "Actions",
+            "status.active": "Active",
+            "status.pending": "Pending Review",
+            "status.quarantine": "Quarantine",
+            "drawer.title": "Identity Context",
+            "drawer.roles_label": "Custom Claims & Roles",
+            "drawer.last_login": "Last Active",
+            "drawer.security_level": "Security Tier",
+            "drawer.save_changes": "Apply Permission Logic",
+            "drawer.revoke": "Revoke Access",
+            "feedback.syncing": "Actualizando permisos...",
+            "feedback.wait": "Propagating Identity Claims"
+        };
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if(i18n_map[key]) el.innerText = i18n_map[key];
+        });
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if(i18n_map[key]) el.placeholder = i18n_map[key];
+        });
+    </script>
+</body></html>
